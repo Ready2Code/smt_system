@@ -15,7 +15,13 @@ Including another URLconf
 """
 from django.conf.urls import url
 from django.contrib import admin
+from controller import views as controller_views
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
+    url(r'^opentv/$',            controller_views.start_controller,   name='home'),
+    url(r'^add/$',               controller_views.handle_command,     name='home'),
+    url(r'^show_channels/$',     controller_views.show_channels,      name='show_channels'),
+    url(r'^play/(\d+)/$',        controller_views.play_channel,       name='play_channel'),
+
 ]
