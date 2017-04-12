@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-
 from django.shortcuts import render
+from django.http import HttpResponse
 
 import signal_client
 is_running = False
@@ -10,7 +10,7 @@ def start_controller(request):
     if not is_running:
         signal_client.initial()
         is_running = True
-    return HttpResponse(u"欢迎光临!", type='Application/json')
+    return HttpResponse(u"欢迎光临!", content_type='application/json')
 
 def handle_command(request):
     signal_client.handle_command(request.GET['command'])
@@ -21,5 +21,5 @@ def show_channels(request):
 
 def play_channel(request, id):
     signal_client.handle_command("cplay " + id)
-    return HttpResponse(u"OK", type='Application/json')
+    return HttpResponse(u"OK", content_type='application/json')
 
