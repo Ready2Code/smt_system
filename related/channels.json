@@ -1,0 +1,23 @@
+{
+    "sequence": 1,
+    "channels": [
+        {
+            "name": "娱乐频道",
+            "url": "smt://@:10100",
+            "info": "value1",
+            "id": "1"
+        },
+        {
+            "name": "音乐频道",
+            "url": "smt://@:10200",
+            "info": "value2",
+            "id": "2"
+        },
+        {
+            "name": "NERCDTV",
+            "url": "smt://@:10300",
+            "info": "value3",
+            "id": "3"
+        }
+    ]
+}

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Channels</title>
+        <script src="{{STATIC_URL}}jquery.min.js"  ></script>
+    </head>
+    <body >
+        <p>result: <span id='result'></span></p>
+        <button type="button" id='opentv' >Open TV</button>
+        <table border="1" >
+            <td>  </td>
+            <td> name </td>
+            <td> url </td>
+            <td> info </td>
+            <td> id  </td>
+        {% for channel in channels %}
+        <tr> 
+            <td>  >>  </td>
+            <td channel='{{ channel.id }}' class='channel'> {{ channel.name }} </td>
+            <td> {{ channel.url }} </td>
+            <td> {{ channel.info }} </td>
+            <td> {{ channel.id }} </td>
+        </tr> 
+        {% endfor %}
+        </table>
+        <script>
+            $(document).ready(function(){
+                $("#opentv").click(function(){
+                    $.get("/opentv/",function(ret){
+                        $('#result').html(ret)
+                    })
+                });
+            });
+            $(document).ready(function(){
+                $("td.channel").click(function(){
+                    $.get("/play/"+$(this).attr('channel'),function(ret){
+                        $('#result').html(ret)
+                    })
+                });
+            });
+        </script>      
+    </body>
+</html>
