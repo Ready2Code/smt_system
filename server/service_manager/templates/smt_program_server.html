@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+    <head>
+            <title>smt program server</title>
+        </head>
+        <body >
+            <table border="1" >
+                <td>  </td>
+                <td> name </td>
+                <td> url </td>
+                <td> begin </td>
+                <td> end  </td>
+            {% for program in programmers %}
+            <tr> 
+                <td>  >>  </td>
+                <td> {{ program.name }} </td>
+                <td> {{ program.url }} </td>
+                <td> {{ program.begin }} </td>
+                <td> {{ program.end }} </td>
+            </tr> 
+            {% endfor %}
+            </table>
+             
+        </body>
+    </html>
