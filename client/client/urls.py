@@ -23,7 +23,9 @@ urlpatterns = [
     url(r'^command/$',               controller_views.handle_command,     name='home'),
     url(r'^show_channels/command/$',               controller_views.handle_command,     name='home'),
     url(r'^show_channels/$',     controller_views.show_channels,      name='show_channels'),
+    url(r'^currentprogramme/$',     controller_views.get_current_programme_info,      name='get_current_programme'),
     url(r'^get_channels/$',      controller_views.get_channels,       name='get_channels'),
-    url(r'^play/(\d+)/$',        controller_views.play_channel,       name='play_channel'),
+    url(r'^cplay/(\d+)/$',        controller_views.play_channel,       name='play_channel'),
+
 
 ]

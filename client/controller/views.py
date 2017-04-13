@@ -27,3 +27,10 @@ def play_channel(request, id):
 def get_channels(request):
     return HttpResponse(json.dumps(signal_client.channel_info), content_type='application/json')
 
+def get_current_programme_info(request):
+    print 'get current programme info'
+    ret = signal_client.get_current_programme();
+    ret["channel_id"] = signal_client.continue_play_channel 
+    return HttpResponse(json.dumps(ret), content_type='application/json')
+
+

@@ -242,6 +242,7 @@ def show_channels():
         print bcolors.OKBLUE + json.dumps(value, ensure_ascii=False,indent=4, sort_keys=True) + bcolors.ENDC
 
 def show_channel(channel_id = DEFAULT):
+    ret = object()
     if channel_id is DEFAULT:
         print bcolors.FAIL + "missing operand: need channel_id" + bcolors.ENDC
         return
@@ -249,6 +250,12 @@ def show_channel(channel_id = DEFAULT):
         print bcolors.FAIL + "unknown channel_id" + bcolors.ENDC
     else:
         print bcolors.OKBLUE + json.dumps(channels_info[channel_id], ensure_ascii=False,indent=4,sort_keys=True) + bcolors.ENDC
+        ret = channels_info[channel_id] 
+    return ret
+
+def get_current_programme():
+    global continue_play_channel
+    return show_channel(continue_play_channel)
 
 def play_programmer(val = DEFAULT):
     # to play the whole channel broadcast resources
