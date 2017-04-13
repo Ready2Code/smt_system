@@ -73,7 +73,7 @@ def call_ffplay(res):
     delta = endtime - begintime
     ffplay_command = ''
     if(res_type == 'broadcast'):
-        ffplay_command = './ffplay {0},{1},{2},{3},{4} -port {5}'.format(res['url'],cal_screen_value(res['layout']['posx'], True), cal_screen_value(res['layout']['posy'], False), cal_screen_value(res['layout']['width'], True), cal_screen_value(res['layout']['height'], False), FFPLAY_LISTEN_PORT) 
+        ffplay_command = '../related/ffplay {0},{1},{2},{3},{4} -port {5}'.format(res['url'],cal_screen_value(res['layout']['posx'], True), cal_screen_value(res['layout']['posy'], False), cal_screen_value(res['layout']['width'], True), cal_screen_value(res['layout']['height'], False), FFPLAY_LISTEN_PORT) 
     #print ffplay_command
     #p = Popen(shlex.split(ffplay_command))
     pffplay = Popen(shlex.split(ffplay_command), stdout=FNULL, stderr=STDOUT)
@@ -148,7 +148,6 @@ def UDP_recv(port, channel_id, name):
         data, address = s.recvfrom(4096)
         json_data = json.loads(data)
         channels_info[channel_id] = json_data
-        print 'RECV ....'
 
         if(is_continue_play and
             continue_play_channel == channel_id and

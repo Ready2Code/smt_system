@@ -5,16 +5,18 @@
         <script src="{{STATIC_URL}}jquery.min.js"  ></script>
     </head>
     <body >
-        <p>result: <span id='result'></span></p>
         <button type="button" id='opentv' >Open TV</button>
-        <table border="1" >
+        <p>result: <span id='result'></span></p>
+        <hr/>
+        <button type="button" id='getchannels' >Get Channels</button>
+        <table id='channeltable' border="1" >
             <td>  </td>
             <td> name </td>
             <td> url </td>
             <td> info </td>
             <td> id  </td>
         {% for channel in channels %}
-        <tr> 
+        <tr class='channel_info'> 
             <td>  >>  </td>
             <td channel='{{ channel.id }}' class='channel'> {{ channel.name }} </td>
             <td> {{ channel.url }} </td>
@@ -23,21 +25,77 @@
         </tr> 
         {% endfor %}
         </table>
-        <script>
-            $(document).ready(function(){
-                $("#opentv").click(function(){
-                    $.get("/opentv/",function(ret){
-                        $('#result').html(ret)
-                    })
-                });
-            });
-            $(document).ready(function(){
+        <hr/>
+        <form id='commandForm' action='command' method='get'> 
+             <p>Command: <input type="text" name="command" /></p>
+             <input type="submit" value="Submit" />
+        </form>
+        <hr/>
+
+            <script>
+            function set_event_response() {
                 $("td.channel").click(function(){
                     $.get("/play/"+$(this).attr('channel'),function(ret){
                         $('#result').html(ret)
                     })
                 });
+            }
+            function set_command_handle() {
+                $('#commandForm').on('submit', function (e){
+                    e.preventDefault();
+                    $.ajax( {
+                        type : "GET",
+                        dataType: "json",
+                        url : 'command',
+                        data : $(this).serialize(),
+                        success : function (res) {
+                            console.log(res)
+                            if (res.type == 'ok') {
+                                alert(res.msg);
+                                window.location.href = '';
+                                } else {
+                                if (res.type == "no") {
+                                    alert(res.msg);
+                                }
+                            }
+                        }
+                    });
+                });
+            }
+            function set_channels_list() {
+                $("#getchannels").click(function(){
+                    $.get("/get_channels/",function(ret){
+                        $("tr.channel_info").remove()
+                        channels = ret.channels
+                        var newtr = ""
+                        for(var i=0; i< channels.length; i++) {
+                            newtr = newtr + "<tr class='channel_info'> "
+                                newtr = newtr + "<td>  >>  </td>"
+                                newtr = newtr + "<td channel='" + channels[i].id + "' class='channel'> " + channels[i].name + " </td>"
+                                newtr = newtr + "<td>" + channels[i].url + "</td>"
+                                newtr = newtr + "<td>" + channels[i].info + " </td>"
+                                newtr = newtr + "<td>" + channels[i].id + "</td>"
+                                newtr = newtr + "</tr>"
+                        }
+                        $("#channeltable").append(newtr)
+                        set_event_response()
+                        //$('#result').html(channels)
+                    })
+                });
+
+            }
+            $(document).ready(function(){
+                set_event_response()
+                set_command_handle()
+                set_channels_list()
+                $("#opentv").click(function(){
+                    $.get("/opentv/",function(ret){
+                        console.log(ret)
+                        $('#result').html(ret)
+                    })
+                });
             });
+
         </script>      
     </body>
 </html>
