@@ -20,7 +20,7 @@ def handle_command(request):
 def show_channels(request):
     return render(request, 'show_channels.html', signal_client.channel_info)
 
-def play_channel(request, id):
+def cplay_channel(request, id):
     signal_client.handle_command("cplay " + id)
     return HttpResponse(u"OK", content_type='application/json')
 
@@ -32,5 +32,13 @@ def get_current_programme_info(request):
     ret = signal_client.get_current_programme();
     ret["channel_id"] = signal_client.continue_play_channel 
     return HttpResponse(json.dumps(ret), content_type='application/json')
+
+def play_channel(request, channel_id, res_id):
+    signal_client.handle_command("play " + channel_id +":" +res_id)
+    return HttpResponse(u"OK", content_type='application/json')
+
+def stop_channel(request, channel_id, res_id):
+    signal_client.handle_command("stop " + channel_id +":" +res_id)
+    return HttpResponse(u"OK", content_type='application/json')
 
 

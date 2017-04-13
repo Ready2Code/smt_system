@@ -15,21 +15,7 @@
             <td> url </td>
             <td> info </td>
             <td>  </td>
-        {% for channel in channels %}
-        <tr class='channel_info'> 
-            <td> {{ channel.id }} </td>
-            <td > {{ channel.name }} </td>
-            <td> {{ channel.url }} </td>
-            <td> {{ channel.info }} </td>
-            <td> <button channel='{{ channel.id }}' class='channel'> Open </button> </td>
-        </tr> 
-        {% endfor %}
         </table>
-        <hr/>
-        <form id='commandForm' action='command' method='get'> 
-             <p>Command: <input type="text" name="command" /></p>
-             <input type="submit" value="Submit" />
-        </form>
         <hr/>
         <button type="button" id='currentprogramme' >Current Programme</button>
         <table id='programmeinfo' border="1" >
@@ -39,7 +25,13 @@
             <td> id  </td>
             <td>  </td>
             <td>  </td>
-       </table>
+        </table>
+        <hr/>
+        <form id='commandForm' action='command' method='get'> 
+             Command: <input type="text" name="command" />
+             <input type="submit" value="Submit" />
+        </form>
+ 
 
             <script>
             function set_event_response() {
@@ -49,10 +41,9 @@
                     })
                 });
             }
-            function set_programme_event_response() {
-                $("td.programmeresource").click(function(){
-                    $.get("/play/"+$(this).attr('channel'),function(ret){
-                        $('#result').html(ret)
+            function set_programme_process_response() {
+                $("button.process_resource").click(function(){
+                    $.get("/" + $(this).attr('command') +"/"+$(this).attr('channel_id')+"/"+$(this).attr('resource_id')+"/",function(ret){
                     })
                 });
             }
@@ -60,7 +51,6 @@
             function set_programme_response() {
                 $("#currentprogramme").click(function(){
                     $.get("/currentprogramme/", function(ret){
-                        console.log(ret)
                         $("tr.programme_info").remove()
                         resources = ret.programmer.resources
                         var newtr = ""
@@ -70,12 +60,18 @@
                                 newtr = newtr + "<td>" + resources[i].url + "</td>"
                                 newtr = newtr + "<td>" + resources[i].info + " </td>"
                                 newtr = newtr + "<td>" + resources[i].id + "</td>"
-                                newtr = newtr + "<td > <button resourceid='" + resources[i].id + " channel_id='" + ret.channel_id + "' class='openresource'>Open</button> </td>"
-                                newtr = newtr + "<td > <button resourceid='" + resources[i].id + " channel_id='" + ret.channel_id + "' class='closeresource'>Close</button> </td>"
+                                newtr = newtr + "<td > <button resource_id='" + resources[i].id + "' " 
+                                              + "channel_id='" + ret.channel_id + "' "
+                                              + "command='play' " 
+                                              + "class='process_resource'>Open</button> </td>"
+                                newtr = newtr + "<td > <button resource_id='" + resources[i].id + "' " 
+                                              + "channel_id='" + ret.channel_id + "' "
+                                              + "command='stop' " 
+                                              + "class='process_resource'>Close</button> </td>"
                                 newtr = newtr + "</tr>"
                         }
                         $("#programmeinfo").append(newtr)
-                        set_programme_event_response()
+                        set_programme_process_response()
  
                     })
                 });
@@ -112,7 +108,7 @@
                         for(var i=0; i< channels.length; i++) {
                             newtr = newtr + "<tr class='channel_info'> "
                                 newtr = newtr + "<td>" + channels[i].id + "</td>"
-                                newtr = newtr + "<td " + channels[i].name + " </td>"
+                                newtr = newtr + "<td>" + channels[i].name + " </td>"
                                 newtr = newtr + "<td>" + channels[i].url + "</td>"
                                 newtr = newtr + "<td>" + channels[i].info + " </td>"
                                 newtr = newtr + "<td> <button channel='" + channels[i].id + "' class='channel'> Open </button> </td>"
@@ -130,6 +126,7 @@
                 set_command_handle()
                 set_channels_list()
                 set_programme_response()
+                set_programme_process_response()
                 $("#opentv").click(function(){
                     $.get("/opentv/",function(ret){
                         console.log(ret)
