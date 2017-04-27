@@ -22,7 +22,7 @@ FILE_RELATIVE_PATH = './'
 CHANNEL_FILE_NAME = '../related/channels.json'
 CONFIG_FILE_NAME = 'programs.json'
 DESTINATION_IP = '127.0.0.1'
-DESTINATION_IP = '192.168.1.212'
+#DESTINATION_IP = '192.168.1.212'
 
 BROADCASE_TIME_INTERVAL = 0.5   #seconds
 
@@ -31,7 +31,7 @@ RESERVED_POS_TWO = 0
 CHANNEL_NUM = 1
 BROADBAND_SERVER_IP = '127.0.0.1'
 #BROADCAST_SERVER_IP = '239.1.1.1'
-BROADCAST_SERVER_IP = '192.168.1.212'
+BROADCAST_SERVER_IP = '127.0.0.1'
 
 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 packet = ''
@@ -92,7 +92,10 @@ def convert_signal(json_file):
    
     resources = json_data['programmer']['resources']
     for res in resources:
-        localfile = res['url']
+        localfile = ''
+	if ('url' in res.keys()): localfile = res['url']
+	elif ('playlist' in res.keys()): localfile = res['playlist']
+	if(localfile == ''): print 'error url or playlist has to been assigned' 
         if localfile.encode('ascii', 'ignore').startswith('./'):
             localfile = localfile.replace('./', FILE_RELATIVE_PATH)
         ffplay_port = '{0}{1}{2}{3}{4}'.format(RESERVED_POS_ONE,RESERVED_POS_TWO, CHANNEL_NUM, program_num, resource_num)
@@ -121,10 +124,12 @@ def call_ffmpeg(file_dir, res, port, ffplay_port):
     res_type = res['type']
     delta = res['end'] - datetime.now()
     ffmpeg_command = ''
+    playlist = ''
+    if('playlist' in res.keys()): playlist = '-f concat'
     if(res_type == 'broadcast'):
-        ffmpeg_command = '../related/ffmpeg -re -i {0} -begintime {1} -c:v copy -c:a aac -f mpu smt://{2}:{3}'.format(file_dir, begintime, BROADCAST_SERVER_IP, ffplay_port)
+        ffmpeg_command = '../related/ffmpeg -re {4} -i {0} -begintime {1} -c:v copy -c:a aac -f mpu smt://{2}:{3}'.format(file_dir, begintime, BROADCAST_SERVER_IP, ffplay_port, playlist)
     elif(res_type == 'broadband'):
-         ffmpeg_command = '../related/ffmpeg -re -port {1} -i {0} -begintime {2} -c:v copy -c:a aac -f mpu smt://{3}:{4}'.format(file_dir, port, begintime, BROADBAND_SERVER_IP, 1) 
+         ffmpeg_command = '../related/ffmpeg -re -port {1} {5} -i {0} -begintime {2} -c:v copy -c:a aac -f mpu smt://{3}:{4}'.format(file_dir, port, begintime, BROADBAND_SERVER_IP, 1, playlist) 
     print ffmpeg_command
     #p = Popen(shlex.split(ffmpeg_command))
     p = Popen(shlex.split(ffmpeg_command), stdout=FNULL, stderr=STDOUT)
@@ -141,10 +146,10 @@ def delay_broadcast(s, packet, des):
         #print 'Dest:',des,' Duration:', packet['programmer']['begin'], '~', packet['programmer']['end'],' Now:', datetime.now(), 'SIGNAL sending ', packet['programmer']['name']
         sp = json.dumps(packet, cls=DateTimeEncoder)#.encode('utf8')
         s.sendto(sp, des)
-        #print sp
+        print sp
     else:
-        #print 'no proper signal to send...'
-        pass
+        print 'no proper signal to send...'
+        #pass
 
 def main():
     if len(sys.argv) != 4 and len(sys.argv) != 1:
