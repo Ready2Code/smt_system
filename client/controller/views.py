@@ -6,6 +6,9 @@ import json
 
 import signal_client
 is_running = False
+def start_page(request):
+    return HttpResponseRedirect("/show_channels/")
+
 def start_controller(request):
     global is_running
     if not is_running:

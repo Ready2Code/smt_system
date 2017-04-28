@@ -19,15 +19,16 @@ from controller import views as controller_views
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'^opentv/$',            controller_views.start_controller,   name='opentv'),
-    url(r'^command/$',               controller_views.handle_command,     name='home'),
-    url(r'^show_channels/command/$',               controller_views.handle_command,     name='home'),
-    url(r'^show_channels/$',     controller_views.show_channels,      name='show_channels'),
-    url(r'^currentprogramme/$',     controller_views.get_current_programme_info,      name='get_current_programme'),
-    url(r'^get_channels/$',      controller_views.get_channels,       name='get_channels'),
-    url(r'^cplay/(\d+)/$',        controller_views.cplay_channel,       name='play_channel'),
-    url(r'^play/(\d+)/([\w-]+)/$',        controller_views.play_channel,       name='play_channel'),
-    url(r'^stop/(\d+)/([\w-]+)/$',        controller_views.stop_channel,       name='play_channel'),
+    url(r'^$',                         controller_views.start_page,         name='startpage'),
+    url(r'^opentv/$',                  controller_views.start_controller,   name='opentv'),
+    url(r'^command/$',                 controller_views.handle_command,     name='command'),
+    url(r'^show_channels/command/$',   controller_views.handle_command,     name='show_channels_command'),
+    url(r'^show_channels/$',           controller_views.show_channels,      name='show_channels'),
+    url(r'^currentprogramme/$',        controller_views.get_current_programme_info,      name='get_current_programme'),
+    url(r'^get_channels/$',            controller_views.get_channels,       name='get_channels'),
+    url(r'^cplay/(\d+)/$',             controller_views.cplay_channel,      name='cplay_channel'),
+    url(r'^play/(\d+)/([\w-]+)/$',     controller_views.play_channel,       name='play_channel'),
+    url(r'^stop/(\d+)/([\w-]+)/$',     controller_views.stop_channel,       name='stop_channel'),
 
 
 ]
