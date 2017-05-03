@@ -17,8 +17,12 @@
              <p/>
              <input type="submit" value="Modify" />
         </form>
+        <hr/>
 
-            <a href='start_programs/'> start server </a>
+        <form id='startServer' action='start_programs/' method='get'>
+             <input type="submit" value="start server" />
+        </form>
+        <hr/>
 
             <script>
             function set_ajax(formid, cbfun) {
@@ -35,7 +39,8 @@
                 });
             }
             function set_service_settings() {
-		    set_ajax("serviceSettings")
+                set_ajax("serviceSettings")
+                set_ajax("startServer")
 	    }
             $(document).ready(function(){
                 set_service_settings()
