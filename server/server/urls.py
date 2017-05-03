@@ -27,5 +27,6 @@ urlpatterns = [
     url(r'^show_status/$',           state_monitor_views.show_status,           name='show_status'),
     url(r'^start_programs/$',        service_manager_views.start_programs,      name='start_programs'),
     url(r'^show_programs/$',         service_manager_views.show_programs,       name='show_programs'),
+    url(r'^set_settings/$',          service_manager_views.modify_service_settings,       name='modify_service_settings'),
     url(r'^admin/', admin.site.urls),
 ]

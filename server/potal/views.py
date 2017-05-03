@@ -2,7 +2,9 @@
 from __future__ import unicode_literals
 
 from django.shortcuts import render
+from service_manager.models import ServiceSettings
 
-# Create your views here.
 def start_page(request):
-    return render(request, 'startpage.html')
+    service_settings = ServiceSettings.objects.get(name="default")
+    return render(request, 'startpage.html', {'service_settings':service_settings})
+

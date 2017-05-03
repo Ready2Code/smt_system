@@ -2,9 +2,45 @@
 <html>
     <head>
             <title>start page</title>
+            <script src="{{STATIC_URL}}jquery.min.js"  ></script>
         </head>
         <body >
+        <form id='serviceSettings' action='set_settings' method='get'>
+             Signal Dest IP: <input type="text" name="signal_destip" value="{{service_settings.signal_destip}}"/>
+
+             <p/>
+             Signal Port: <input type="text"  name="signal_port" value="{{service_settings.signal_port}}"/>
+             <p/>
+             Resource Broadcast IP: <input type="text" name="resource_broadcast_ip" value="{{service_settings.resource_broadcast_ip}}"/>
+             <p/>
+             Resource Broadband IP: <input type="text" name="resource_broadband_ip" value="{{service_settings.resource_broadband_ip}}"/>
+             <p/>
+             <input type="submit" value="Modify" />
+        </form>
+
             <a href='start_programs/'> start server </a>
+
+            <script>
+            function set_ajax(formid, cbfun) {
+                cbfun = cbfun || function (res) {}
+                $('#'+formid).on('submit', function (e){
+                    e.preventDefault();
+                    $.ajax( {
+                        type : "GET",
+                        dataType: "json",
+                        url : $(this).context.action,
+                        data : $(this).serialize(),
+                        success :cbfun 
+                    });
+                });
+            }
+            function set_service_settings() {
+		    set_ajax("serviceSettings")
+	    }
+            $(document).ready(function(){
+                set_service_settings()
+            })
+            </script>
             
         </body>
     </html>

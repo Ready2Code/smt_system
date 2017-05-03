@@ -44,14 +44,15 @@ resource_num = 1
 destination = DESTINATION_IP
 programmers  = {}
 
-class TimerThread(Thread):
-    def __init__(self, event):
+class SignalTimerThread(Thread):
+    def __init__(self, event, dest):
         Thread.__init__(self)
         self.stopped = event
+        self.dest = dest
 
     def run(self):
         while not self.stopped.wait(BROADCASE_TIME_INTERVAL):
-            delay_broadcast(s, packet, destination)
+            delay_broadcast(s, packet, self.dest)
         
 class DateTimeEncoder(json.JSONEncoder):
     def default(self, o):
@@ -80,7 +81,7 @@ def update_delta_time(tt, now):
     tt = deltatime + now
     return tt 
 
-def convert_signal(json_file):
+def convert_signal(json_file, resource_broadcast_ip, resource_broadband_ip):
     global resource_num
     global sequence_number
     global packet
@@ -101,9 +102,9 @@ def convert_signal(json_file):
         ffplay_port = '{0}{1}{2}{3}{4}'.format(RESERVED_POS_ONE,RESERVED_POS_TWO, CHANNEL_NUM, program_num, resource_num)
         ffmpeg_port = '{0}{1}{2}{3}{4}'.format(RESERVED_POS_ONE, 1, CHANNEL_NUM, program_num, resource_num)
         if(res['type'] == 'broadcast'):
-            res['url'] = 'smt://{0}:{1}'.format(BROADCAST_SERVER_IP, ffplay_port)
+            res['url'] = 'smt://{0}:{1}'.format(resource_broadcast_ip, ffplay_port)
         elif(res['type'] == 'broadband'):
-            res['url'] = 'smt://{0}:{1}@:{2}'.format(BROADBAND_SERVER_IP, ffmpeg_port,ffplay_port)
+            res['url'] = 'smt://{0}:{1}@:{2}'.format(resource_broadband_ip, ffmpeg_port,ffplay_port)
         else:
             print 'error unknown type in resources'
         
@@ -112,13 +113,13 @@ def convert_signal(json_file):
 
         print str(res['begin'])
 
-        t = Thread(target=call_ffmpeg, args=(localfile, res, ffmpeg_port, ffplay_port))
+        t = Thread(target=call_ffmpeg, args=(localfile, res, ffmpeg_port, resource_broadcast_ip, ffplay_port))
         t.daemon = True
         t.start()
         resource_num += 1
     return json_data
 
-def call_ffmpeg(file_dir, res, port, ffplay_port):
+def call_ffmpeg(file_dir, res, port, resource_broadcast_ip, ffplay_port):
     time.sleep(aheadtime/1000)
     begintime = res['begin'].strftime('%Y-%m-%dT%H:%M:%S.%f')
     res_type = res['type']
@@ -127,7 +128,7 @@ def call_ffmpeg(file_dir, res, port, ffplay_port):
     playlist = ''
     if('playlist' in res.keys()): playlist = '-f concat'
     if(res_type == 'broadcast'):
-        ffmpeg_command = '../related/ffmpeg -re {4} -i {0} -begintime {1} -c:v copy -c:a aac -f mpu smt://{2}:{3}'.format(file_dir, begintime, BROADCAST_SERVER_IP, ffplay_port, playlist)
+        ffmpeg_command = '../related/ffmpeg -re {4} -i {0} -begintime {1} -c:v copy -c:a aac -f mpu smt://{2}:{3}'.format(file_dir, begintime, resource_broadcast_ip, ffplay_port, playlist)
     elif(res_type == 'broadband'):
          ffmpeg_command = '../related/ffmpeg -re -port {1} {5} -i {0} -begintime {2} -c:v copy -c:a aac -f mpu smt://{3}:{4}'.format(file_dir, port, begintime, BROADBAND_SERVER_IP, 1, playlist) 
     print ffmpeg_command
@@ -173,9 +174,13 @@ def main():
         port = LOCAL_PORT
         config_file = CONFIG_FILE_NAME
         destip = DESTINATION_IP
-    start_smt_system(port, config_file, destip)
+    start_smt_system(config_file, destip, port)
 
-def start_smt_system(port=LOCAL_PORT, config_file=CONFIG_FILE_NAME, destip=DESTINATION_IP):
+def start_smt_system(programs_file=CONFIG_FILE_NAME, 
+                     signal_destip=DESTINATION_IP, 
+                     signal_port=LOCAL_PORT,
+                     resource_broadcast_ip = BROADCAST_SERVER_IP ,
+                     resource_broadband_ip = BROADBAND_SERVER_IP ):
     global program_num
     global resource_num
     global packet
@@ -186,22 +191,17 @@ def start_smt_system(port=LOCAL_PORT, config_file=CONFIG_FILE_NAME, destip=DESTI
     global programmers 
 
     #destination = destip
-    json_data = load(config_file)
-    print "load file <" , config_file , "> successful \n"
-    channel_info = load(CHANNEL_FILE_NAME)
-    channel_id = json_data['id']
-    for channel in channel_info['channels']:
-        if channel['id'] == channel_id:
-            port = channel['url'].split(':')[-1]
-            destination = (destip, int(port))
-            break
+    json_data = load(programs_file)
+    print "load file <" , programs_file , "> successful \n"
+
+    signal_destination = (signal_destip, int(signal_port))
     aheadtime = json_data['aheadtime']
     cachetime = json_data['cachetime']
     programmers = json_data['programmers']
     print 'aheadtime =', aheadtime , 'cachetime =', cachetime
 
     stopFlag = Event()
-    thread = TimerThread(stopFlag)
+    thread = SignalTimerThread(stopFlag, signal_destination)
     thread.setDaemon(True)
     thread.start()
     
@@ -211,7 +211,7 @@ def start_smt_system(port=LOCAL_PORT, config_file=CONFIG_FILE_NAME, destip=DESTI
         program_data = url_load(url)
         print json.loads(program_data) 
         resource_num = 1
-        convert = convert_signal(program_data)
+        convert = convert_signal(program_data, resource_broadcast_ip, resource_broadband_ip)
         packet = convert
         #print convert
         endtime = convert['programmer']['end'] - timedelta(milliseconds=(aheadtime+cachetime))
