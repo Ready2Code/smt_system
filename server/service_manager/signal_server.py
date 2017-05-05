@@ -117,6 +117,7 @@ def convert_signal(json_file, resource_broadcast_ip, resource_broadband_ip):
         t.daemon = True
         t.start()
         resource_num += 1
+        resource_num = resource_num % 10
     return json_data
 
 def call_ffmpeg(file_dir, res, port, resource_broadcast_ip, ffplay_port):
@@ -218,6 +219,7 @@ def start_smt_system(programs_file=CONFIG_FILE_NAME,
         print 'endtime = ', endtime
         time.sleep((endtime - datetime.now()).seconds)
         program_num += 1
+        program_num = program % 10
         
 
 
