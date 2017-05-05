@@ -147,7 +147,7 @@ def delay_broadcast(s, packet, des):
         #print 'Dest:',des,' Duration:', packet['programmer']['begin'], '~', packet['programmer']['end'],' Now:', datetime.now(), 'SIGNAL sending ', packet['programmer']['name']
         sp = json.dumps(packet, cls=DateTimeEncoder)#.encode('utf8')
         s.sendto(sp, des)
-        print sp
+        #print sp
     else:
         print 'no proper signal to send...'
         #pass
@@ -209,7 +209,7 @@ def start_smt_system(programs_file=CONFIG_FILE_NAME,
         url = i['url']
         print "processing", i['name'], url
         program_data = url_load(url)
-        print json.loads(program_data) 
+        #print json.loads(program_data) 
         resource_num = 1
         convert = convert_signal(program_data, resource_broadcast_ip, resource_broadband_ip)
         packet = convert
