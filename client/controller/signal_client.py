@@ -7,6 +7,7 @@ import sys
 import urllib2
 import shlex
 import os
+import platform
 from datetime import datetime, timedelta
 from threading import Timer, Thread, Event
 from subprocess import call,Popen,PIPE,STDOUT
@@ -41,12 +42,20 @@ class bcolors:
 
 def get_screen_resolution():
     global SCREEN_WIDTH
-    global SCREEN_HEIGHT 
-    output = Popen('xrandr | grep "\*" | cut -d" " -f4',shell=True, stdout=PIPE).communicate()[0]
-    resolution = output.split()[0].split(b'x')
-    SCREEN_WIDTH = int(resolution[0])
-    SCREEN_HEIGHT = int(resolution[1])
-    print bcolors.UNDERLINE + 'screen resolution: '+ resolution[0]+ ' X '+ resolution[1] + bcolors.ENDC 
+    global SCREEN_HEIGHT
+    if platform.system() == "Linux":
+        output = Popen('xrandr | grep "\*" | cut -d" " -f4',shell=True, stdout=PIPE).communicate()[0]
+        resolution = output.split()[0].split(b'x')
+        SCREEN_WIDTH = int(resolution[0])
+        SCREEN_HEIGHT = int(resolution[1])
+    elif platform.system() == "Windows":
+        output = Popen("wmic DESKTOPMONITOR get screenwidth, screenheight", shell=True, stdout=PIPE).communicate()[0]
+        resolution = output.split()
+        SCREEN_WIDTH  = int(resolution[3])
+        SCREEN_HEIGHT = int(resolution[2])
+    else:
+        print "can't get platform type"
+    print bcolors.UNDERLINE + 'screen resolution: '+ str(SCREEN_WIDTH)+ ' X '+ str(SCREEN_HEIGHT) + bcolors.ENDC 
 
 def cal_screen_value(val, is_width):
     if isinstance(val, int):
@@ -72,9 +81,13 @@ def call_ffplay(res):
     res_type = res['type']
     delta = endtime - begintime
     ffplay_command = ''
+    if platform.system() == "Windows":
+        ffplay_command = '../related/ffplay.exe'
+    if platform.system() == "Linux":
+        ffplay_command = '../related/ffplay'
     if(res_type == 'broadcast'):
-        ffplay_command = '../related/ffplay {0},{1},{2},{3},{4} -port {5}'.format(res['url'],cal_screen_value(res['layout']['posx'], True), cal_screen_value(res['layout']['posy'], False), cal_screen_value(res['layout']['width'], True), cal_screen_value(res['layout']['height'], False), FFPLAY_LISTEN_PORT) 
-    #print ffplay_command
+        ffplay_command = ffplay_command + ' {0},{1},{2},{3},{4} -port {5}'.format(res['url'],cal_screen_value(res['layout']['posx'], True), cal_screen_value(res['layout']['posy'], False), cal_screen_value(res['layout']['width'], True), cal_screen_value(res['layout']['height'], False), FFPLAY_LISTEN_PORT) 
+    print ffplay_command
     #p = Popen(shlex.split(ffplay_command))
     pffplay = Popen(shlex.split(ffplay_command), stdout=FNULL, stderr=STDOUT)
     # add 1 more second    
@@ -111,6 +124,7 @@ def add_ffplay(res):
     if is_continue_play == 1 and res['type'] == 'broadcast':
         add_command['format']['kind'] = 'all'
     addcommand = json.dumps(add_command)
+    print "addcommand ",addcommand
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     s.sendto(addcommand,("localhost", FFPLAY_LISTEN_PORT))
    
