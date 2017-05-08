@@ -2,11 +2,13 @@
 from __future__ import unicode_literals
 from django.shortcuts import render
 from django.http import HttpResponse
+from django.http import HttpResponseRedirect
 import json
 
 import signal_client
 is_running = False
 def start_page(request):
+    print "start page"
     return HttpResponseRedirect("/show_channels/")
 
 def start_controller(request):
@@ -35,6 +37,9 @@ def get_current_programme_info(request):
     ret = signal_client.get_current_programme();
     ret["channel_id"] = signal_client.continue_play_channel 
     return HttpResponse(json.dumps(ret), content_type='application/json')
+
+def related_operator(request):
+    return render(request, 'related_operator.html')
 
 def play_channel(request, channel_id, res_id):
     signal_client.handle_command("play " + channel_id +":" +res_id)
