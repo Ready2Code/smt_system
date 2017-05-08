@@ -7,6 +7,7 @@ import sys
 import urllib2
 import shlex
 import os
+import platform
 from datetime import datetime, timedelta
 from threading import Timer, Thread, Event
 from subprocess import call,Popen,PIPE,STDOUT
@@ -128,10 +129,14 @@ def call_ffmpeg(file_dir, res, port, resource_broadcast_ip, ffplay_port):
     ffmpeg_command = ''
     playlist = ''
     if('playlist' in res.keys()): playlist = '-f concat'
+    if platform.system() == "Windows":
+        ffmpeg_command = '../related/ffmpeg.exe'
+    if platform.system() == "Linux":
+        ffmpeg_command = '../related/ffmpeg'
     if(res_type == 'broadcast'):
-        ffmpeg_command = '../related/ffmpeg -re {4} -i {0} -begintime {1} -c:v copy -c:a aac -f mpu smt://{2}:{3}'.format(file_dir, begintime, resource_broadcast_ip, ffplay_port, playlist)
+        ffmpeg_command = ffmpeg_command + ' -re {4} -i {0} -begintime {1} -c:v copy -c:a aac -f mpu smt://{2}:{3}'.format(file_dir, begintime, resource_broadcast_ip, ffplay_port, playlist)
     elif(res_type == 'broadband'):
-        ffmpeg_command = '../related/ffmpeg -re -port {1} {5} -i {0} -begintime {2} -c:v copy -c:a aac -f mpu smt://{3}:{4}'.format(file_dir, port, begintime, BROADBAND_SERVER_IP, 1, playlist) 
+        ffmpeg_command = ffmpeg_command + ' -re -port {1} {5} -i {0} -begintime {2} -c:v copy -c:a aac -f mpu smt://{3}:{4}'.format(file_dir, port, begintime, BROADBAND_SERVER_IP, 1, playlist) 
     print ffmpeg_command
     #p = Popen(shlex.split(ffmpeg_command))
     p = Popen(shlex.split(ffmpeg_command), stdout=FNULL, stderr=STDOUT)
@@ -219,7 +224,7 @@ def start_smt_system(programs_file=CONFIG_FILE_NAME,
         print 'endtime = ', endtime
         time.sleep((endtime - datetime.now()).seconds)
         program_num += 1
-        program_num = program % 10
+        program_num = program_num % 10
 
 
 
