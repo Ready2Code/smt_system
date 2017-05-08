@@ -1,25 +1,11 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Channels</title>
+        <title>Current Program</title>
         <script src="{{STATIC_URL}}jquery.min.js"  ></script>
     </head>
     <body >
-        <button type="button" id='opentv' >Open TV</button>
-        <p>result: <span id='result'></span></p>
-        <hr/>
-        <button type="button" id='getchannels' >Get Channels</button>
-        <table id='channeltable' border="1" >
-            <td> id  </td>
-            <td> name </td>
-            <td> url </td>
-            <td> info </td>
-            <td>  </td>
-        </table>
-        <hr/>
         <button type="button" id='currentprogramme' >Current Programme</button>
-        <p/>
-        <a href='related_operator'> Open Related Operator </a>
         <table id='programmeinfo' border="1" >
             <td> name </td>
             <td> url </td>
@@ -29,20 +15,7 @@
             <td>  </td>
         </table>
         <hr/>
-        <form id='commandForm' action='command' method='get'> 
-             Command: <input type="text" name="command" />
-             <input type="submit" value="Submit" />
-        </form>
- 
-
             <script>
-            function set_event_response() {
-                $("button.channel").click(function(){
-                    $.get("/cplay/"+$(this).attr('channel'),function(ret){
-                        $('#result').html(ret)
-                    })
-                });
-            }
             function set_programme_process_response() {
                 $("button.process_resource").click(function(){
                     $.get("/" + $(this).attr('command') +"/"+$(this).attr('channel_id')+"/"+$(this).attr('resource_id')+"/",function(ret){
@@ -94,44 +67,9 @@
             }
 
 
-            function set_command_handle() {
-                set_form_ajax('commandForm')
-            }
-
-            function set_channels_list() {
-                $("#getchannels").click(function(){
-                    $.get("/get_channels/",function(ret){
-                        $("tr.channel_info").remove()
-                        channels = ret.channels
-                        var newtr = ""
-                        for(var i=0; i< channels.length; i++) {
-                            newtr = newtr + "<tr class='channel_info'> "
-                                newtr = newtr + "<td>" + channels[i].id + "</td>"
-                                newtr = newtr + "<td>" + channels[i].name + " </td>"
-                                newtr = newtr + "<td>" + channels[i].url + "</td>"
-                                newtr = newtr + "<td>" + channels[i].info + " </td>"
-                                newtr = newtr + "<td> <button channel='" + channels[i].id + "' class='channel'> Open </button> </td>"
-                                newtr = newtr + "</tr>"
-                        }
-                        $("#channeltable").append(newtr)
-                        set_event_response()
-                        //$('#result').html(channels)
-                    })
-                });
-
-            }
             $(document).ready(function(){
-                set_event_response()
-                set_command_handle()
-                set_channels_list()
                 set_programme_response()
                 set_programme_process_response()
-                $("#opentv").click(function(){
-                    $.get("/opentv/",function(ret){
-                        console.log(ret)
-                        $('#result').html(ret)
-                    })
-                });
             });
 
         </script>      

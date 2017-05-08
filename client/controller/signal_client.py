@@ -134,6 +134,7 @@ def add_ffplay(res):
         add_command['format']['kind'] = 'all'
     addcommand = json.dumps(add_command)
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    print "addcommand=%s" % addcommand
     s.sendto(addcommand,("localhost", FFPLAY_LISTEN_PORT))
 
     if(related == 'true'):

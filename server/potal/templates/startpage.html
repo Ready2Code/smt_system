@@ -25,7 +25,7 @@
         <hr/>
 
             <script>
-            function set_ajax(formid, cbfun) {
+            function set_form_ajax(formid, cbfun) {
                 cbfun = cbfun || function (res) {}
                 $('#'+formid).on('submit', function (e){
                     e.preventDefault();
@@ -39,8 +39,8 @@
                 });
             }
             function set_service_settings() {
-                set_ajax("serviceSettings")
-                set_ajax("startServer")
+                set_form_ajax("serviceSettings")
+                set_form_ajax("startServer")
 	    }
             $(document).ready(function(){
                 set_service_settings()
