@@ -20,8 +20,9 @@ FNULL = open(os.devnull, 'w')
 
 LOCAL_PORT = 8001
 FILE_RELATIVE_PATH = './'
-CHANNEL_FILE_NAME = '../related/channels.json'
-CONFIG_FILE_NAME = 'programs.json'
+SETTING_RELATIVE_PATH = '../related/'
+CHANNEL_FILE_NAME = SETTING_RELATIVE_PATH + 'channels.json'
+CONFIG_FILE_NAME =  SETTING_RELATIVE_PATH + 'programs.json'
 DESTINATION_IP = '127.0.0.1'
 #DESTINATION_IP = '192.168.1.212'
 
@@ -130,9 +131,9 @@ def call_ffmpeg(file_dir, res, port, resource_broadcast_ip, ffplay_port):
     playlist = ''
     if('playlist' in res.keys()): playlist = '-f concat'
     if platform.system() == "Windows":
-        ffmpeg_command = '../related/ffmpeg.exe'
+        ffmpeg_command = SETTING_RELATIVE_PATH + 'ffmpeg.exe'
     if platform.system() == "Linux":
-        ffmpeg_command = '../related/ffmpeg'
+        ffmpeg_command = SETTING_RELATIVE_PATH + 'ffmpeg'
     if(res_type == 'broadcast'):
         ffmpeg_command = ffmpeg_command + ' -re {4} -i {0} -begintime {1} -c:v copy -c:a aac -f mpu smt://{2}:{3}'.format(file_dir, begintime, resource_broadcast_ip, ffplay_port, playlist)
     elif(res_type == 'broadband'):
