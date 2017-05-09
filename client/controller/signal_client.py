@@ -87,9 +87,9 @@ def call_ffplay(res):
     delta = endtime - begintime
     ffplay_command = ''
     if platform.system() == "Windows":
-        ffplay_command = '../related/ffplay.exe'
+        ffplay_command = RELATIVE_PATH + 'ffplay.exe'
     if platform.system() == "Linux":
-        ffplay_command = '../related/ffplay'
+        ffplay_command = RELATIVE_PATH + 'ffplay'
     if(res_type == 'broadcast'):
         ffplay_command = ffplay_command + ' {0},{1},{2},{3},{4} -port {5}'.format(res['url'],cal_screen_value(res['layout']['posx'], True), cal_screen_value(res['layout']['posy'], False), cal_screen_value(res['layout']['width'], True), cal_screen_value(res['layout']['height'], False), FFPLAY_LISTEN_PORT) 
     print ffplay_command
