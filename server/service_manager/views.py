@@ -39,6 +39,7 @@ def modify_service_settings(request):
     service_settings.signal_port     = request.GET['signal_port']
     service_settings.resource_broadcast_ip   = request.GET['resource_broadcast_ip']
     service_settings.resource_broadband_ip   =request.GET['resource_broadband_ip']
+    service_settings.programs                = request.GET['programs_file_path']
     service_settings.save()
     return HttpResponse(u"ok", content_type='application/json')
         
