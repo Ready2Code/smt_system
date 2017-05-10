@@ -34,7 +34,6 @@ function setLanguage(lang) {
 function translate() {
 	loadDict();
 	$("[lang]").each(function() {
-		console.log(this.tagName.toLowerCase())
 		switch (this.tagName.toLowerCase()) {
 			case "input":
 				$(this).val( __tr($(this).attr("lang")) );

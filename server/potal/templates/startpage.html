@@ -7,7 +7,6 @@
         <body >
         <form id='serviceSettings' action='set_settings' method='get'>
              Signal Dest IP: <input type="text" name="signal_destip" value="{{service_settings.signal_destip}}"/>
-
              <p/>
              Signal Port: <input type="text"  name="signal_port" value="{{service_settings.signal_port}}"/>
              <p/>
@@ -17,14 +16,31 @@
              <p/>
              Programs file Path:    <input type="text" name="programs_file_path"    value="{{service_settings.programs}}"/>
              <p/>
+             <hr style="border:1px dotted #036" />
+             Info Collector Ip:     <input type="text" name="info_collector_ip" value="{{monitor_settings.info_collector_ip}}"/>
+             <p/>
+             Info Collector Port:   <input type="text"  name="info_collector_port" value="{{monitor_settings.info_collector_port}}"/>
+             <p/>
+             Info Websocket Ip:     <input type="text" name="info_websocket_ip" value="{{monitor_settings.info_websocket_ip}}"/>
+             <p/>
+             Info Websocket Port:   <input type="text" name="info_websocket_port" value="{{monitor_settings.info_websocket_port}}"/>
+             <p/>
              <input type="submit" value="Modify" />
         </form>
-        <hr/>
 
+        <hr/>
         <form id='startServer' action='start_programs/' method='get'>
              <input type="submit" value="start server" />
         </form>
+        <p/>
         <hr/>
+        <form id='startInfoServer' action='start_state_monitor/' method='get'>
+             <input type="submit" value="start Info Server" />
+        </form>
+        <p/>
+        <a href='show_status'> Show Status </a>
+        <hr/>
+
 
             <script>
             function set_form_ajax(formid, cbfun) {
@@ -43,6 +59,7 @@
             function set_service_settings() {
                 set_form_ajax("serviceSettings")
                 set_form_ajax("startServer")
+                set_form_ajax("startInfoServer")
 	    }
             $(document).ready(function(){
                 set_service_settings()

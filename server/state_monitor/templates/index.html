@@ -7,6 +7,9 @@
     <script type="text/javascript" src="{{STATIC_URL}}singlylinkedlist.js"></script>
     <script type="text/javascript" src="{{STATIC_URL}}Highcharts/js/highcharts.js"></script>
     <script type="text/javascript" src="{{STATIC_URL}}Highcharts/js/modules/exporting.js"></script>
+    <script type="text/javascript">  
+        websocket_destination = 'ws://{{monitor_settings.info_websocket_ip}}:{{monitor_settings.info_websocket_port}}'
+    </script> 
     <script type="text/javascript" src="{{STATIC_URL}}linechart.js"></script> 
     <script type="text/javascript" src="{{STATIC_URL}}strings.js"></script> 
     <script type="text/javascript" src="{{STATIC_URL}}lang.js"></script>     

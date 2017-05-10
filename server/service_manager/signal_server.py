@@ -34,6 +34,8 @@ CHANNEL_NUM = 1
 BROADBAND_SERVER_IP = '127.0.0.1'
 #BROADCAST_SERVER_IP = '239.1.1.1'
 BROADCAST_SERVER_IP = '127.0.0.1'
+AVLOGEXT_IP = '127.0.0.1'
+AVLOGEXT_PORT = 7778
 
 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 packet = ''
@@ -83,7 +85,7 @@ def update_delta_time(tt, now):
     tt = deltatime + now
     return tt 
 
-def convert_signal(json_file, resource_broadcast_ip, resource_broadband_ip):
+def convert_signal(json_file, resource_broadcast_ip, resource_broadband_ip,avlogext=''):
     global resource_num
     global sequence_number
     global packet
@@ -115,29 +117,34 @@ def convert_signal(json_file, resource_broadcast_ip, resource_broadband_ip):
 
         print str(res['begin'])
 
-        t = Thread(target=call_ffmpeg, args=(localfile, res, ffmpeg_port, resource_broadcast_ip, ffplay_port))
+        t = Thread(target=call_ffmpeg, args=(localfile, res, ffmpeg_port, resource_broadcast_ip, ffplay_port, avlogext))
         t.daemon = True
         t.start()
         resource_num += 1
         resource_num = resource_num % 10
     return json_data
 
-def call_ffmpeg(file_dir, res, port, resource_broadcast_ip, ffplay_port):
+def call_ffmpeg(file_dir, res, port, resource_broadcast_ip, ffplay_port, avlogext=''):
     time.sleep(aheadtime/1000)
     begintime = res['begin'].strftime('%Y-%m-%dT%H:%M:%S.%f')
     res_type = res['type']
     delta = res['end'] - datetime.now()
     ffmpeg_command = ''
     playlist = ''
+    str_avlogext = ''
     if('playlist' in res.keys()): playlist = '-f concat'
     if platform.system() == "Windows":
         ffmpeg_command = SETTING_RELATIVE_PATH + 'ffmpeg.exe'
     if platform.system() == "Linux":
         ffmpeg_command = SETTING_RELATIVE_PATH + 'ffmpeg'
+
+    if(len(avlogext) != 0):
+        str_avlogext = '-avlogext ' + avlogext + ' -deviceinfo ' + res['name']
+
     if(res_type == 'broadcast'):
-        ffmpeg_command = ffmpeg_command + ' -re {4} -i {0} -begintime {1} -c:v copy -c:a aac -f mpu smt://{2}:{3}'.format(file_dir, begintime, resource_broadcast_ip, ffplay_port, playlist)
+        ffmpeg_command = ffmpeg_command + ' -re {4} -i {0} -begintime {1} {5} -c:v copy -c:a aac -f mpu smt://{2}:{3}'.format(file_dir, begintime, resource_broadcast_ip, ffplay_port, playlist, str_avlogext)
     elif(res_type == 'broadband'):
-        ffmpeg_command = ffmpeg_command + ' -re -port {1} {5} -i {0} -begintime {2} -c:v copy -c:a aac -f mpu smt://{3}:{4}'.format(file_dir, port, begintime, BROADBAND_SERVER_IP, 1, playlist) 
+        ffmpeg_command = ffmpeg_command + ' -re -port {1} {5} -i {0} -begintime {2} {6} -c:v copy -c:a aac -f mpu smt://{3}:{4}'.format(file_dir, port, begintime, BROADBAND_SERVER_IP, 1, playlist, str_avlogext) 
     print ffmpeg_command
     #p = Popen(shlex.split(ffmpeg_command))
     p = Popen(shlex.split(ffmpeg_command), stdout=FNULL, stderr=STDOUT)
@@ -187,7 +194,9 @@ def start_smt_system(programs_file=CONFIG_FILE_NAME,
                      signal_destip=DESTINATION_IP, 
                      signal_port=LOCAL_PORT,
                      resource_broadcast_ip = BROADCAST_SERVER_IP ,
-                     resource_broadband_ip = BROADBAND_SERVER_IP ):
+                     resource_broadband_ip = BROADBAND_SERVER_IP ,
+                     avlogext_ip           = AVLOGEXT_IP,
+                     avlogext_port         = AVLOGEXT_PORT):
     global program_num
     global resource_num
     global packet
@@ -218,7 +227,7 @@ def start_smt_system(programs_file=CONFIG_FILE_NAME,
         program_data = url_load(url)
         #print json.loads(program_data) 
         resource_num = 1
-        convert = convert_signal(program_data, resource_broadcast_ip, resource_broadband_ip)
+        convert = convert_signal(program_data, resource_broadcast_ip, resource_broadband_ip, avlogext_ip+':'+str(avlogext_port))
         packet = convert
         #print convert
         endtime = convert['programmer']['end'] - timedelta(milliseconds=(aheadtime+cachetime))

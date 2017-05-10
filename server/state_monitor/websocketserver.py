@@ -178,7 +178,6 @@ class WebSocket(threading.Thread):#继承Thread
 
 
             else:
-                #thread.start_new_thread(Sender, (1,1))
                 return
                 global g_code_length
                 global g_header_length
@@ -215,15 +214,15 @@ class WebSocket(threading.Thread):#继承Thread
 
 
 class WebSocketServer(object):
-    def __init__(self):
+    def __init__(self, addr, port):
         self.socket = None
+        self.addr = addr
+        self.port = port
     def begin(self):
-        addr = "127.0.0.1"
-        port = 12345
-        print( 'WebSocketServer(%s:%d) Start!'%(addr,port))
+        print( 'WebSocketServer(%s:%d) Start!'%(self.addr, self.port))
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEADDR,1)
-        self.socket.bind((addr,port))
+        self.socket.bind((self.addr, self.port))
         self.socket.listen(50)
 
 
@@ -241,23 +240,20 @@ class WebSocketServer(object):
             connectionlist['connection'+str(i)]=connection
             i = i + 1
 
-def run_websocket(no1, no2):
-    server = WebSocketServer()
+def run_websocket(addr, port):
+    server = WebSocketServer(addr, port)
     server.begin()
 
-def Sender(no1, no2):
-    HOST=''
-    #HOST='192.168.253.1'
-    PORT=7778
+def info_collector(host, port):
     BUFFER=4096
     #sock.settimeout(5)
     print ""
-    print "MessageServer(Port:%d). ." %PORT,
+    print "MessageServer(Port:%d). ." %port,
     while True:
         try:
             sock=socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
             sock.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEADDR,1)
-            sock.bind((HOST,PORT))
+            sock.bind((host,port))
         except Exception as e:
             print e
             sock.close()
@@ -267,7 +263,7 @@ def Sender(no1, no2):
         print "Start!"
         break
     #sock.listen(0)
-    print('tcpServer listen at: %s:%s\n\r' %(HOST,PORT))
+    print('tcpServer listen at: %s:%s\n\r' %(host,port))
     while True:
          #client_sock,client_addr=sock.accept()
          #print('%s:%s connect' %client_addr)
@@ -280,7 +276,7 @@ def Sender(no1, no2):
          #print "last=",recv[-2]
          #ddate = json.loads(recv[:-1],encoding="utf-8")
          #print ddate
-         print recv[:-1]
+         #print recv[:-1]
          if recv.decode('utf8').upper()=="QUIT":
             print('quit now')
             break
@@ -291,14 +287,12 @@ def Sender(no1, no2):
     sock.close() 
 
 
-def run():
-    thread.start_new_thread(Sender, (1,1))
-    thread.start_new_thread(run_websocket, (1,1))
-    #server = WebSocketServer()
-    #server.begin()
+def start_info_server(info_collector_ip, info_collector_port, info_websocket_ip, info_websocket_port ):
+    thread.start_new_thread(info_collector, (info_collector_ip, info_collector_port))
+    thread.start_new_thread(run_websocket, (info_websocket_ip, info_websocket_port ))
 
 if __name__ == "__main__":
-    run()
+    start_info_server("", 7777, "127.0.0.1", 7778)
        
     
 

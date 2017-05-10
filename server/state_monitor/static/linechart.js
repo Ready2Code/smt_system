@@ -458,8 +458,9 @@ $(function() {
         showdiv("tab1","none")
         showdiv("tab2","none")
         
-        var host = "ws://202.120.39.169:10031/";
-        //var host = "ws://192.168.1.41:17708/";
+        //var host = "ws://202.120.39.169:10031/";
+        //var host = "ws://192.168.1.22:8001/ws/";
+        var host = websocket_destination 
         setInterval(drawbitrateCharts, 500);
         setInterval(drawDelayChart, 500);
         setInterval(drawPacketLostChart, 500);
