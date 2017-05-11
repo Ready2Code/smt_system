@@ -33,7 +33,8 @@ pffplay = None
 related = 'false'
 exception = ''
 channel_info = {}
-
+g_info_collector_dest = ''
+g_device_name = ''
 class bcolors:
     HEADER = '\033[95m'
     OKBLUE = '\033[94m'
@@ -86,12 +87,25 @@ def call_ffplay(res):
     res_type = res['type']
     delta = endtime - begintime
     ffplay_command = ''
+    str_avlogext=''
+    
     if platform.system() == "Windows":
         ffplay_command = RELATIVE_PATH + 'ffplay.exe'
     if platform.system() == "Linux":
         ffplay_command = RELATIVE_PATH + 'ffplay'
+
+    if g_info_collector_dest != '' and g_device_name != '':
+        str_avlogext = '-avlogext ' + g_info_collector_dest + ' -deviceinfo ' + g_device_name
+        
     if(res_type == 'broadcast'):
-        ffplay_command = ffplay_command + ' {0},{1},{2},{3},{4} -port {5}'.format(res['url'],cal_screen_value(res['layout']['posx'], True), cal_screen_value(res['layout']['posy'], False), cal_screen_value(res['layout']['width'], True), cal_screen_value(res['layout']['height'], False), FFPLAY_LISTEN_PORT) 
+        #-sync smt 
+        ffplay_command = ffplay_command + ' {6} {0},{1},{2},{3},{4} -port {5}'.format(res['url'],
+                                                                                                cal_screen_value(res['layout']['posx'], True), 
+                                                                                                cal_screen_value(res['layout']['posy'], False), 
+                                                                                                cal_screen_value(res['layout']['width'], True), 
+                                                                                                cal_screen_value(res['layout']['height'], False), 
+                                                                                                FFPLAY_LISTEN_PORT,
+                                                                                                str_avlogext) 
     print ffplay_command
     #p = Popen(shlex.split(ffplay_command))
     pffplay = Popen(shlex.split(ffplay_command), stdout=FNULL, stderr=STDOUT)
@@ -260,8 +274,13 @@ def handle_command(command):
     else:
         options[option[0]]()
 
-def initial():
+def initial(info_collector_dest='', device_name=''):
     global channel_info 
+    global g_info_collector_dest
+    global g_device_name
+
+    g_info_collector_dest = info_collector_dest
+    g_device_name = device_name
     channel_info = load(RELATIVE_PATH + CHANNEL_FILE)
 
     # each channel is assigned one thread to handle its broadcast signaling

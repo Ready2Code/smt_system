@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
+from models import get_controller_settings
 import json
 
 import signal_client
@@ -14,7 +15,10 @@ def start_page(request):
 def start_controller(request):
     global is_running
     if not is_running:
-        signal_client.initial()
+        controller_settings = get_controller_settings()
+        info_collector_dest = controller_settings.info_collector_ip + ':' + str(controller_settings.info_collector_port)
+        device_name = controller_settings.controller_name
+        signal_client.initial(info_collector_dest, device_name)
         is_running = True
     return HttpResponse(u"ok", content_type='application/json')
 
@@ -23,7 +27,9 @@ def handle_command(request):
     return HttpResponse(u"ok", content_type='application/json')
 
 def show_channels(request):
-    return render(request, 'show_channels.html', signal_client.channel_info)
+    controller_settings = get_controller_settings()
+    #return render(request, 'show_channels.html', signal_client.channel_info)
+    return render(request, 'show_channels.html', {'controller_settings':controller_settings})
 
 def cplay_channel(request, id):
     signal_client.handle_command("cplay " + id)
@@ -49,4 +55,14 @@ def stop_channel(request, channel_id, res_id):
     signal_client.handle_command("stop " + channel_id +":" +res_id)
     return HttpResponse(u"OK", content_type='application/json')
 
-
+def modify_controller_settings(request):
+    controller_settings = get_controller_settings()   
+    controller_settings.controller_name        = request.GET['controller_name']
+    controller_settings.info_collector_ip      = request.GET['info_collector_ip']
+    controller_settings.info_collector_port    = request.GET['info_collector_port']
+    controller_settings.info_websocket_ip      = request.GET['info_websocket_ip']
+    controller_settings.info_websocket_port    = request.GET['info_websocket_port']
+    controller_settings.save()
+ 
+    return HttpResponse(u"ok", content_type='application/json')
+        
