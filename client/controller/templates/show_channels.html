@@ -5,6 +5,20 @@
         <script src="{{STATIC_URL}}jquery.min.js"  ></script>
     </head>
     <body >
+        <form id='controllerSettings' action='set_settings' method='get'>
+             Device Name:           <input type="text" name="controller_name" value="{{controller_settings.controller_name}}"/>
+             <p/>
+             Info Collector Ip:     <input type="text" name="info_collector_ip" value="{{controller_settings.info_collector_ip}}"/>
+             <p/>
+             Info Collector Port:   <input type="text"  name="info_collector_port" value="{{controller_settings.info_collector_port}}"/>
+             <p/>
+             Info Websocket Ip:     <input type="text" name="info_websocket_ip" value="{{controller_settings.info_websocket_ip}}"/>
+             <p/>
+             Info Websocket Port:   <input type="text" name="info_websocket_port" value="{{controller_settings.info_websocket_port}}"/>
+             <p/>
+             <input type="submit" value="Modify" />
+        </form>
+
         <button type="button" id='opentv' >Open TV</button>
         <p>result: <span id='result'></span></p>
         <hr/>
@@ -123,6 +137,7 @@
             $(document).ready(function(){
                 set_event_response()
                 set_command_handle()
+                set_form_ajax('controllerSettings')
                 set_channels_list()
                 set_programme_response()
                 set_programme_process_response()
