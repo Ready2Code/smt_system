@@ -173,12 +173,14 @@ def prompt_add():
     addcommand = json.dumps(add_command)
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     s.sendto(addcommand,("localhost", FFPLAY_LISTEN_PORT))
+    
 def prompt_del():
     del_command = {'type':'del', 'format': {'name': ''}}
     del_command['format']['name'] = PROMPT_ICON_FILE
     delcommand = json.dumps(del_command)
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     s.sendto(delcommand, ('localhost', FFPLAY_LISTEN_PORT))
+    
 def UDP_recv(port, channel_id, name):
     global sequence
     last_sequence = sequence

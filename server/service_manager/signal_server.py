@@ -65,7 +65,7 @@ class DateTimeEncoder(json.JSONEncoder):
         return json.JSONEncoder.default(self, o)
 
 def load(name):
-    name = FILE_RELATIVE_PATH + name
+    if not name.startswith('/') and not name.startswith('.'):  name = SETTING_RELATIVE_PATH + name
     with open(name) as json_file:
         data = json.load(json_file)
         return data
