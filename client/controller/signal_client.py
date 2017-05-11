@@ -170,6 +170,7 @@ def del_ffplay(res):
         server_ip = url.split('@')[0].split('://')[1]
         name = url.replace(server_ip, '')
 
+    if(related == 'true'):    prompt_del()
     del_command = {'type':'del', 'server': '', 'format': {'name': ''}}
     del_command['server'] = server_ip
     del_command['format']['name'] = name
@@ -197,6 +198,7 @@ def prompt_del():
     
 def UDP_recv(port, channel_id, name):
     global sequence
+    global related
     last_sequence = sequence
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     s.bind(('', port))
@@ -216,9 +218,14 @@ def UDP_recv(port, channel_id, name):
         if json_data['programmer']['sequence'] > last_sequence:
             last_sequence = json_data['programmer']['sequence']
             print bcolors.WARNING + "\n{1} id [{0}] have an updated signaling ...".format(channel_id, name.encode('utf-8').strip()) + bcolors.ENDC
-            if pffplay is not None:
-                t = Thread(target=prompt_add)
-                t.start()
+            if 'related' in json_data['programmer'].keys(): 
+                related = json_data['programmer']['related']
+                if related == 'true' and pffplay is not None:
+                    t = Thread(target=prompt_add)
+                    t.start()
+                if related == 'false' and pffplay is not None:
+                    t = Thread(target=prompt_del)
+                    t.start()                
     #print json_data
     #print current_json 
 

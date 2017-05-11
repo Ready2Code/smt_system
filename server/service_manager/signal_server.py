@@ -139,7 +139,7 @@ def call_ffmpeg(file_dir, res, port, resource_broadcast_ip, ffplay_port, avlogex
         ffmpeg_command = SETTING_RELATIVE_PATH + 'ffmpeg'
 
     if(len(avlogext) != 0):
-        str_avlogext = '-avlogext ' + avlogext + ' -deviceinfo ' + res['name']
+        str_avlogext = '-avlogext ' + avlogext + ' -deviceinfo ' + res['id']
 
     if(res_type == 'broadcast'):
         ffmpeg_command = ffmpeg_command + ' -re {4} -i {0} -begintime {1} {5} -c:v copy -c:a aac -f mpu smt://{2}:{3}'.format(file_dir, begintime, resource_broadcast_ip, ffplay_port, playlist, str_avlogext)
@@ -149,7 +149,7 @@ def call_ffmpeg(file_dir, res, port, resource_broadcast_ip, ffplay_port, avlogex
     #p = Popen(shlex.split(ffmpeg_command))
     p = Popen(shlex.split(ffmpeg_command), stdout=FNULL, stderr=STDOUT)
     time.sleep(delta.seconds+1)
-    print delta.seconds, "passed  resource [", res['name'], "] is closed"
+    print delta.seconds, "passed  resource [", res['id'], "] is closed"
     p.kill()
 
 def delay_broadcast(s, packet, des):
