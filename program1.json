@@ -1,0 +1,66 @@
+{
+    "programmer": {
+        "name": "快乐时间2",
+        "id": "a1",
+        "sequence": 1,
+        "begin": "d00:00:00",  
+        "end": "d00:01:30",
+	"related": "true", 
+        "resources": [
+            {
+                "name": "爸爸去哪儿",
+		"id": "a20",
+		"poster": "http://img1.gtimg.com/18/1833/183396/18339686_980x1200_850.jpg",
+                "type": "broadcast",
+                "playlist": "/home/frank/resource/baba_labels/label_list.txt",
+                "info": "label demo",
+                "sequence": "1",
+                "begin": "d00:00:00",
+                "end": "d00:01:20",
+                "layout": {
+                    "posx": 0,
+                    "posy": 0,
+                    "width": 1920,
+                    "height": 1080
+                },
+		"label":["cindy","angela","stone","opening","kimi","cunzhang","zhangliang","tianliang","ending"],
+		"exception": "a21"
+            },
+            {
+                "name": "爸爸去哪儿",
+		"id": "a21",
+		"poster": "http://img1.gtimg.com/18/1833/183396/18339686_980x1200_850.jpg",
+                "type": "broadband",
+                "playlist": "/home/frank/resource/baba_labels/label_list.txt",
+                "info": "label demo",
+                "sequence": "1",
+                "begin": "d00:00:00",
+                "end": "d01:01:20",
+                "layout": {
+                    "posx": 0,
+                    "posy": 0,
+                    "width": 1920,
+                    "height": 1080
+                },
+		"label":["cindy","angela","stone","opening","kimi","cunzhang","zhangliang","tianliang","ending"],
+		"exception": "a20"
+            },
+            {
+                "name": "宝宝与玩具",
+		"id": "a22",
+                "type": "broadband",
+                 "url": "/home/frank/resource/HEVC/BabyAndToy_1920x1080_25_3Mbps.mp4",
+                "info": "value1",
+                "sequence": "1",
+                "begin": "d00:00:00",
+                "end": "d00:03:00",
+                "layout": {
+                    "posx": 0,
+                    "posy": 0,
+                    "width": 720,
+                    "height": 360
+                }
+            }
+        ]
+    }
+}
