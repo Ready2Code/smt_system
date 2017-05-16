@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'potal',
     'state_monitor',
     'service_manager',
+    'resources',
 ]
 
 MIDDLEWARE = [
