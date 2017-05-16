@@ -278,6 +278,8 @@ def handle_command(command):
 
     if len(option) == 2:
         options[option[0]](option[1])
+    elif len(option) == 3:
+        options[option[0]](option[1])(option[2])
     else:
         options[option[0]]()
 
@@ -338,7 +340,7 @@ def get_current_programme():
     global continue_play_channel
     return show_channel(continue_play_channel)
 
-def play_programmer(val = DEFAULT):
+def play_programmer(val = DEFAULT, full = DEFAULT):
     global related
     global exception
     # to play the whole channel broadcast resources
@@ -365,6 +367,12 @@ def play_programmer(val = DEFAULT):
                 exception = vals[0] + ':' + res['exception']
             else:
                 exception = ''
+                
+            if full == 'full':
+                res['layout']['posx'] = 0
+                res['layout']['posy'] = 0
+                res['layout']['width'] = '100%'
+                res['layout']['height'] = '100%'            
             if pffplay is not None:
                 t = Thread(target=add_ffplay, args=(res, ))
                 t.setDaemon(True)
