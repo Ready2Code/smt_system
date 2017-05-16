@@ -7,6 +7,7 @@ import sys
 import urllib2
 import shlex
 import os
+import shutil
 import platform
 from datetime import datetime, timedelta
 from threading import Timer, Thread, Event
@@ -23,6 +24,7 @@ FILE_RELATIVE_PATH = './'
 SETTING_RELATIVE_PATH = '../related/'
 CHANNEL_FILE_NAME = SETTING_RELATIVE_PATH + 'channels.json'
 CONFIG_FILE_NAME =  SETTING_RELATIVE_PATH + 'programs.json'
+POSTER_PATH = 'server/resources/static/'
 DESTINATION_IP = '127.0.0.1'
 #DESTINATION_IP = '192.168.1.212'
 
@@ -115,7 +117,12 @@ def convert_signal(json_file, resource_broadcast_ip, resource_broadband_ip,avlog
         res['begin'] = update_delta_time(res['begin'], endtime)
         res['end'] = update_delta_time(res['end'], endtime)
 
-        print str(res['begin'])
+        if 'poster' in res.keys():
+            (path, name) = os.path.split(res['poster'])
+            shutil.copy(res['poster'], POSTER_PATH + name)
+            res['poster'] = 'static/' + name
+            
+        #print str(res['begin'])
 
         t = Thread(target=call_ffmpeg, args=(localfile, res, ffmpeg_port, resource_broadcast_ip, ffplay_port, avlogext))
         t.daemon = True
