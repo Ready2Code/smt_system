@@ -24,7 +24,7 @@ FILE_RELATIVE_PATH = './'
 SETTING_RELATIVE_PATH = '../related/'
 CHANNEL_FILE_NAME = SETTING_RELATIVE_PATH + 'channels.json'
 CONFIG_FILE_NAME =  SETTING_RELATIVE_PATH + 'programs.json'
-POSTER_PATH = 'server/resources/static/'
+POSTER_PATH = 'resources/static/'
 DESTINATION_IP = '127.0.0.1'
 #DESTINATION_IP = '192.168.1.212'
 
