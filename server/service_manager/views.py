@@ -24,7 +24,8 @@ def start_programs(request):
                                                                  service_settings.resource_broadcast_ip, 
                                                                  service_settings.resource_broadband_ip,
                                                                  monitor_settings.info_collector_ip,
-                                                                 monitor_settings.info_collector_port))
+                                                                 monitor_settings.info_collector_port),
+                                                                 request.get_host())
     t.setDaemon(True)
     t.start()
     #start_smt_system()

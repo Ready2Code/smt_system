@@ -87,7 +87,7 @@ def update_delta_time(tt, now):
     tt = deltatime + now
     return tt 
 
-def convert_signal(json_file, resource_broadcast_ip, resource_broadband_ip,avlogext=''):
+def convert_signal(json_file, resource_broadcast_ip, resource_broadband_ip,avlogext='',static_resource_host):
     global resource_num
     global sequence_number
     global packet
@@ -120,7 +120,7 @@ def convert_signal(json_file, resource_broadcast_ip, resource_broadband_ip,avlog
         if 'poster' in res.keys():
             (path, name) = os.path.split(res['poster'])
             shutil.copy(res['poster'], POSTER_PATH + name)
-            res['poster'] = 'static/' + name
+            res['poster'] = 'http://' + static_resource_host + '/static/' + name
             
         #print str(res['begin'])
 
@@ -203,7 +203,8 @@ def start_smt_system(programs_file=CONFIG_FILE_NAME,
                      resource_broadcast_ip = BROADCAST_SERVER_IP ,
                      resource_broadband_ip = BROADBAND_SERVER_IP ,
                      avlogext_ip           = AVLOGEXT_IP,
-                     avlogext_port         = AVLOGEXT_PORT):
+                     avlogext_port         = AVLOGEXT_PORT,
+                     static_resource_host  = ''):
     global program_num
     global resource_num
     global packet
@@ -234,7 +235,7 @@ def start_smt_system(programs_file=CONFIG_FILE_NAME,
         program_data = url_load(url)
         #print json.loads(program_data) 
         resource_num = 1
-        convert = convert_signal(program_data, resource_broadcast_ip, resource_broadband_ip, avlogext_ip+':'+str(avlogext_port))
+        convert = convert_signal(program_data, resource_broadcast_ip, resource_broadband_ip, avlogext_ip+':'+str(avlogext_port),static_resource_host)
         packet = convert
         #print convert
         endtime = convert['programmer']['end'] - timedelta(milliseconds=(aheadtime+cachetime))
