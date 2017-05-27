@@ -3,40 +3,158 @@
     <head>
         <title>Current Program</title>
         <script src="{{STATIC_URL}}jquery.min.js"  ></script>
+        <link type="text/css" rel="stylesheet" href="{{STATIC_URL}}smt.css"/>
+		<meta hhtp-equiv="refresh" content="20" name="viewport" content='width=320'>
+		<style>
+          #programmeinfo{
+		    width:100%;
+            height:100%;
+	        margin:0;
+		    padding:0;
+		  }
+          #currentprogramme{
+		    width:200px;
+            height:100px;
+			font-size:25pt;
+		  }
+          .process_resource {
+		     width:100px;
+             height:80px;
+			 font-size:25pt;
+		  }
+          #tv{
+		     width:150px;
+             height:80px;
+			 font-size:25pt;
+		  } 
+          #pad{
+		     width:150px;
+             height:80px;
+			 font-size:25pt;
+		  } 
+          #big{
+		     width:150px;
+             height:80px;
+			 font-size:25pt;
+		  } 
+          #small{
+		     width:150px;
+             height:80px;
+			 font-size:25pt;
+		  } 
+		</style>
     </head>
-    <body >
-        <button type="button" id='currentprogramme' >Current Programme</button>
-        <table id='programmeinfo' border="1" >
-            <td> name </td>
-            <td> url </td>
-            <td> info </td>
-            <td> id  </td>
+ <body>
+        <button type="button" id='currentprogramme'>Current Programme</button>
+        <table id='programmeinfo' border="1" cellpadding="0" cellspacing="0" width="100%" >
+		<tr>
+            <td style="display:none;"> name </td>
+            <td style="display:none;"> url </td>
+            <td style="display:none;"> info </td>
+            <td style="display:none;"> id </td>
             <td>  </td>
             <td>  </td>
+		</tr>
         </table>
-        <hr/>
+<!--        <hr/>
+		<a href="smt://127.0.0.1:1234">test smt</a> -->
+		<div id='popup' ></div> 
+		<div id='img' ></div> 
+		<div id='popup2' ></div> 
             <script>
             function set_programme_process_response() {
                 $("button.process_resource").click(function(){
+			   //   $("#img").style.visibility="hidden";
+			      if($(this).attr('command')=="stop"){
+			        console.log("close button click")
                     $.get("/" + $(this).attr('command') +"/"+$(this).attr('channel_id')+"/"+$(this).attr('resource_id')+"/",function(ret){
                     })
-                });
-            }
+					return;
+
+				   }
+			   console.log("open22 click")
+			   var newtr = ""
+			   newtr = newtr +"<div id='nav'><ul> <li><button  id='tv'"  + "resource_id='" 
+			           + $(this).attr('resource_id') + "' " 
+			           + "channel_id='" + $(this).attr('channel_id') + "' "
+			           + "command='play'" +">tv</button></li> <li> <button  id='pad'" +"'" + "resource_id='" 
+			           + $(this).attr('resource_id') + "' " 
+			           + "channel_id='" + $(this).attr('channel_id') + "' "
+					   + "resource_url='" + $(this).attr('resource_url') + "' "
+			           + "command='play' " +">pad</button></li></ul></div>"
+			    console.log(newtr)		   
+               $("#popup").append(newtr)
+               $("#popup").show()
+               $("#pad").click(function(){
+				  window.open($(this).attr('resource_url'))
+                  $("#popup").hide()
+                  $("#popup").empty()
+			      console.log("pad  button click")		   
+			   })
+               
+			   $("#tv").click(function(){
+			       console.log("tv button click!")
+			       var newtr = ""
+			       newtr = newtr +"<div id='nav'><ul> <li><input type='button' value='big screen' id='big' /></li> <li> <button  id='small'"                           + "resource_id='" 
+     			           + $("#tv").attr('resource_id') + "' " 
+	    		           + "channel_id='" + $("#tv").attr('channel_id') + "' "
+		    	           + "command='play' " +">small screen</button></li></ul></div>"
+
+			      $("#popup2").append(newtr)
+                  $("#popup2").show()
+                  $("#popup").hide()
+                  $("#popup").empty()
+                 
+				  $("#small").click(function(){
+			        console.log("small screen button click")		   
+                    $("#popup2").empty()
+                    $("#popup2").hide()
+                    $.get("/" + $(this).attr('command') +"/"+$(this).attr('channel_id')+"/"+$(this).attr('resource_id')+"/",function(ret){
+			       
+				    })
+			     })
+
+               });
+
+               $("#open1").click(function(){
+			     console.log("open1 click")		   
+              // $("tr.programme_info1").remove()
+			   var newtr = ""
+			   newtr = newtr +"<div id='nav'><ul> <li><input type='button' value='电视' id='tv' /></li> <li><input type='button' value='pad' id='pad' /></li></ul></div>"
+               $("#popup").append(newtr)
+               $("#popup").show()
+			   set_programme_process_response()
+				  })
+               $("#big").click(function(){
+			     
+			     console.log("big screen button click")		   
+			   })
+			   })
+               $("#pad").click(function(){
+                  gotoActivity('videoactivity')			     
+			      console.log("pad  button click")		   
+			   })
+              }
  
             function set_programme_response() {
                 $("#currentprogramme").click(function(){
+					hideImg()
                     $.get("/currentprogramme/", function(ret){
                         $("tr.programme_info").remove()
                         resources = ret.programmer.resources
+
                         var newtr = ""
-                        for(var i=0; i< resources.length; i++) {
+                        for(var i=1; i< resources.length; i++) {
                             newtr = newtr + "<tr class='programme_info'> "
-                                newtr = newtr + "<td > " + resources[i].name + " </td>"
-                                newtr = newtr + "<td>" + resources[i].url + "</td>"
-                                newtr = newtr + "<td>" + resources[i].info + " </td>"
-                                newtr = newtr + "<td>" + resources[i].id + "</td>"
+							    console.log(resources[i].poster)
+                                newtr = newtr + "<td > <a href='#'><img src=" + resources[i].poster + " </td>"
+                             //   newtr = newtr + "<td > <a href='#'><img src=" + "/home/lwj/smt_system_2017/dtq.jpg" + " </td>"
+                               // newtr = newtr + "<td>" + resources[i].url + "</td>"
+                               // newtr = newtr + "<td>" + resources[i].info + " </td>"
+                              //  newtr = newtr + "<td>" + resources[i].id + "</td>"
                                 newtr = newtr + "<td > <button resource_id='" + resources[i].id + "' " 
                                               + "channel_id='" + ret.channel_id + "' "
+											  + "resource_url='" + resources[i].url + "' "
                                               + "command='play' " 
                                               + "class='process_resource'>Open</button> </td>"
                                 newtr = newtr + "<td > <button resource_id='" + resources[i].id + "' " 
@@ -66,8 +184,37 @@
                 });
             }
 
-
+            function showImg(){
+			   var str="<img src='http://192.168.0.193:8000/static/quanjing0.png' width='100%' height='100%' display:block>"	
+			  
+                $("#img").append(str)
+                $("#img").show()
+			} 
+            function hideImg(){
+			   
+                $("#img").hide()
+			}
+            function displayBt(data){
+			
+			    console.log("displayBt:run")
+			    console.log(data)
+                if(data==true)
+			      currentprogramme.style.display="block"
+			}
+            function get_related(){
+			    
+			    //console.log("get_related")
+               $.ajax( {
+                        type : "GET",
+                        dataType: "json",
+                        url : "/show_channels/related_operator/get_related",
+                        success :displayBt,
+                });
+			}
             $(document).ready(function(){
+				showImg()
+			    currentprogramme.style.display="none"
+				setInterval("get_related()",5000)
                 set_programme_response()
                 set_programme_process_response()
             });

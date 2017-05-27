@@ -32,4 +32,5 @@ urlpatterns = [
     url(r'^stop/(\d+)/([\w-]+)/$',     controller_views.stop_channel,       name='stop_channel'),
     url(r'^show_channels/set_settings/$',          controller_views.modify_controller_settings,       name='modify_service_settings'),
 
+    url(r'^show_channels/related_operator/get_related/$',            controller_views.get_related,       name='get_related'),
 ]

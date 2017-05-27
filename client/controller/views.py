@@ -65,4 +65,12 @@ def modify_controller_settings(request):
     controller_settings.save()
  
     return HttpResponse(u"ok", content_type='application/json')
+def get_related(request):
+    if signal_client.related=='true':
+      return HttpResponse(u"true", content_type='application/json')
+    return HttpResponse(u"false", content_type='application/json')
+
+
+
+
         
