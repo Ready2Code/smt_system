@@ -13,11 +13,10 @@ def start_ntpclient(request):
     global ntpthread
     ntpthread.stop()
     ntpthread = ntpThread()
-    ntpthread.set_ntp_status('')
     ntp_server_ip         = request.GET['ntp_server_ip']
     update_interval      = float(request.GET['update_interval'])
     ntpthread.set_ntp_server(ntp_server_ip)
-    ntpthread.set_update_interval(update_interval)
+    ntpthread.set_update_interval(float(update_interval))
     ntpclient_settings = get_ntpclient_settings()
     ntpclient_settings.ntp_server_ip = ntp_server_ip 
     ntpclient_settings.update_interval = update_interval 

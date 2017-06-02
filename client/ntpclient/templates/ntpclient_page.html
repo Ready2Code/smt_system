@@ -7,17 +7,17 @@
     <body >
         <p   id='ntp_status'>ntp status:</p>    
         <form id='start_ntp_client' action='start_ntpclient' method='get'>
-             Ntp Server Ip:           <input type="text" name="ntp_server_ip"  value="{{ntpclient_settings.ntp_server_ip}}"/>
+             Ntp Server Ip:           <input type="text" id="ntp_server_ip" name="ntp_server_ip"  value="{{ntpclient_settings.ntp_server_ip}}"/>
              <p/>
-             Update Interval:           <input type="text" name="update_interval"  value="{{ntpclient_settings.update_interval}}"/>
+             Update Interval:           <input type="text" id="update_interval"  name="update_interval" value="{{ntpclient_settings.update_interval}}"/>
              <p/>
              <input type="submit" value="Start" />
         </form>
 
             <script>
+            var ntpclienttimer = 0
             function show_ntp_status(ret) {
                 $("#ntp_status").text('ntp status: ' + ret)
-                console.log( parseFloat(ret) )
                 if(isNaN(parseFloat(ret))) {
                     $("#ntp_status").css('color', '#F00')
                 } else if(Math.abs(parseFloat(ret)) > 0.001 ){
@@ -46,7 +46,11 @@
 
             $(document).ready(function(){
                 set_form_ajax('start_ntp_client')
-                setInterval(get_ntp_status,3000)
+                intvl = parseFloat($("#update_interval").val())
+                if(!isNaN(intvl)) {
+                    ntpclienttimer  = setInterval(get_ntp_status,intvl* 1000)
+                }
+
             });
 
         </script>      

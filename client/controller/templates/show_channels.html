@@ -5,6 +5,9 @@
         <script src="{{STATIC_URL}}jquery.min.js"  ></script>
     </head>
     <body >
+        <iframe src="/ntpclient_page" height="50" ></iframe>
+        <a href="/ntpclient_page"> Set Ntp Client>></a>
+        <hr/>
         <form id='controllerSettings' action='set_settings' method='get'>
              Device Name:           <input type="text" name="controller_name" value="{{controller_settings.controller_name}}"/>
              <p/>

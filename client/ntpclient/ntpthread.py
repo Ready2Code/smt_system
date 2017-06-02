@@ -17,7 +17,7 @@ class ntpThread (threading.Thread):
         self.offset_count = 0
         self.delta = 0.04 #diff time due to program process
         self.interval = INTERVAL
-        self.status = ''
+        self.status = 'stop'
         self.is_run = False
 
     def stop(self):
