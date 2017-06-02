@@ -427,6 +427,13 @@ def stop_play(val = DEFAULT):
                 t.setDaemon(True)
                 t.start()
 
+def render():
+    render_command = {'type':'render','format': {'name': ''}}
+    rendercommand = json.dumps(render_command)
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    s.sendto(rendercommand,("localhost", FFPLAY_LISTEN_PORT))
+
+
 def exit():
     print bcolors.OKGREEN + 'goodbye & have a good day...' + bcolors.ENDC
     os._exit(0)
@@ -439,6 +446,7 @@ options = { 'help':help,
             'cplay':continue_play,
             'stopall':stop_all,
             'stop':stop_play,
+            'render':render,
             'exit':exit,
 }
 
