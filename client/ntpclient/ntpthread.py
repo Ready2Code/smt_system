@@ -18,14 +18,19 @@ class ntpThread (threading.Thread):
         self.delta = 0.04 #diff time due to program process
         self.interval = INTERVAL
         self.status = ''
+        self.is_run = False
+
+    def stop(self):
+        self.is_run = False
 
     def run(self):
-        while True:
+        self.is_run = True
+        while self.is_run:
             try:
                 response = self.client.request(self.server_ip)
             except Exception, e:
                 traceback.print_exc()
-                self.status = 'error'
+                self.status = str(e)
                 continue 
             ts = response.tx_time  
             if self.offset_count == 0:
@@ -63,6 +68,9 @@ class ntpThread (threading.Thread):
 
     def get_ntp_status(self):
         return self.status  
+
+    def set_ntp_status(self, s):
+        self.status = s 
 
 if __name__ == "__main__":
     iv = 3

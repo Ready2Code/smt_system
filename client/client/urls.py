@@ -16,6 +16,7 @@ Including another URLconf
 from django.conf.urls import url
 from django.contrib import admin
 from controller import views as controller_views
+from ntpclient  import views as ntpclient_views
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
@@ -33,4 +34,7 @@ urlpatterns = [
     url(r'^show_channels/set_settings/$',          controller_views.modify_controller_settings,       name='modify_service_settings'),
 
     url(r'^show_channels/related_operator/get_related/$',            controller_views.get_related,       name='get_related'),
+    url(r'^ntpclient_page/$',          ntpclient_views.ntpclient_page,     name='ntpclient_page'),
+    url(r'^ntpclient_page/get_ntpclient_status$',          ntpclient_views.get_ntpclient_status,     name='get_ntpclient_status'),
+    url(r'^ntpclient_page/start_ntpclient$',          ntpclient_views.start_ntpclient,     name='start_ntpclient'),
 ]
