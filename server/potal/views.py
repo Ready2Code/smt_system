@@ -38,7 +38,10 @@ def modify_service_settings(request):
  
     return HttpResponse(u"ok", content_type='application/json')
 def get_config_file(request):
-    file=open('../related/programmes.json')
+    global filepath
+    filepath=request.GET["path"].encode('UTF8')
+    print  filepath
+    file=open(filepath)
     try:
        data=file.read()
     finally:
@@ -47,9 +50,10 @@ def get_config_file(request):
        return HttpResponse(json.dumps(data), content_type='application/json')
 @csrf_exempt
 def set_config_file(request):
+    global filepath
     data=request.POST["text"].encode('UTF8')
-    print data
-    file=open('../related/programmes.json','w')
+    print filepath
+    file=open(filepath,'w')
     try:
        data=file.write(data)
     finally:

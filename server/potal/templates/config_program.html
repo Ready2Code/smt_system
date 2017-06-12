@@ -4,7 +4,11 @@
            <title>config progtammers</title>
 		   <script src="{{STATIC_URL}}jquery.min.js"  ></script>
 		   <style type="text/css">
-		    #file_text
+		    #file_path
+            {
+			  width:100%;
+			}
+            #file_text
             {
 			   width:100%;
 			   height:100%;
@@ -12,6 +16,9 @@
 		   </style>
         </head>
         <body >
+		   
+		   <textarea id="file_path" rows="1" name="filepath">please input config file path!!</textarea> 
+		   <hr/>
 		   <button type="button" id='get_file' >getFile</button>
 		   <button type="button" id='set_file' >setFile</button>
 		   <hr/>
@@ -24,19 +31,18 @@
 			   console.log(data)
 			};
 
-            function get_config_file(){
+            function get_config_file(path){
 			   console.log("get config file!!")
 			   $.ajax({
 				 type:"GET",
 				 dataType:"json",
 				 url:"/config_program/get_config_file/",
+				 data:{path:path},
 				 success: display_file,					   
 			    });
 			}
 			  
             function set_config_file(text){
-			    var host='1.1.1.1'
-				var port='1111'
 				$.ajax({
 				 type:"POST",
 				 dataType:"json",
@@ -48,15 +54,18 @@
 
 			$(document).ready(function(){
 			   $("#file_text").val("")
+               var filepath
 			   $("#get_file").click(function(){ 
+			      $("#file_text").val("")
+                  filepath= $("#file_path").val()
 			      console.log("get file button!!")
-				  get_config_file() 
+				  get_config_file(filepath) 
 			    }); 
 			   $("#set_file").click(function(){
 			     var data2
 				 data2=$("#file_text").val()
 			     console.log(data2)
-				 set_config_file(data2) 
+			     set_config_file(data2) 
 			   }); 	 
 		   });
          </script>
