@@ -13,7 +13,8 @@ from state_monitor.models import MonitorSettings
 
 
     
-
+start_flag=1
+stop_flag=0
 def start_programs(request):
     service_settings = get_service_settings()   
     monitor_settings = get_monitor_settings()   
@@ -35,4 +36,21 @@ def show_programs(request):
     return render(request, 'smt_program_server.html', {'programmers': signal_server.programmers})
 
 
-
+def start_server(request):
+  global start_flag
+  global stop_flag
+  if start_flag==1:
+     start_flag=0
+     stop_flag=1
+     print "start_server"
+     start_programs(request)
+  return HttpResponse(u"ok", content_type='application/json')
+def stop_server(request):
+  global start_flag
+  global stop_flag
+  if stop_flag==1:
+     start_flag=1
+     stop_flag=0
+     print "stop_server"
+     stop_all()
+  return HttpResponse(u"ok", content_type='application/json')

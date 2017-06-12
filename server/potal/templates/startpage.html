@@ -40,6 +40,10 @@
         <p/>
         <a href='show_status'> Show Status </a>
         <hr/>
+        <a href='config_program/'>config_programmers </a>
+        <hr/>
+		<button type="button" id="start" style="width:80px;height:40px;">start</button>
+		<button type="button" id="stop" style="width:80px;height:40px">stop</button>
 
 
             <script>
@@ -63,6 +67,12 @@
 	    }
             $(document).ready(function(){
                 set_service_settings()
+				$("#start").click(function(){
+			    	$.get("/start_server/",function(ret){})	
+				})
+				$("#stop").click(function(){
+			    	$.get("/stop_server/",function(ret){}) 	
+				})
             })
             </script>
             

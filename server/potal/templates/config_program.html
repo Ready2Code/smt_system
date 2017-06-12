@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+    <head>
+           <title>config progtammers</title>
+		   <script src="{{STATIC_URL}}jquery.min.js"  ></script>
+		   <style type="text/css">
+		    #file_text
+            {
+			   width:100%;
+			   height:100%;
+			}
+		   </style>
+        </head>
+        <body >
+		   <button type="button" id='get_file' >getFile</button>
+		   <button type="button" id='set_file' >setFile</button>
+		   <hr/>
+		    <textarea id="file_text" rows="80" name="text"></textarea> 
+         <script>
+
+		    function display_file(data){
+			   $("#file_text").val(data)
+			   console.log("display config file!!")
+			   console.log(data)
+			};
+
+            function get_config_file(){
+			   console.log("get config file!!")
+			   $.ajax({
+				 type:"GET",
+				 dataType:"json",
+				 url:"/config_program/get_config_file",
+				 success: display_file,					   
+			    });
+			}
+			  
+            function set_config_file(text){
+			    var host='1.1.1.1'
+				var port='1111'
+				$.ajax({
+				 type:"POST",
+				 dataType:"json",
+				 url:"/config_program/set_config_file/",
+				 data:{text:text},
+				 success: display_file,				   
+			    });	
+			}
+
+			$(document).ready(function(){
+			   $("#file_text").val("")
+			   $("#get_file").click(function(){ 
+			      console.log("get file button!!")
+				  get_config_file() 
+			    }); 
+			   $("#set_file").click(function(){
+			     var data2
+				 data2=$("#file_text").val()
+			     console.log(data2)
+				 set_config_file(data2) 
+			   }); 	 
+		   });
+         </script>
+        </body>
+    </html>

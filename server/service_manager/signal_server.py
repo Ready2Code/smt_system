@@ -9,6 +9,7 @@ import shlex
 import os
 import shutil
 import platform
+import signal
 from datetime import datetime, timedelta
 from threading import Timer, Thread, Event
 from subprocess import call,Popen,PIPE,STDOUT
@@ -49,7 +50,10 @@ program_num = 1
 resource_num = 1
 destination = DESTINATION_IP
 programmers  = {}
-
+#################thread flag######################
+signal_timer_thread_flag=1
+start_system_flag=1
+ffmpeg_list=list()
 class SignalTimerThread(Thread):
     def __init__(self, event, dest):
         Thread.__init__(self)
@@ -57,8 +61,12 @@ class SignalTimerThread(Thread):
         self.dest = dest
 
     def run(self):
+        global signal_timer_thread_flag
         while not self.stopped.wait(BROADCASE_TIME_INTERVAL):
-            delay_broadcast(s, packet, self.dest)
+            if signal_timer_thread_flag==1:
+              delay_broadcast(s, packet, self.dest)
+            else:
+              break
 
 class DateTimeEncoder(json.JSONEncoder):
     def default(self, o):
@@ -88,6 +96,7 @@ def update_delta_time(tt, now):
     return tt 
 
 def convert_signal(json_file, resource_broadcast_ip, resource_broadband_ip,avlogext='',static_resource_host=''):
+#def convert_signal(json_file, resource_broadcast_ip, resource_broadband_ip,static_resource_host,avlogext=''):
     global resource_num
     global sequence_number
     global packet
@@ -152,13 +161,30 @@ def call_ffmpeg(file_dir, res, port, resource_broadcast_ip, ffplay_port, avlogex
         ffmpeg_command = ffmpeg_command + ' -re {4} -i {0} -begintime {1} {5} -c:v copy -c:a aac -f mpu smt://{2}:{3}'.format(file_dir, begintime, resource_broadcast_ip, ffplay_port, playlist, str_avlogext)
     elif(res_type == 'broadband'):
         ffmpeg_command = ffmpeg_command + ' -re -port {1} {5} -i {0} -begintime {2} {6} -c:v copy -c:a aac -f mpu smt://{3}:{4}'.format(file_dir, port, begintime, BROADBAND_SERVER_IP, 1, playlist, str_avlogext) 
-    print ffmpeg_command
-    #p = Popen(shlex.split(ffmpeg_command))
-    p = Popen(shlex.split(ffmpeg_command), stdout=FNULL, stderr=STDOUT)
+
+    try:
+        p = Popen(shlex.split(ffmpeg_command), stdout=FNULL, stderr=FNULL)
+    except:
+        print "error ---------------------------------------" 
+    ffmpeg_list.append(p)
     time.sleep(delta.seconds+1)
     print delta.seconds, "passed  resource [", res['id'], "] is closed"
+    ffmpeg_list.pop()  
     p.kill()
+    p.wait()
 
+def stop_all():
+    signal_timer_thread_flag=0
+    start_system_flag=0
+    stopFlag.set()
+    print "stop all!!!!!!!!!!!!!!!!"
+    print signal_timer_thread_flag
+    print start_system_flag
+    print range(len(ffmpeg_list))
+    for i in range(len(ffmpeg_list)):
+        ffmpeg_list[i].kill()
+        ffmpeg_list[i].wait()
+    del ffmpeg_list[:]
 def delay_broadcast(s, packet, des):
     if len(packet) == 0:
         return
@@ -178,7 +204,8 @@ def main():
         print 'Usage: %s <port> <programs.json> <destination>' % sys.argv[0]
         print '       or leave the parameters empty'
         return
-
+    global signal_timer_thread_flag
+    global start_system_flag
     global program_num
     global resource_num
     global packet
@@ -212,8 +239,8 @@ def start_smt_system(programs_file=CONFIG_FILE_NAME,
     global destination
     global aheadtime
     global cachetime
-    global programmers 
-
+    global programmers
+    global stopFlag
     #destination = destip
     json_data = load(programs_file)
     print "load file <" , programs_file , "> successful \n"
@@ -230,6 +257,9 @@ def start_smt_system(programs_file=CONFIG_FILE_NAME,
     thread.start()
 
     for i in cycle(programmers):
+      if start_system_flag==0:
+        break
+      else:
         url = i['url']
         print "processing", i['name'], url
         program_data = url_load(url)
