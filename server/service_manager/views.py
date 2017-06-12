@@ -5,6 +5,7 @@ from django.shortcuts import render
 from django.http import HttpResponse
 
 from signal_server import start_smt_system
+from signal_server import stop_all
 import threading
 from service_manager.models import ServiceSettings
 from service_manager.models import get_service_settings
