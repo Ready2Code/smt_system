@@ -23,7 +23,7 @@ from service_manager import views as service_manager_views
 urlpatterns = [
     #url(r'^$', potal.views.start_page , name='startpage'),
     url(r'^$',                       potal_views.start_page ,                   name='startpage'),
-	url(r'^config_program$',potal_views.config_program,   name='config_program'),
+	url(r'^config_program/$',potal_views.config_program,   name='config_program'),
 
     url(r'^ws/$',                    state_monitor_views.connect_websocket,    name='connect_websocket '),
     url(r'^start_state_monitor/$',   state_monitor_views.start_state_monitor,   name='start_state_monitro'),
