@@ -30,7 +30,7 @@ urlpatterns = [
     url(r'^show_status/$',           state_monitor_views.show_status,           name='show_status'),
     url(r'^start_programs/$',        service_manager_views.start_programs,      name='start_programs'),
     url(r'^show_programs/$',         service_manager_views.show_programs,       name='show_programs'),
-    url(r'^set_settings/$',          potal_views.modify_service_settings,       name='modify_service_settings'),
+    url(r'^set_settings$',          potal_views.modify_service_settings,       name='modify_service_settings'),
     url(r'^admin/', admin.site.urls),
     url(r'^config_program/get_config_file/$', potal_views.get_config_file,       name='get_config_file'),
     url(r'^config_program/set_config_file/$', potal_views.set_config_file,       name='set_config_file'),
