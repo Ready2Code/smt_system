@@ -213,7 +213,7 @@ def main():
     #global destination
     global aheadtime
     global cachetime
-
+    signal(signal.SIGCHLD,signal.SIG_IGN)
     if len(sys.argv) == 4:
         port = int(sys.argv[1])
         config_file = sys.argv[2]
