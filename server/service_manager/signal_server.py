@@ -174,9 +174,16 @@ def call_ffmpeg(file_dir, res, port, resource_broadcast_ip, ffplay_port, avlogex
     p.wait()
 
 def stop_all():
+    global signal_timer_thread_flag
+    global start_system_flag
+    global stopFlag
+    global packet
+
     signal_timer_thread_flag=0
     start_system_flag=0
     stopFlag.set()
+    packet = ''
+
     print "stop all!!!!!!!!!!!!!!!!"
     print signal_timer_thread_flag
     print start_system_flag
@@ -241,6 +248,8 @@ def start_smt_system(programs_file=CONFIG_FILE_NAME,
     global cachetime
     global programmers
     global stopFlag
+
+
     #destination = destip
     json_data = load(programs_file)
     print "load file <" , programs_file , "> successful \n"
