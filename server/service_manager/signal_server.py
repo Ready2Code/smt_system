@@ -161,6 +161,8 @@ def call_ffmpeg(file_dir, res, port, resource_broadcast_ip, ffplay_port, avlogex
         ffmpeg_command = ffmpeg_command + ' -re {4} -i {0} -begintime {1} {5} -c:v copy -c:a aac -f mpu smt://{2}:{3}'.format(file_dir, begintime, resource_broadcast_ip, ffplay_port, playlist, str_avlogext)
     elif(res_type == 'broadband'):
         ffmpeg_command = ffmpeg_command + ' -re -port {1} {5} -i {0} -begintime {2} {6} -c:v copy -c:a aac -f mpu smt://{3}:{4}'.format(file_dir, port, begintime, BROADBAND_SERVER_IP, 1, playlist, str_avlogext) 
+    
+    print ffmpeg_command
 
     try:
         p = Popen(shlex.split(ffmpeg_command), stdout=FNULL, stderr=FNULL)
