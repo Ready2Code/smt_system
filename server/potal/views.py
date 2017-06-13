@@ -8,7 +8,7 @@ from state_monitor.models import get_monitor_settings
 from state_monitor.models import MonitorSettings
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
-import simplejson
+#import simplejson
 import json
 def start_page(request):
     #service_settings = ServiceSettings.objects.get(name="default")
