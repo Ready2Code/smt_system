@@ -267,6 +267,7 @@ def start_smt_system(programs_file=CONFIG_FILE_NAME,
     thread.setDaemon(True)
     thread.start()
 
+    endtime = datetime.now()
     for i in cycle(programmers):
       if start_system_flag==0:
         break
