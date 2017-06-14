@@ -185,10 +185,15 @@
             }
 
             function showImg(){
-			   var str="<img src='http://192.168.0.193:8000/static/quanjing0.png' width='100%' height='100%' display:block>"	
-			  
-                $("#img").append(str)
-                $("#img").show()
+                $.get("/currentprogramme/", function(ret){			
+                  $("tr.programme_info").remove()
+                  resources = ret.programmer.resources
+				  imgurl=resources[0].poster
+			      var str="<img src="+imgurl+" width='100%' height='100%' display:block>"	 
+			      console.log(imgurl)		   
+                  $("#img").append(str)
+                  $("#img").show()
+				})
 			} 
             function hideImg(){
 			   
@@ -212,11 +217,11 @@
                 });
 			}
             $(document).ready(function(){
-				showImg()
 			    currentprogramme.style.display="none"
 				setInterval("get_related()",5000)
                 set_programme_response()
                 set_programme_process_response()
+				showImg()
             });
 
         </script>      
