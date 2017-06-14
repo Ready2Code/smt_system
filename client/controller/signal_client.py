@@ -99,7 +99,7 @@ def call_ffplay(res):
         
     if(res_type == 'broadcast'):
         #-sync smt 
-        ffplay_command = ffplay_command + ' {6} {0},{1},{2},{3},{4} -port {5}'.format(res['url'],
+        ffplay_command = ffplay_command + ' -sync smt {6} {0},{1},{2},{3},{4} -port {5}'.format(res['url'],
                                                                                                 cal_screen_value(res['layout']['posx'], True), 
                                                                                                 cal_screen_value(res['layout']['posy'], False), 
                                                                                                 cal_screen_value(res['layout']['width'], True), 
@@ -401,7 +401,10 @@ def stop_all():
     global pffplay
     global sequence
     is_continue_play = 0
-    pffplay.kill()
+    try:
+        pffplay.kill()
+    except:
+        pass
     pffplay = None
     sequence = 0
 
