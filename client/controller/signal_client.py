@@ -450,6 +450,8 @@ options = { 'help':help,
             'stopall':stop_all,
             'stop':stop_play,
             'render':render,
+            'prompt':prompt_add,
+            'hide':prompt_del,
             'exit':exit,
 }
 
