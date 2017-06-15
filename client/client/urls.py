@@ -37,4 +37,5 @@ urlpatterns = [
     url(r'^ntpclient_page/$',          ntpclient_views.ntpclient_page,     name='ntpclient_page'),
     url(r'^ntpclient_page/get_ntpclient_status$',          ntpclient_views.get_ntpclient_status,     name='get_ntpclient_status'),
     url(r'^ntpclient_page/start_ntpclient$',          ntpclient_views.start_ntpclient,     name='start_ntpclient'),
+    url(r'^show_channels/related_operator/command/$',   controller_views.handle_command,     name='related_operator_command'),
 ]

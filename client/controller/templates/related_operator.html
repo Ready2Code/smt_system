@@ -42,9 +42,24 @@
              height:80px;
 			 font-size:25pt;
 		  } 
+          #control_bt{
+		     width:80px;
+             height:20px;
+			 font-size:10pt;
+		  } 
+          #ctr_cmd{
+		     width:80px;
+             height:20px;
+			 font-size:15pt;
+		  } 
 		</style>
     </head>
  <body>
+        <form id='commandForm' action='command' method='get'>
+		   <input type="text"  id="ctr_cmd" value="hide" name="command"/>
+		   <input type="submit" id="control_bt" value="submit" />
+		  </form> 
+          <hr/>
         <button type="button" id='currentprogramme'>Current Programme</button>
         <table id='programmeinfo' border="1" cellpadding="0" cellspacing="0" width="100%" >
 		<tr>
@@ -56,8 +71,6 @@
             <td>  </td>
 		</tr>
         </table>
-<!--        <hr/>
-		<a href="smt://127.0.0.1:1234">test smt</a> -->
 		<div id='popup' ></div> 
 		<div id='img' ></div> 
 		<div id='popup2' ></div> 
@@ -183,7 +196,9 @@
                     });
                 });
             }
-
+            function set_command_handle() {  
+				set_form_ajax('commandForm')
+			}
             function showImg(){
                 $.get("/currentprogramme/", function(ret){			
                   $("tr.programme_info").remove()
@@ -205,6 +220,8 @@
 			    console.log(data)
                 if(data==true)
 			      currentprogramme.style.display="block"
+			      control_bt.style.display="block"
+			      ctr_cmd.style.display="block"
 			}
             function get_related(){
 			    
@@ -218,7 +235,10 @@
 			}
             $(document).ready(function(){
 			    currentprogramme.style.display="none"
+			    control_bt.style.display="none"
+			    ctr_cmd.style.display="none"
 				setInterval("get_related()",5000)
+                set_command_handle()  
                 set_programme_response()
                 set_programme_process_response()
 				showImg()
