@@ -138,6 +138,7 @@ def convert_signal(json_file, resource_broadcast_ip, resource_broadband_ip,avlog
         t.start()
         resource_num += 1
         resource_num = resource_num % 10
+		 time.sleep(0.1)
     return json_data
 
 def call_ffmpeg(file_dir, res, port, resource_broadcast_ip, ffplay_port, avlogext=''):
@@ -171,7 +172,7 @@ def call_ffmpeg(file_dir, res, port, resource_broadcast_ip, ffplay_port, avlogex
     ffmpeg_list.append(p)
     time.sleep(delta.seconds+1)
     print delta.seconds, "passed  resource [", res['id'], "] is closed"
-    ffmpeg_list.pop()  
+    ffmpeg_list.pop(0)  
     p.kill()
     p.wait()
 
