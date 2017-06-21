@@ -31,6 +31,7 @@ class ntpThread (threading.Thread):
             except Exception, e:
                 traceback.print_exc()
                 self.status = str(e)
+                time.sleep(self.interval)
                 continue 
             ts = response.tx_time  
             if self.offset_count == 0:
