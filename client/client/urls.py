@@ -16,6 +16,7 @@ Including another URLconf
 from django.conf.urls import url
 from django.contrib import admin
 from controller import views as controller_views
+from tools import views as tools_views
 from ntpclient  import views as ntpclient_views
 
 urlpatterns = [
@@ -38,4 +39,6 @@ urlpatterns = [
     url(r'^ntpclient_page/get_ntpclient_status$',          ntpclient_views.get_ntpclient_status,     name='get_ntpclient_status'),
     url(r'^ntpclient_page/start_ntpclient$',          ntpclient_views.start_ntpclient,     name='start_ntpclient'),
     url(r'^show_channels/related_operator/command/$',   controller_views.handle_command,     name='related_operator_command'),
+    url(r'^tools/$',                    tools_views.tools,         name='tools'),
+    url(r'^tools/render$',                    tools_views.video_render,         name='video_render'),
 ]

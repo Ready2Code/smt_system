@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Tool</title>
+        <script src="{{STATIC_URL}}jquery.min.js"  ></script>
+    </head>
+    <body >
+        <form id='render' action='render' method='get'>
+             IP:port<p/>
+             <input type="text" name="addr1" value=""/> <p/>
+             <input type="text" name="addr2" value=""/> <p/>
+             <input type="text" name="addr3" value=""/> <p/>
+             <input type="text" name="addr4" value=""/> <p/>
+             <input type="text" name="addr5" value=""/> <p/>
+             <input type="submit" value="Render" />
+        </form>
+
+
+        <script>
+            function set_form_ajax(formid, cbfun) {
+                cbfun = cbfun || function (res) {}
+                $('#'+formid).on('submit', function (e){
+                    e.preventDefault();
+                    $.ajax( {
+                        type : "GET",
+                        dataType: "json",
+                        url : $(this).context.action,
+                        data : $(this).serialize(),
+                        success :cbfun 
+                    });
+                });
+            }
+
+
+            $(document).ready(function(){
+                set_form_ajax('render')
+            });
+
+        </script>      
+    </body>
+</html>
