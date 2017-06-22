@@ -4,6 +4,7 @@ from django.shortcuts import render
 from django.http import HttpResponse
 import socket
 import json
+VIDEO_RENDER_DEVICE_NUM=5
 
 str_render = {"type" : "render", "format" : {"name" : ""}}
 
@@ -13,22 +14,19 @@ def tools(request):
 def addr_str_to_tuple(addr):
     pos = addr.find(':')
     if -1 == pos:
-        return ('127.0.0.1',1)
+        return 0
     addr_tuple =  (addr[:pos], int(addr[pos+1:]))
     return addr_tuple 
 
 def video_render(request):
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    addr1 = request.GET['addr1']
-    addr2 = request.GET['addr2']
-    addr3 = request.GET['addr3']
-    addr4 = request.GET['addr4']
-    addr5 = request.GET['addr5']
+    addr_list = []
+    for i in range(VIDEO_RENDER_DEVICE_NUM):
+        key = 'addr'+str(i)
+        addr_list.append(addr_str_to_tuple(request.GET[key]))
     json_cmd = json.dumps(str_render)
-    s.sendto(json_cmd, addr_str_to_tuple(addr1))
-    s.sendto(json_cmd, addr_str_to_tuple(addr2))
-    s.sendto(json_cmd, addr_str_to_tuple(addr3))
-    s.sendto(json_cmd, addr_str_to_tuple(addr4))
-    s.sendto(json_cmd, addr_str_to_tuple(addr5))
+    for i in range(VIDEO_RENDER_DEVICE_NUM):
+        if 0 != addr_list[i]:
+            s.sendto(json_cmd, addr_list[i])
     return HttpResponse(u"ok", content_type='application/json')
 
