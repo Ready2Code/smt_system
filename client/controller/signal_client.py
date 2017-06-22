@@ -255,12 +255,14 @@ def play_json(json_data):
                 t = Thread(target=call_ffplay, args=(res, ))
                 t.setDaemon(True)
                 t.start()
+                break
     else:
         for res in json_data['programmer']['resources']:
             if(res['type'] == 'broadcast'):
                 t = Thread(target=add_ffplay, args=(res, ))
                 t.setDaemon(True)
                 t.start()
+                break
 
 def exception():
     global exception
