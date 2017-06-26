@@ -27,7 +27,7 @@ urlpatterns = [
 
     url(r'^ws/$',                    state_monitor_views.connect_websocket,    name='connect_websocket '),
     url(r'^start_state_monitor/$',   state_monitor_views.start_state_monitor,   name='start_state_monitro'),
-    url(r'^show_status/$',           state_monitor_views.show_status,           name='show_status'),
+    url(r'^show_status$',           state_monitor_views.show_status,           name='show_status'),
     url(r'^start_programs/$',        service_manager_views.start_programs,      name='start_programs'),
     url(r'^show_programs/$',         service_manager_views.show_programs,       name='show_programs'),
     url(r'^set_settings$',          potal_views.modify_service_settings,       name='modify_service_settings'),
