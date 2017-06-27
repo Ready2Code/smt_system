@@ -144,8 +144,8 @@ def convert_signal(json_file, resource_broadcast_ip, resource_broadband_ip,avlog
 def get_begin_time_string(begin_time, zone_offset='default'):
     if 'default' == zone_offset:
         now_stamp = time.time()
-        local_time = datetime.datetime.fromtimestamp(now_stamp)
-        utc_time = datetime.datetime.utcfromtimestamp(now_stamp)
+        local_time = datetime.fromtimestamp(now_stamp)
+        utc_time = datetime.utcfromtimestamp(now_stamp)
         zone_offset = local_time - utc_time
     begin_time_with_zone_offset = begin_time + zone_offset
     begin_time_utc_string = begin_time_with_zone_offset.strftime("%Y-%m-%dT%H:%M:%S.%f")
