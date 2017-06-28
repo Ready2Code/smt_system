@@ -45,7 +45,7 @@
          <script>
             var name=""
 			var path=""
-			var add_delete=true
+			var add_delete_up_down="add"
 		    type_info=""
 			url_info=""
 			posx_info=""
@@ -56,25 +56,51 @@
 		    function write_programmes_file(data){
 			  var jsonObj=JSON.parse(data)
 			  var add_json={}
-			  if(add_delete==true){
+			 /*********************add  object***********************/ 
+			  if(add_delete_up_down=="add"){
                 add_json['name']=name
                 add_json['url']=path
                 add_json['begin']="00:00:00"
                 add_json['end']="00:00:00"
 			    jsonObj.programmers.push(add_json)
-			  }else{
-			  
-			    add_delete=true
+			  }else if(add_delete_up_down=="del"){
+			 /*********************delete object***********************/ 
+			    add_delete_up_down="add"
 		        for(i=0;i<jsonObj.programmers.length;i++){  
 				  str=path
 				  str2=jsonObj.programmers[i].url
 				  if(str==str2){
 				    jsonObj.programmers.splice(i,1)  
-				  }
-					  
-				  
+				  }	  
 				}
-
+			  }else if(add_delete_up_down=="up"){
+			 /*********************up object***********************/ 
+			    add_delete_up_down="add"
+		        for(i=0;i<jsonObj.programmers.length;i++){  
+				  str=path
+				  str2=jsonObj.programmers[i].url
+				  if(str==str2){
+		            var tem_arr={}		   
+				    tmp_arr=jsonObj.programmers[i]
+				    jsonObj.programmers[i]= jsonObj.programmers[i-1]
+				    jsonObj.programmers[i-1]=tmp_arr
+				  }	  
+				}
+			  }else if(add_delete_up_down=="down"){
+			 /*********************down object***********************/ 
+			    add_delete_up_down="add"
+		        for(i=0;i<jsonObj.programmers.length;i++){  
+				  str=path
+				  str2=jsonObj.programmers[i].url
+				  if(str==str2){
+		            var tem_arr={}		   
+				    tmp_arr=jsonObj.programmers[i]
+				    jsonObj.programmers[i]= jsonObj.programmers[i+1]
+				    jsonObj.programmers[i+1]=tmp_arr
+					break
+				  }	  
+				}
+			  }else{
 			  
 			  }
 			  var json_data=JSON.stringify(jsonObj).replace(/\\n/g,"\\n").replace(/\\r/g,"\\n")
@@ -137,7 +163,7 @@
 
             function set_global_value(programme_path,add_delete_flag){
 			  path=programme_path
-			  add_delete=add_delete_flag
+			  add_delete_up_down=add_delete_flag
 			}
             function set_global_info_value(type,url,posx,posy,width,height,num){
 			  type_info=type
@@ -178,6 +204,9 @@
 				   if($tr.index()!=len-1){
 				     $tr.fadeOut().fadeIn()
 					 $tr.next().after($tr) 
+				     path= $(this).attr('path')
+				     set_global_value(path,"down")
+				     set_programmes_file()
 				   }		   
 					   
 			   })
@@ -187,15 +216,17 @@
 				   if($tr.index()>1){
 				     $tr.fadeOut().fadeIn()
 					 $tr.prev().before($tr) 
+				     path= $(this).attr('path')
+				     set_global_value(path,"up")
+				     set_programmes_file()
 				   }		   
 			  })
 		       $("button.process_resource_delete").unbind('click').bind('click',function(){
 
 			     var currentIndex=event.srcElement.parentNode.parentNode.rowIndex
 			     document.all.programme_list.deleteRow(currentIndex)
-			     add_delete=false
 				 path= $(this).attr('path')
-				 set_global_value(path,add_delete)
+				 set_global_value(path,"del")
 				 set_programmes_file()
 			  })
 					   
