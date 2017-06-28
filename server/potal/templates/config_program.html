@@ -193,6 +193,7 @@
 		    	})
 
 		       $("button.process_resource_info").unbind('click').bind('click',function(){
+			        $("#content_list").show()
 				    path= $(this).attr('path')
                     get_programme_info(path)
 		    	})
@@ -265,6 +266,7 @@
 				   newtr = newtr + "<td ><input type='text' id='input_width'  father_id="+$(this).attr('id')+"  value="+width+"></td>"
 				   newtr = newtr + "<td ><input type='text' id='input_height' father_id="+$(this).attr('id')+"  value="+height+"></td>"
 			       $("#layout_list").append(newtr)
+				   $("#layout_list").show()
 		    	})
 		      $("button.process_resource_submit").unbind('click').bind('click',function(){
 					var new_posx=""
@@ -292,6 +294,7 @@
 					}
 				   set_global_info_value(type_val,url_val,new_posx,new_posy,new_width,new_height,new_number)
 		           set_programme_info(path)
+				   $("#layout_list").hide()
                       
 			   })
 			}
@@ -393,6 +396,9 @@
 				   
 			   })
 			   set_programme_process_response()
+			   $("#layout_list").hide()
+			   $("#addprogramme_list").hide()
+			   $("#content_list").hide()
 		   });
          </script>
         </body>
