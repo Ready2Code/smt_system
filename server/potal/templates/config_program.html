@@ -92,7 +92,7 @@
 		        for(i=0;i<jsonObj.programmers.length;i++){  
 				  str=path
 				  str2=jsonObj.programmers[i].url
-				  if(str==str2){
+				  if(str==str2 && i!=jsonObj.programmers.length-1){
 		            var tem_arr={}		   
 				    tmp_arr=jsonObj.programmers[i]
 				    jsonObj.programmers[i]= jsonObj.programmers[i+1]
@@ -101,7 +101,7 @@
 				  }	  
 				}
 			  }else{
-			  
+			      return  
 			  }
 			  var json_data=JSON.stringify(jsonObj).replace(/\\n/g,"\\n").replace(/\\r/g,"\\n")
 			  set_config_file(json_data)
