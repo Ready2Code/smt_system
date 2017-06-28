@@ -34,6 +34,7 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^config_program/get_config_file/$', potal_views.get_config_file,       name='get_config_file'),
     url(r'^config_program/set_config_file/$', potal_views.set_config_file,       name='set_config_file'),
+    url(r'^config_program/get_file_list/$', potal_views.get_file_list,       name='get_file_list'),
     url(r'^start_server/$', service_manager_views.start_server,       name='start_server'),
     url(r'^stop_server/$', service_manager_views.stop_server,       name='stop_server')
 ]

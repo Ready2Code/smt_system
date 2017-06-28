@@ -8,8 +8,10 @@ from state_monitor.models import get_monitor_settings
 from state_monitor.models import MonitorSettings
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
-#import simplejson
+import os
 import json
+import codecs
+from collections import OrderedDict
 def start_page(request):
     #service_settings = ServiceSettings.objects.get(name="default")
     monitor_settings = get_monitor_settings()
@@ -21,12 +23,14 @@ def config_program(request):
     return render(request, 'config_program.html')
 	
 def modify_service_settings(request):
+    global programmes_path
     service_settings = get_service_settings()   
     service_settings.signal_destip   = request.GET['signal_destip']
     service_settings.signal_port     = request.GET['signal_port']
     service_settings.resource_broadcast_ip   = request.GET['resource_broadcast_ip']
     service_settings.resource_broadband_ip   =request.GET['resource_broadband_ip']
     service_settings.programs                = request.GET['programs_file_path']
+    programmes_path                = request.GET['programs_file_path'].encode('UTF-8')
     service_settings.save()
 
     monitor_settings = get_monitor_settings()   
@@ -39,24 +43,45 @@ def modify_service_settings(request):
     return HttpResponse(u"ok", content_type='application/json')
 def get_config_file(request):
     global filepath
+    global programmes_path
     filepath=request.GET["path"].encode('UTF8')
     print  filepath
-    file=open(filepath)
+#print  programmes_path
+    if filepath=='programmes.json':
+	   filepath=programmes_path
+    print  filepath
+    file=codecs.open(filepath,'r','utf-8')
+    data = ''
     try:
        data=file.read()
     finally:
        file.close()
        print data
-       return HttpResponse(json.dumps(data), content_type='application/json')
+       return HttpResponse(json.dumps(data, ensure_ascii=False), content_type='application/json')
 @csrf_exempt
 def set_config_file(request):
     global filepath
     data=request.POST["text"].encode('UTF8')
+    print "==============================000=======================================\n"
+    print data
+    data=json.dumps(json.loads(data,object_pairs_hook=OrderedDict),ensure_ascii=False,indent=4,sort_keys=False)
     print filepath
-    file=open(filepath,'w')
+    print "=====================================================================\n"
+    print data
+    file=codecs.open(filepath,'w','utf-8')
     try:
        data=file.write(data)
     finally:
        file.close()
+       filepath=""
     return HttpResponse(u"true", content_type='application/json')
-   
+def get_file_list(request):
+    allpath=''
+    rootdir=request.GET["rootdir"].encode('UTF8')
+    g=os.walk(rootdir)
+    for path,d,filelist in g:
+	  for i in range(0,len(filelist)):
+		path=os.path.join(path,filelist[i])
+		allpath+=path+";"
+    return HttpResponse(json.dumps(allpath), content_type='application/json')
+

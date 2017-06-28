@@ -17,56 +17,351 @@
         </head>
         <body >
 		   
-		   <textarea id="file_path" rows="1" name="filepath">please input config file path!!</textarea> 
+		   rootdir:<textarea id="file_path" rows="1" name="filepath">/home/lwj/static</textarea> 
+			 <table id='programme_list' border="1" > 
+			   <td><button type="button" id="addBt">addprogram</button> </td>
+			   <td>name </td>
+			   <td> info</td>
+			   <td> down</td>
+			   <td> up</td>
+			   <td>delete</td>
+			   <td></td>
 		   <hr/>
-		   <button type="button" id='get_file' >getFile</button>
-		   <button type="button" id='set_file' >setFile</button>
+			 <table id='content_list' border="1" > 
+			   <td>name </td>
+			   <td> net</td>
+			   <td> path</td>
+			   <td> layout</td>
+			   <td> submit</td>
 		   <hr/>
-		    <textarea id="file_text" rows="80" name="text"></textarea> 
+			 <table id='addprogramme_list' border="1" > 
+			   <td>name </td>
+		   <hr/>
+			 <table id='layout_list' border="1" > 
+			   <td>posx </td>
+			   <td> posy</td>
+			   <td> width</td>
+			   <td> height</td>
          <script>
+            var name=""
+			var path=""
+			var add_delete=true
+		    type_info=""
+			url_info=""
+			posx_info=""
+			posy_info=""
+			width_info=""
+			height_info=""
+			resource_num=0
+		    function write_programmes_file(data){
+			  var jsonObj=JSON.parse(data)
+			  var add_json={}
+			  if(add_delete==true){
+                add_json['name']=name
+                add_json['url']=path
+                add_json['begin']="00:00:00"
+                add_json['end']="00:00:00"
+			    jsonObj.programmers.push(add_json)
+			  }else{
+			  
+			    add_delete=true
+		        for(i=0;i<jsonObj.programmers.length;i++){  
+				  str=path
+				  str2=jsonObj.programmers[i].url
+				  if(str==str2){
+				    jsonObj.programmers.splice(i,1)  
+				  }
+					  
+				  
+				}
 
-		    function display_file(data){
-			   $("#file_text").val(data)
-			   console.log("display config file!!")
-			   console.log(data)
-			};
+			  
+			  }
+			  var json_data=JSON.stringify(jsonObj).replace(/\\n/g,"\\n").replace(/\\r/g,"\\n")
+			  set_config_file(json_data)
+			}
 
-            function get_config_file(path){
-			   console.log("get config file!!")
+		    function write_programme_info(data){
+			   var jsonObj=JSON.parse(data)
+			  console.log(type_info )
+			  console.log( url_info  )
+			  console.log(posx_info  )
+			  console.log(posy_info  )
+			  console.log( width_info  )
+			  console.log(height_info )
+			  console.log(resource_num)
+               resource=jsonObj.programmer.resources			   
+		       resource[resource_num].type= type_info 
+		       resource[resource_num].url= url_info 
+		       resource[resource_num].layout.posx= posx_info 
+		       resource[resource_num].layout.posy= posy_info 
+		       resource[resource_num].layout.width= width_info 
+		       resource[resource_num].layout.height= height_info 
+			   var json_data=JSON.stringify(jsonObj).replace(/\\n/g,"\\n").replace(/\\r/g,"\\n")
+			  set_config_file(json_data)
+			}
+		    function set_programmes_file(){
+		     	
+               var path="programmes.json"
 			   $.ajax({
 				 type:"GET",
 				 dataType:"json",
 				 url:"/config_program/get_config_file/",
 				 data:{path:path},
+				 async:false,
+				 success:write_programmes_file,					   
+			    });
+			
+			}
+		    function set_programme_info(path){
+			   $.ajax({
+				 type:"GET",
+				 dataType:"json",
+				 url:"/config_program/get_config_file/",
+				 data:{path:path},
+				 async:false,
+				 success:write_programme_info,					   
+			    });	
+			}
+		    function set_programme_process_response() {
+		        $("button.process_resource").unbind('click').bind('click',function(){
+		              name=$(this).attr('programmename')
+		              path=$(this).attr('path')
+		              console.log(path)
+                      get_programme_list(name,path)
+					  set_programmes_file()
+			          $("#addprogramme_list").hide()
+		    	})
+			}
+
+
+            function set_global_value(programme_path,add_delete_flag){
+			  path=programme_path
+			  add_delete=add_delete_flag
+			}
+            function set_global_info_value(type,url,posx,posy,width,height,num){
+			  type_info=type
+			  url_info=url
+			  posx_info=posx
+			  posy_info=posy
+			  width_info=width
+			  height_info=height
+			  resource_num=num
+			}
+            function get_programme_list(name,path){
+		      console.log("get_programme_list!!###############" )
+		      console.log(path)
+			   var newtr = ""
+			     newtr = newtr + "<tr class='programme_list'> "
+				 newtr = newtr + "<td ></td>"
+				 newtr = newtr + "<td ><button type='button' programmename='"+name+" '"+"  class='process_resource_programme'>"+name+"</button></td>"
+				 newtr = newtr + "<td ><button type='button'  path="+path+""+"  programmename='"+name+" '"+"  class='process_resource_info'>"+"info"+"</button></td>"
+				 newtr = newtr + "<td ><button type='button'  path="+path+""+"  programmename='"+name+" '"+"  class='process_resource_down'>"+"down"+"</button></td>"
+				 newtr = newtr + "<td ><button type='button'  path="+path+""+"  programmename='"+name+" '"+"  class='process_resource_up'>"+"up"+"</button></td>"
+				 newtr = newtr + "<td ><button type='button'  path="+path+""+"  programmename='"+name+" '"+"  class='process_resource_delete'>"+"delet"+"</button></td>"
+			    $("#programme_list").append(newtr)
+
+		       $("button.process_resource_programme").unbind('click').bind('click',function(){
+		          console.log( $(this).attr('programmename') )
+				   $("#addprogramme_list").show()
+		    	})
+
+		       $("button.process_resource_info").unbind('click').bind('click',function(){
+				    path= $(this).attr('path')
+                    get_programme_info(path)
+		    	})
+
+			   var $down=$(".down")
+			   var len=$down.length
+		       $("button.process_resource_down").unbind('click').bind('click',function(){
+                   var $tr=$(this).parents("tr")
+				   if($tr.index()!=len-1){
+				     $tr.fadeOut().fadeIn()
+					 $tr.next().after($tr) 
+				   }		   
+					   
+			   })
+		       $("button.process_resource_up").unbind('click').bind('click',function(){
+                   var $tr=$(this).parents("tr")
+			       console.log($tr.index())
+				   if($tr.index()>1){
+				     $tr.fadeOut().fadeIn()
+					 $tr.prev().before($tr) 
+				   }		   
+			  })
+		       $("button.process_resource_delete").unbind('click').bind('click',function(){
+
+			     var currentIndex=event.srcElement.parentNode.parentNode.rowIndex
+			     document.all.programme_list.deleteRow(currentIndex)
+			     add_delete=false
+				 path= $(this).attr('path')
+				 set_global_value(path,add_delete)
+				 set_programmes_file()
+			  })
+					   
+			}
+
+            function get_content_list(jsonObj){
+               resource=jsonObj.programmer.resources			   
+               $("tr.content_list").remove()
+			   console.log("get content list file!!")
+			   var newtr = ""
+			   for(var i=0; i< resource.length; i++) {
+			     newtr = newtr + "<tr class='content_list'> "
+				 newtr = newtr + "<td >"+resource[i].name+"</td>"
+			     if(resource[i].type=='broadcast'){
+				   newtr = newtr + "<td ><select id='select"+i+"'>"+"<option value='"+resource[i].type+"'>"+resource[i].type+"</option>"+"<option value='boadband'>boadband</option>"+"</select></td>"
+			     }else{
+				   newtr = newtr + "<td ><select id='select"+i+"'>"+"<option value='"+resource[i].type+"'>"+resource[i].type+"</option>"+"<option value='boadcast'>boadcast</option>"+"</select></td>"
+			   
+			     }
+				 newtr = newtr + "<td ><input type='text' id='text"+i+"' value="+resource[i].url+"></td>"
+				 newtr = newtr + "<td ><button type='button' id='layout"+i+"'  posx='"+resource[i].layout.posx+"'  posy='"+resource[i].layout.posy+"'  width='"+resource[i].layout.width+"'   height='"+resource[i].layout.height+"'"+" class='process_resource_layout'>layout</button></td>"
+				 newtr = newtr + "<td ><button type='button' number='"+i+"'   text_id='text"+i+"' layout_id='layout"+i+"' select_id='select"+i+"'  path="+resource[i].url+""+" name='"+resource[i].name+" '"+"  posx='"+resource[i].layout.posx+"'"+"  posy='"+resource[i].layout.posy+"'"+"  width='"+resource[i].layout.width+"'"+"  height='"+resource[i].layout.height+"'"+" class='process_resource_submit'>"+"submit"+"</button></td>"
+		      }
+			  $("#content_list").append(newtr)
+		      $("button.process_resource_layout").unbind('click').bind('click',function(){
+		          console.log( $(this).attr('posx') )
+                   $("tr.layout_list").remove()
+				   var posx= $(this).attr('posx')
+				   var posy= $(this).attr('posy')
+				   var width= $(this).attr('width')
+				   var height= $(this).attr('height')
+			       var newtr = ""
+			       newtr = newtr + "<tr class='layout_list'> "
+				   newtr = newtr + "<td ><input type='text' id='input_posx'   father_id="+$(this).attr('id')+"  value="+posx+"></td>"
+				   newtr = newtr + "<td ><input type='text' id='input_posy'   father_id="+$(this).attr('id')+"  value="+posy+"></td>"
+				   newtr = newtr + "<td ><input type='text' id='input_width'  father_id="+$(this).attr('id')+"  value="+width+"></td>"
+				   newtr = newtr + "<td ><input type='text' id='input_height' father_id="+$(this).attr('id')+"  value="+height+"></td>"
+			       $("#layout_list").append(newtr)
+		    	})
+		      $("button.process_resource_submit").unbind('click').bind('click',function(){
+					var new_posx=""
+					var new_posy=""
+					var new_width=""
+					var new_height=""
+					text_id="#"+$(this).attr('text_id')	
+					layout_id=$(this).attr('layout_id')
+				    select_id="#"+$(this).attr('select_id')
+					new_number=$(this).attr('number')	
+				    url_val=$(text_id).val()
+				    type_val=$(select_id).val()
+				    father_id= $("#input_posx").attr('father_id')
+					console.log(father_id)
+				    if(layout_id==father_id){
+					  new_posx= $("#input_posx").val()
+					  new_posy= $("#input_posy").val()
+					  new_width= $("#input_width").val()
+					  new_height= $("#input_height").val()
+					}else{
+					  new_posx=$(this).attr('posx')	
+					  new_posy=$(this).attr('posy')	
+					  new_width=$(this).attr('width')	
+					  new_height=$(this).attr('height')	
+					}
+				   set_global_info_value(type_val,url_val,new_posx,new_posy,new_width,new_height,new_number)
+		           set_programme_info(path)
+                      
+			   })
+			}
+            clean_addprogramme_list=false
+            function get_addprogramme_list(jsonObj,current_path){
+			  var rows=$("#addprogramme_list").length
+		      console.log( rows )
+              if(clean_addprogramme_list){
+			      $("tr.addprogramme_list").remove()
+                  clean_addprogramme_list=false
+			  }
+               var addprogramme_obj=jsonObj.programmer			   
+			   var newtr = ""
+			   newtr = newtr + "<tr class='addprogramme_list'> "
+			   newtr = newtr + "<td ><button type='button'  path="+current_path+"  programmename='"+addprogramme_obj.name+" '"+"  class='process_resource'>"+addprogramme_obj.name+"</button></td>"
+			   $("#addprogramme_list").append(newtr)
+			   set_programme_process_response()
+			}
+            current_path=""
+		    function display_file(data){
+			   var jsonObj=JSON.parse(data)
+               get_addprogramme_list(jsonObj,current_path)
+			}
+           
+            function display_file_list(data){
+			   var strs=new Array()
+			   var strpath=new Array()
+			   var path=""
+			   strs=data.split(";")
+			   for(i=0;i<strs.length;i++){
+                 path=strs[i]
+				 if(path)
+                   get_config_file(path)
+				   
+			   }     
+			}
+
+		    function creat_info_list(data){
+			   var jsonObj=JSON.parse(data)
+               var addprogramme_obj=jsonObj.programmer			   
+               get_content_list(jsonObj)
+			}
+			
+            function get_programme_info(path){
+			   console.log(path)
+			   $.ajax({
+				 type:"GET",
+				 dataType:"json",
+				 url:"/config_program/get_config_file/",
+				 data:{path:path},
+				 async:false,
+				 success: creat_info_list,					   
+			    });
+			}
+
+            function get_config_file(path){
+               current_path=path
+			   $.ajax({
+				 type:"GET",
+				 dataType:"json",
+				 url:"/config_program/get_config_file/",
+				 data:{path:path},
+				 async:false,
 				 success: display_file,					   
 			    });
 			}
-			  
+		    function get_file_list(rootdir){
+               clean_addprogramme_list=true
+			   $.ajax({
+				 type:"GET",
+		         dataType:"json",
+				 url:"/config_program/get_file_list/",
+			     data:{rootdir:rootdir},
+			     success: display_file_list,                    
+		       });
+		    }
+            function set_config_file_response(){
+			
+			 //  console.log(data)
+			}
+			
             function set_config_file(text){
 				$.ajax({
 				 type:"POST",
 				 dataType:"json",
 				 url:"/config_program/set_config_file/",
 				 data:{text:text},
-				 success: display_file,				   
+				 success: set_config_file_response,				   
 			    });	
 			}
 
 			$(document).ready(function(){
-			   $("#file_text").val("")
                var filepath
-			   $("#get_file").click(function(){ 
-			      $("#file_text").val("")
-                  filepath= $("#file_path").val()
-			      console.log("get file button!!")
-				  get_config_file(filepath) 
-			    }); 
-			   $("#set_file").click(function(){
-			     var data2
-				 data2=$("#file_text").val()
-			     console.log(data2)
-			     set_config_file(data2) 
-			   }); 	 
+			   $("#addBt").click(function(){ 
+			     var rows=$("#addprogramme_list").length
+                 filepath= $("#file_path").val()
+			     get_file_list(filepath)
+				 $("#addprogramme_list").show()
+				   
+			   })
+			   set_programme_process_response()
 		   });
          </script>
         </body>
