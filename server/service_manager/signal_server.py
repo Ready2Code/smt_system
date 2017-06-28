@@ -153,7 +153,7 @@ def get_begin_time_string(begin_time, zone_offset='default'):
     
 def call_ffmpeg(file_dir, res, port, resource_broadcast_ip, ffplay_port, avlogext=''):
     time.sleep(aheadtime/1000)
-    begintime = get_begin_time_string(res['begin'])
+    begintime = get_begin_time_string(res['begin'],timedelta(hours=8))
     res_type = res['type']
     delta = res['end'] - datetime.now()
     ffmpeg_command = ''
