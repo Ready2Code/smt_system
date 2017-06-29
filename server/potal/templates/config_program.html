@@ -59,7 +59,7 @@
 			 /*********************add  object***********************/ 
 			  if(add_delete_up_down=="add"){
                 add_json['name']=name
-                add_json['url']=path
+                add_json['url']="file://"+path
                 add_json['begin']="00:00:00"
                 add_json['end']="00:00:00"
 			    jsonObj.programmers.push(add_json)
