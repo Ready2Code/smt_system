@@ -13,7 +13,7 @@ Including another URLconf
     1. Import the include() function: from django.conf.urls import url, include
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
-from django.conf.urls import url
+from django.conf.urls import url,include
 from django.contrib import admin
 from potal import views as potal_views
 from state_monitor import views as state_monitor_views
@@ -37,4 +37,5 @@ urlpatterns = [
     url(r'^config_program/get_file_list/$', potal_views.get_file_list,       name='get_file_list'),
     url(r'^start_server/$', service_manager_views.start_server,       name='start_server'),
     url(r'^stop_server/$', service_manager_views.stop_server,       name='stop_server')
+    url(r'^ts_adapter/',               include('ts_adapter.urls')),
 ]

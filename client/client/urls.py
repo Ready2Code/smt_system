@@ -13,7 +13,7 @@ Including another URLconf
     1. Import the include() function: from django.conf.urls import url, include
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
-from django.conf.urls import url
+from django.conf.urls import include, url
 from django.contrib import admin
 from controller import views as controller_views
 from tools import views as tools_views
@@ -42,10 +42,5 @@ urlpatterns = [
     url(r'^show_channels/related_operator/command/$',   controller_views.handle_command,     name='related_operator_command'),
     url(r'^tools/$',                    tools_views.tools,         name='tools'),
     url(r'^tools/render$',                    tools_views.video_render,         name='video_render'),
-    url(r'^ts_adapter/$',               ts_adapter_views.ts_adapter,         name='ts_adapter'),
-    url(r'^ts_adapter/update_list/$',   ts_adapter_views.update_list,         name='update_list'),
-    url(r'^ts_adapter/modify/$',        ts_adapter_views.modify_item,              name='modify'),
-    url(r'^ts_adapter/delete/$',        ts_adapter_views.delete_item,              name='delete'),
-    url(r'^ts_adapter/start/$',         ts_adapter_views.start,              name='start_ts_adapter'),
-    url(r'^ts_adapter/stop/$',          ts_adapter_views.stop,              name='stop_ts_adapter'),
+    url(r'^ts_adapter/',               include('ts_adapter.urls')),
 ]

@@ -8,6 +8,8 @@
         <iframe src="/ntpclient_page" height="50" ></iframe>
         <a href="/ntpclient_page"> Set Ntp Client>></a>
         <hr/>
+        <a href='/ts_adapter/?mode=ts2ip'>Ts Adapter</a>
+        <hr/>
         <form id='controllerSettings' action='set_settings' method='get'>
              Device Name:           <input type="text" name="controller_name" value="{{controller_settings.controller_name}}"/>
              <p/>
@@ -21,6 +23,7 @@
              <p/>
              <input type="submit" value="Modify" />
         </form>
+        
 
         <button type="button" id='opentv' >Open TV</button>
         <p>result: <span id='result'></span></p>

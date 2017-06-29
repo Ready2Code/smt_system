@@ -5,6 +5,9 @@
             <script src="{{STATIC_URL}}jquery.min.js"  ></script>
         </head>
         <body >
+        <hr/>
+        <a href='/ts_adapter/?mode=ip2ts'>Ts Adapter</a>
+        <hr/>
         <form id='serviceSettings' action='set_settings' method='get'>
              Signal Dest IP: <input type="text" name="signal_destip" value="{{service_settings.signal_destip}}"/>
              <p/>
