@@ -79,9 +79,9 @@ def get_file_list(request):
     allpath=''
     rootdir=request.GET["rootdir"].encode('UTF8')
     for root,dirs,files in os.walk(rootdir):
-	  for file in files:
-		path=os.path.join(root,file)
-        if "program.json" in path
-	    	allpath+=path+";"
+       for file in files:
+         path=os.path.join(root,file)
+         if "program.json" in path:
+             allpath+=path+";"
     return HttpResponse(json.dumps(allpath), content_type='application/json')
 
