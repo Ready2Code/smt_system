@@ -46,4 +46,6 @@ urlpatterns = [
     url(r'^ts_adapter/update_list/$',   ts_adapter_views.update_list,         name='update_list'),
     url(r'^ts_adapter/modify/$',        ts_adapter_views.modify_item,              name='modify'),
     url(r'^ts_adapter/delete/$',        ts_adapter_views.delete_item,              name='delete'),
+    url(r'^ts_adapter/start/$',         ts_adapter_views.start,              name='start_ts_adapter'),
+    url(r'^ts_adapter/stop/$',          ts_adapter_views.stop,              name='stop_ts_adapter'),
 ]
