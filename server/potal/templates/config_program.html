@@ -290,7 +290,7 @@
 				   newtr = newtr + "<td ><input type='text' id='input_posy'   father_id="+$(this).attr('id')+"  value="+posy+"></td>"
 				   newtr = newtr + "<td ><input type='text' id='input_width'  father_id="+$(this).attr('id')+"  value="+width+"></td>"
 				   newtr = newtr + "<td ><input type='text' id='input_height' father_id="+$(this).attr('id')+"  value="+height+"></td>"
-			       $("#layout_list").append(newtr)
+			       $("#addprogramme_list").after($("#layout_list").append(newtr))
 				   $("#layout_list").show()
 		    	})
 		      $("button.process_resource_submit").unbind('click').bind('click',function(){
