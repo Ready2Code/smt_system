@@ -34,6 +34,11 @@
                 cbfun = cbfun || function (res) {}
                 $('#'+formid).on('submit', function (e){
                     e.preventDefault();
+                    intvl = parseFloat($("#update_interval").val())
+                    if(!isNaN(intvl)) {
+                        ntpclienttimer  = setInterval(get_ntp_status,intvl* 1000)
+                    }
+
                     $.ajax( {
                         type : "GET",
                         dataType: "json",
@@ -46,10 +51,6 @@
 
             $(document).ready(function(){
                 set_form_ajax('start_ntp_client')
-                intvl = parseFloat($("#update_interval").val())
-                if(!isNaN(intvl)) {
-                    ntpclienttimer  = setInterval(get_ntp_status,intvl* 1000)
-                }
 
             });
 
