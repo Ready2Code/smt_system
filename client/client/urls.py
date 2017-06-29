@@ -18,6 +18,7 @@ from django.contrib import admin
 from controller import views as controller_views
 from tools import views as tools_views
 from ntpclient  import views as ntpclient_views
+from ts_adapter import views as ts_adapter_views
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
@@ -41,4 +42,8 @@ urlpatterns = [
     url(r'^show_channels/related_operator/command/$',   controller_views.handle_command,     name='related_operator_command'),
     url(r'^tools/$',                    tools_views.tools,         name='tools'),
     url(r'^tools/render$',                    tools_views.video_render,         name='video_render'),
+    url(r'^ts_adapter/$',               ts_adapter_views.ts_adapter,         name='ts_adapter'),
+    url(r'^ts_adapter/update_list/$',   ts_adapter_views.update_list,         name='update_list'),
+    url(r'^ts_adapter/modify/$',        ts_adapter_views.modify_item,              name='modify'),
+    url(r'^ts_adapter/delete/$',        ts_adapter_views.delete_item,              name='delete'),
 ]

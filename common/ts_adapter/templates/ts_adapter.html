@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>TS adapter</title>
+        <script src="{{STATIC_URL}}jquery.min.js"  ></script>
+    </head>
+    <body >
+        <button type='button' id='update_list'> Update List </button>
+        <p/>
+        <table id='ts_adapter_list' border="1" >
+            <td> src addr  </td>
+            <td> dest addr </td>
+            <td> operater</td>
+            <td> selected </td>
+            <td> go </td>
+        </table>
+        
+
+        <script>
+            function delete_item() {
+               fa = $(this).parent().parent()
+               srcaddr = fa.find('input.srcaddr')[0]
+               destaddr = fa.find('input.destaddr')[0]
+               if('' == srcaddr.value) {
+                   alert('empty value')
+               } else {
+                   $.get("delete/",{ src_addr:srcaddr.value, dest_addr: destaddr.value})
+               }
+            }
+            function modify() {
+               fa = $(this).parent().parent()
+               srcaddr = fa.find('input.srcaddr')[0]
+               destaddr = fa.find('input.destaddr')[0]
+               if('' == srcaddr.value || '' == destaddr.value) {
+                   alert('empty value')
+               } else {
+                   $.get("modify/",{ src_addr:srcaddr.value, dest_addr: destaddr.value})
+               }
+
+            }
+            function update_list() {
+                    $.get("update_list/",function(ret){
+                        $("tr.list_info").remove()
+                        addr_list = ret
+                        var newtr = ""
+			for(var i = 0; i< addr_list.length + 1; i++) {
+                           if(i == addr_list.length) {
+                               srcaddr = ""
+                               destaddr = ""
+                           } else {
+                               srcaddr = addr_list[i].fields.src_addr
+                               destaddr = addr_list[i].fields.dest_addr
+                           }
+			   newtr = newtr + "<tr class='list_info'> "
+			   newtr = newtr + "<td>" + "<input class='srcaddr' type='text' value='"+srcaddr+"'/>" + "</td>"
+			   newtr = newtr + "<td>" + "<input class='destaddr' type='text' value='"+destaddr+"'/>" + "</td>"
+			   newtr = newtr + "<td>" + "<button class='modify'>Modify</button>" +
+                                                    "<button class='delete'>Delete</button>" + "</td>"
+			   newtr = newtr + "<td>" + "<input type='checkbox'/>" + "</td>"
+			   newtr = newtr + "<td>" + "<button>Start</button>" + "</td>"
+			   newtr = newtr + "</tr>"
+			}
+                        $("#ts_adapter_list").append(newtr)
+                        $(".modify").click(modify)
+                        $(".delete").click(delete_item)
+                        //set_event_response()
+                        //$('#result').html(channels)
+                    })
+
+            }
+            function set_form_ajax(formid, cbfun) {
+                cbfun = cbfun || function (res) {}
+                $('#'+formid).on('submit', function (e){
+                    e.preventDefault();
+                    $.ajax( {
+                        type : "GET",
+                        dataType: "json",
+                        url : $(this).context.action,
+                        data : $(this).serialize(),
+                        success :cbfun 
+                    });
+                });
+            }
+
+
+            $(document).ready(function(){
+                update_list()
+                $("#update_list").click(update_list)
+            });
+
+        </script>      
+    </body>
+</html>
