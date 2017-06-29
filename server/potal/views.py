@@ -30,7 +30,7 @@ def modify_service_settings(request):
     service_settings.resource_broadcast_ip   = request.GET['resource_broadcast_ip']
     service_settings.resource_broadband_ip   =request.GET['resource_broadband_ip']
     service_settings.programs                = request.GET['programs_file_path']
-    programmes_path                = request.GET['programs_file_path'].encode('UTF-8')
+    service_settings.resource_file_path      = request.GET['resource_file_path']
     service_settings.save()
 
     monitor_settings = get_monitor_settings()   
@@ -43,12 +43,12 @@ def modify_service_settings(request):
     return HttpResponse(u"ok", content_type='application/json')
 def get_config_file(request):
     global filepath
-    global programmes_path
     filepath=request.GET["path"].encode('UTF8')
     print  filepath
-#print  programmes_path
+    service_settings_info = get_service_settings()
+    print  service_settings_info.programs
     if filepath=='programmes.json':
-	   filepath=programmes_path
+	   filepath=service_settings_info.programs
     print  filepath
     file=codecs.open(filepath,'r','utf-8')
     data = ''
@@ -56,18 +56,13 @@ def get_config_file(request):
        data=file.read()
     finally:
        file.close()
-       print data
        return HttpResponse(json.dumps(data, ensure_ascii=False), content_type='application/json')
 @csrf_exempt
 def set_config_file(request):
     global filepath
     data=request.POST["text"].encode('UTF8')
-    print "==============================000=======================================\n"
-    print data
     data=json.dumps(json.loads(data,object_pairs_hook=OrderedDict),ensure_ascii=False,indent=4,sort_keys=False)
     print filepath
-    print "=====================================================================\n"
-    print data
     file=codecs.open(filepath,'w','utf-8')
     try:
        data=file.write(data)
@@ -77,7 +72,11 @@ def set_config_file(request):
     return HttpResponse(u"true", content_type='application/json')
 def get_file_list(request):
     allpath=''
-    rootdir=request.GET["rootdir"].encode('UTF8')
+    print "*****************service setting rootdir*************/"
+    service_settings_rootdir = get_service_settings()
+#    rootdir=request.GET["rootdir"].encode('UTF8')
+    rootdir=service_settings_rootdir.resource_file_path
+    print  rootdir
     for root,dirs,files in os.walk(rootdir):
        for file in files:
          path=os.path.join(root,file)
