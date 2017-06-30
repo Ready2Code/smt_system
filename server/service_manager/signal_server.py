@@ -95,6 +95,10 @@ def update_delta_time(tt, now):
     tt = deltatime + now
     return tt 
 
+def first_signal(dest):
+    str  = '{"programmer": {"sequence": 0}}'
+    s.sendto(str, dest)
+    
 def convert_signal(json_file, resource_broadcast_ip, resource_broadband_ip,avlogext='',static_resource_host=''):
 #def convert_signal(json_file, resource_broadcast_ip, resource_broadband_ip,static_resource_host,avlogext=''):
     global resource_num
@@ -273,6 +277,7 @@ def start_smt_system(programs_file=CONFIG_FILE_NAME,
     programmers = json_data['programmers']
     print 'aheadtime =', aheadtime , 'cachetime =', cachetime,'start_system_flag=',start_system_flag
 
+    first_signal(signal_destination)
     stopFlag = Event()
     thread = SignalTimerThread(stopFlag, signal_destination)
     thread.setDaemon(True)

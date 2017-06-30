@@ -209,6 +209,9 @@ def UDP_recv(port, channel_id, name):
         json_data = json.loads(data)
         channels_info[channel_id] = json_data
 
+        if json_data['programmer']['sequence']  == 0:
+            stop_all()
+            
         if(is_continue_play and
            continue_play_channel == channel_id and
            json_data['programmer']['sequence'] > sequence):
