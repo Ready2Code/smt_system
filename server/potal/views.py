@@ -49,7 +49,9 @@ def get_config_file(request):
     print  service_settings_info.programs
     if filepath=='programmes.json':
 	   filepath=service_settings_info.programs
+    print  "/*************************filepath*******************************/"
     print  filepath
+    print  "/********************************************************/"
     file=codecs.open(filepath,'r','utf-8')
     data = ''
     try:
