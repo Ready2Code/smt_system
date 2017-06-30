@@ -262,7 +262,7 @@ def start_smt_system(programs_file=CONFIG_FILE_NAME,
     global programmers
     global stopFlag
 
-
+    start_system_flag=1
     #destination = destip
     json_data = load(programs_file)
     print "load file <" , programs_file , "> successful \n"
@@ -271,7 +271,7 @@ def start_smt_system(programs_file=CONFIG_FILE_NAME,
     aheadtime = json_data['aheadtime']
     cachetime = json_data['cachetime']
     programmers = json_data['programmers']
-    print 'aheadtime =', aheadtime , 'cachetime =', cachetime
+    print 'aheadtime =', aheadtime , 'cachetime =', cachetime,'start_system_flag=',start_system_flag
 
     stopFlag = Event()
     thread = SignalTimerThread(stopFlag, signal_destination)
