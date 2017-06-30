@@ -210,7 +210,7 @@ def UDP_recv(port, channel_id, name):
         channels_info[channel_id] = json_data
 
         if json_data['programmer']['sequence']  == 0:
-            stop_all()
+            clear_all()
             
         if(is_continue_play and
            continue_play_channel == channel_id and
@@ -252,6 +252,7 @@ def COMMAND_recv(port):
 
 def play_json(json_data):
     #print 'play_json'
+    global pffplay
     if pffplay is None:
         for res in json_data['programmer']['resources']:
             if(res['type'] == 'broadcast'):
@@ -401,17 +402,22 @@ def continue_play(channel = DEFAULT):
     continue_play_channel = channel
     is_continue_play = 1
 
-def stop_all():
-    global is_continue_play
+
+
+def clear_all():
     global pffplay
     global sequence
-    is_continue_play = 0
     try:
         pffplay.kill()
     except:
         pass
     pffplay = None
     sequence = 0
+
+def stop_all():
+    global is_continue_play
+    is_continue_play = 0
+    clear_all()
 
 def stop_play(val = DEFAULT):
     global pffplay
