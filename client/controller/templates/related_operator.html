@@ -55,6 +55,7 @@
 		</style>
     </head>
  <body>
+        <button type="button" id='pause'>Pause</button>
         <form id='commandForm' action='command' method='get'>
 		   <input type="text"  id="ctr_cmd" value="hide" name="command"/>
 		   <input type="submit" id="control_bt" value="submit" />
@@ -149,6 +150,9 @@
 			   })
               }
  
+            function set_pause() {
+                $.get("/show_channels/command/",{ command:"render"})
+            }
             function set_programme_response() {
                 $("#currentprogramme").click(function(){
 					hideImg()
@@ -242,6 +246,7 @@
                 set_programme_response()
                 set_programme_process_response()
 				showImg()
+                $("#pause").click(set_pause)
             });
 
         </script>      
