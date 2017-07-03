@@ -267,14 +267,14 @@
 			     newtr = newtr + "<tr class='content_list'> "
 				 newtr = newtr + "<td >"+resource[i].name+"</td>"
 			     if(resource[i].type=='broadcast'){
-				   newtr = newtr + "<td ><select id='select"+i+"'>"+"<option value='"+resource[i].type+"'>"+resource[i].type+"</option>"+"<option value='boadband'>boadband</option>"+"</select></td>"
+				   newtr = newtr + "<td ><select id='select"+i+"'>"+"<option value='"+resource[i].type+"'>广播</option>"+"<option value='boadband'>宽带</option>"+"</select></td>"
 			     }else{
-				   newtr = newtr + "<td ><select id='select"+i+"'>"+"<option value='"+resource[i].type+"'>"+resource[i].type+"</option>"+"<option value='boadcast'>boadcast</option>"+"</select></td>"
+				   newtr = newtr + "<td ><select id='select"+i+"'>"+"<option value='"+resource[i].type+"'>宽带</option>"+"<option value='boadcast'>广播</option>"+"</select></td>"
 			   
 			     }
 				 newtr = newtr + "<td ><input type='text' id='text"+i+"' value="+resource[i].url+"></td>"
-				 newtr = newtr + "<td ><button type='button' id='layout"+i+"'  posx='"+resource[i].layout.posx+"'  posy='"+resource[i].layout.posy+"'  width='"+resource[i].layout.width+"'   height='"+resource[i].layout.height+"'"+" class='process_resource_layout'>layout</button></td>"
-				 newtr = newtr + "<td ><button type='button' number='"+i+"'   text_id='text"+i+"' layout_id='layout"+i+"' select_id='select"+i+"'  path="+resource[i].url+""+" name='"+resource[i].name+" '"+"  posx='"+resource[i].layout.posx+"'"+"  posy='"+resource[i].layout.posy+"'"+"  width='"+resource[i].layout.width+"'"+"  height='"+resource[i].layout.height+"'"+" class='process_resource_submit'>"+"submit"+"</button></td>"
+				 newtr = newtr + "<td ><button type='button' id='layout"+i+"'  posx='"+resource[i].layout.posx+"'  posy='"+resource[i].layout.posy+"'  width='"+resource[i].layout.width+"'   height='"+resource[i].layout.height+"'"+" class='process_resource_layout'>布局</button></td>"
+				 newtr = newtr + "<td ><button type='button' number='"+i+"'   text_id='text"+i+"' layout_id='layout"+i+"' select_id='select"+i+"'  path="+resource[i].url+""+" name='"+resource[i].name+" '"+"  posx='"+resource[i].layout.posx+"'"+"  posy='"+resource[i].layout.posy+"'"+"  width='"+resource[i].layout.width+"'"+"  height='"+resource[i].layout.height+"'"+" class='process_resource_submit'>提交</button></td>"
 		      }
 			  $("#content_list").append(newtr)
 		      $("button.process_resource_layout").unbind('click').bind('click',function(){
