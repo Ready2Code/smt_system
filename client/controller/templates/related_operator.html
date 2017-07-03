@@ -91,11 +91,11 @@
 			   newtr = newtr +"<div id='nav'><ul> <li><button  id='tv'"  + "resource_id='" 
 			           + $(this).attr('resource_id') + "' " 
 			           + "channel_id='" + $(this).attr('channel_id') + "' "
-			           + "command='play'" +">tv</button></li> <li> <button  id='pad'" +"'" + "resource_id='" 
+			           + "command='play'" +">电视</button></li> <li> <button  id='pad'" +"'" + "resource_id='" 
 			           + $(this).attr('resource_id') + "' " 
 			           + "channel_id='" + $(this).attr('channel_id') + "' "
 					   + "resource_url='" + $(this).attr('resource_url') + "' "
-			           + "command='play' " +">pad</button></li></ul></div>"
+			           + "command='play' " +">终端</button></li></ul></div>"
 			    console.log(newtr)		   
                $("#popup").append(newtr)
                $("#popup").show()
@@ -109,10 +109,10 @@
 			   $("#tv").click(function(){
 			       console.log("tv button click!")
 			       var newtr = ""
-			       newtr = newtr +"<div id='nav'><ul> <li><input type='button' value='big screen' id='big' /></li> <li> <button  id='small'"                           + "resource_id='" 
+			       newtr = newtr +"<div id='nav'><ul> <li><input type='button' value='大屏' id='big' /></li> <li> <button  id='small'"                           + "resource_id='" 
      			           + $("#tv").attr('resource_id') + "' " 
 	    		           + "channel_id='" + $("#tv").attr('channel_id') + "' "
-		    	           + "command='play' " +">small screen</button></li></ul></div>"
+		    	           + "command='play' " +">小屏</button></li></ul></div>"
 
 			      $("#popup2").append(newtr)
                   $("#popup2").show()
@@ -173,11 +173,11 @@
                                               + "channel_id='" + ret.channel_id + "' "
 											  + "resource_url='" + resources[i].url + "' "
                                               + "command='play' " 
-                                              + "class='process_resource'>Open</button> </td>"
+                                              + "class='process_resource'>打开</button> </td>"
                                 newtr = newtr + "<td > <button resource_id='" + resources[i].id + "' " 
                                               + "channel_id='" + ret.channel_id + "' "
                                               + "command='stop' " 
-                                              + "class='process_resource'>Close</button> </td>"
+                                              + "class='process_resource'>关闭</button> </td>"
                                 newtr = newtr + "</tr>"
                         }
                         $("#programmeinfo").append(newtr)
