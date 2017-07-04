@@ -109,7 +109,7 @@
 			   $("#tv").click(function(){
 			       console.log("tv button click!")
 			       var newtr = ""
-			       newtr = newtr +"<div id='nav'><ul> <li><input type='button' value='大屏' id='big' /></li> <li> <button  id='small'"                           + "resource_id='" 
+			       newtr = newtr +"<div id='nav'><ul> <li><button  id='big'  resource_id='"+ $("#tv").attr('resource_id')+"' channel_id='"+$("#tv").attr('channel_id')+"' command='play'  >大屏</button></li> <li> <button  id='small'" + "resource_id='" 
      			           + $("#tv").attr('resource_id') + "' " 
 	    		           + "channel_id='" + $("#tv").attr('channel_id') + "' "
 		    	           + "command='play' " +">小屏</button></li></ul></div>"
@@ -119,6 +119,15 @@
                   $("#popup").hide()
                   $("#popup").empty()
                  
+                  $("#big").click(function(){
+			        console.log("big screen button click")		   
+				    var	full_id=1
+                    $("#popup2").empty()
+                    $("#popup2").hide()
+                    $.get("/" + $(this).attr('command') +"/"+$(this).attr('channel_id')+"/"+$(this).attr('resource_id')+"/"+full_id+"/",function(ret){
+			       
+				    })
+			      })
 				  $("#small").click(function(){
 			        console.log("small screen button click")		   
                     $("#popup2").empty()
@@ -139,10 +148,6 @@
                $("#popup").show()
 			   set_programme_process_response()
 				  })
-               $("#big").click(function(){
-			     
-			     console.log("big screen button click")		   
-			   })
 			   })
                $("#pad").click(function(){
                   gotoActivity('videoactivity')			     
