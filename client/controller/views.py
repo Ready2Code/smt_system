@@ -47,8 +47,11 @@ def get_current_programme_info(request):
 def related_operator(request):
     return render(request, 'related_operator.html')
 
-def play_channel(request, channel_id, res_id):
-    signal_client.handle_command("play " + channel_id +":" +res_id)
+def play_channel(request, channel_id, res_id,full_id):
+    if full_id=='1':
+      signal_client.handle_command("play " + channel_id +":" +res_id +"" +"[full]")
+    else:
+       signal_client.handle_command("play " + channel_id +":" +res_id)
     return HttpResponse(u"OK", content_type='application/json')
 
 def stop_channel(request, channel_id, res_id):
