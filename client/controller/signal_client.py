@@ -99,7 +99,17 @@ def call_ffplay(res):
         
     if(res_type == 'broadcast'):
         #-sync smt 
-        ffplay_command = ffplay_command + ' -sync smt {6} {0},{1},{2},{3},{4} -port {5}'.format(res['url'],
+        if ('bk' in res.keys()):
+            ffplay_command = ffplay_command + ' -sync smt {6} {0},{1},{2},{3},{4} -port {5} -bk {7}'.format(res['url'],
+                                                                                                        cal_screen_value(res['layout']['posx'], True), 
+                                                                                                        cal_screen_value(res['layout']['posy'], False), 
+                                                                                                        cal_screen_value(res['layout']['width'], True), 
+                                                                                                        cal_screen_value(res['layout']['height'], False), 
+                                                                                                        FFPLAY_LISTEN_PORT,
+                                                                                                        str_avlogext,
+                                                                                                        res['bk']) 
+        else:
+            ffplay_command = ffplay_command + ' -sync smt {6} {0},{1},{2},{3},{4} -port {5}'.format(res['url'],
                                                                                                 cal_screen_value(res['layout']['posx'], True), 
                                                                                                 cal_screen_value(res['layout']['posy'], False), 
                                                                                                 cal_screen_value(res['layout']['width'], True), 

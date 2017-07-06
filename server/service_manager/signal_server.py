@@ -122,6 +122,8 @@ def convert_signal(json_file, resource_broadcast_ip, resource_broadband_ip,avlog
         ffmpeg_port = '{0}{1}{2}{3}{4}'.format(RESERVED_POS_ONE, 1, CHANNEL_NUM, program_num, resource_num)
         if(res['type'] == 'broadcast'):
             res['url'] = 'smt://{0}:{1}'.format(resource_broadcast_ip, ffplay_port)
+            if ('bk' in res.keys()):
+                res['bk']='smt://{0}:{1}@:{2}'.format(resource_broadband_ip, ffmpeg_port,res['bk'])
         elif(res['type'] == 'broadband'):
             res['url'] = 'smt://{0}:{1}@:{2}'.format(resource_broadband_ip, ffmpeg_port,ffplay_port)
         else:
