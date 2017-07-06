@@ -23,6 +23,8 @@
         
         <p/>
         <button type='button' id='start_selected'> Start Selected </button>
+        <button type='button' id='stop_selected'> Stop Selected </button>
+        <button type='button' id='refresh_status'> Refresh Status </button>
 
         <script>
             function delete_item() {
@@ -75,6 +77,48 @@
                     }
                 )
             }
+            function stop_selected() {
+                $("tr.list_info").each(
+                    function() {
+                        if($(this).find('input.selected')[0].checked) {
+                            $(this).find('button.stop')[0].click()
+                        }
+                    }
+                )
+            }
+            function refresh_status() {
+                $("tr.list_info").each(
+                    function() {
+                        if(true) {
+                            srcaddr = $(this).find('input.srcaddr')[0]
+                            destaddr = $(this).find('input.destaddr')[0]
+                            if('' == srcaddr.value) {
+			    } else {
+                                curtr=($(this).find('font.operator')[0])
+                                //curtr=$(this)
+                                $.ajax({
+                                    url:"find/",
+                                    data:{ src_addr:srcaddr.value, dest_addr: destaddr.value},
+                                    type:"GET",
+                                    dataType:'json',
+                                    success:function(result){
+                                        if (typeof(result.status) != "undefined" && result.status == "on" && result.srcaddr != "") {
+                                            $(this)[0].cur_tr.innerHTML="★"
+                                        } else {
+                                            $(this)[0].cur_tr.innerHTML="☆"
+                                        }
+                                    },
+                                    cur_tr:curtr
+                                })
+			    }
+
+
+                        }
+                    }
+                )
+            }
+ 
+ 
             function update_list() {
                     $.get("update_list/",function(ret){
                         $("tr.list_info").remove()
@@ -91,10 +135,10 @@
 			   newtr = newtr + "<tr class='list_info'> "
 			   newtr = newtr + "<td>" + "<input class='srcaddr' type='text' value='"+srcaddr+"'/>" + "</td>"
 			   newtr = newtr + "<td>" + "<input class='destaddr' type='text' value='"+destaddr+"'/>" + "</td>"
-			   newtr = newtr + "<td>" + "<button class='modify'>Modify</button>" +
+			   newtr = newtr + "<td>" + "<button class='modify'>Add</button>" +
                                                     "<button class='delete'>Delete</button>" + "</td>"
 			   newtr = newtr + "<td>" + "<input class='selected' type='checkbox' checked=true />" + "</td>"
-			   newtr = newtr + "<td>" + "<button class='start'>Start</button>"  +
+			   newtr = newtr + "<td> <font class='operator'> ☆ </font >" + " <button class='start'>Start</button>"  +
 			                            "<button class='stop'>Stop</button>" + "</td>"
 			   newtr = newtr + "</tr>"
 			}
@@ -126,6 +170,8 @@
                 update_list()
                 $("#update_list").click(update_list)
                 $("#start_selected").click(start_selected)
+                $("#stop_selected").click(stop_selected)
+                $("#refresh_status").click(refresh_status)
             });
 
         </script>      

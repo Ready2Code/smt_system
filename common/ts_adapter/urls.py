@@ -8,5 +8,6 @@ urlpatterns = [
     url(r'^delete/$',        ts_adapter_views.delete_item,       name='delete'),
     url(r'^start/$',         ts_adapter_views.start,             name='start_ts_adapter'),
     url(r'^stop/$',          ts_adapter_views.stop,              name='stop_ts_adapter'),
+    url(r'^find/$',          ts_adapter_views.find,              name='find_ts_adapter'),
 ]
 

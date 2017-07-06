@@ -7,24 +7,25 @@ import re
 
 dll_list={}
 
-def kill_process_by_name(name):
-    print name
-    name = name.replace('-','')
+def find_process_by_name(name):
+    name = name.replace('-',' ')
     name_list = name.split()
-    print name_list 
-    #cmd='ps aux | grep %s'%newname
     cmd='ps aux | grep %s'%'| grep '.join(name_list) 
-    print cmd 
     f=os.popen(cmd)
-    regex=re.compile(r'\w+\s+(\d+)\s+.*')
     txt=f.read()
     if len(txt)<5:
         print 'there is no thread by name or command %s'%name
-        return
+        return ''
+    return txt
+
+def kill_process_by_name(name):
+    txt = find_process_by_name(name)
+    regex=re.compile(r'\w+\s+(\d+)\s+.*')
     ids=regex.findall(txt)
     cmd="kill %s"%' '.join(ids)
     print cmd
     os.system(cmd)
+
 
 def init():
     dll = CDLL("../related/libMMTtool.so")
@@ -78,8 +79,13 @@ def start_ts_adapter(mode, srcaddr, destaddr):
 def stop_ts_adapter(srcaddr):
     global dll_list 
     if dll_list.has_key(srcaddr):
-        #dll_list[srcaddr].stop.argtypes = [c_char_p]
-        #dll_list[srcaddr].stop(srcaddr)
         kill_process_by_name(dll_list[srcaddr])
         del dll_list[srcaddr]
+
+def find_ts_adapter(srcaddr):
+    global dll_list 
+    txt = ''
+    if dll_list.has_key(srcaddr):
+        txt = find_process_by_name(dll_list[srcaddr])
+        return txt
 

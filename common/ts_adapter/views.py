@@ -48,3 +48,16 @@ def stop(request):
     srcaddr         = request.GET['src_addr']
     MMTtool.stop_ts_adapter(srcaddr)
     return HttpResponse(u"ok", content_type='application/json')
+
+def find(request):
+    try:
+        srcaddr         = request.GET['src_addr']
+    except:
+        srcaddr = ""
+    txt = MMTtool.find_ts_adapter(srcaddr)
+    ret = {}
+    ret["srcaddr"] = srcaddr
+    ret["status"] = "on"
+    if '' == txt or None == txt:
+        ret["status"] = "off"
+    return HttpResponse(json.dumps(ret), content_type='application/json')
