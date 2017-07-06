@@ -97,7 +97,11 @@ def update_delta_time(tt, now):
 
 def first_signal(dest):
     str  = '{"programmer": {"sequence": 0}}'
-    s.sendto(str, dest)
+    counter = 200
+    while counter > 0:
+        s.sendto(str, dest)
+        counter = counter - 1
+        time.sleep(0.01)
     
 def convert_signal(json_file, resource_broadcast_ip, resource_broadband_ip,avlogext='',static_resource_host=''):
 #def convert_signal(json_file, resource_broadcast_ip, resource_broadband_ip,static_resource_host,avlogext=''):
