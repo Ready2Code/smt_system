@@ -32,6 +32,7 @@ urlpatterns = [
     url(r'^get_channels/$',            controller_views.get_channels,       name='get_channels'),
     url(r'^cplay/(\d+)/$',             controller_views.cplay_channel,      name='cplay_channel'),
     url(r'^play/(\d+)/([\w-]+)/(\d+)/$',     controller_views.play_channel,       name='play_channel'),
+    url(r'^play/(\d+)/([\w-]+)/$',     controller_views.play_channel,       name='play_channel'),
     url(r'^stop/(\d+)/([\w-]+)/$',     controller_views.stop_channel,       name='stop_channel'),
     url(r'^show_channels/set_settings/$',          controller_views.modify_controller_settings,       name='modify_service_settings'),
 

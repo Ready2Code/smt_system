@@ -221,6 +221,7 @@ def UDP_recv(port, channel_id, name):
 
         if json_data['programmer']['sequence']  == 0:
             clear_all()
+            continue
             
         if(is_continue_play and
            continue_play_channel == channel_id and
