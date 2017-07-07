@@ -49,7 +49,7 @@ def related_operator(request):
 
 def play_channel(request, channel_id, res_id,full_id='0'):
     if full_id=='1':
-      signal_client.handle_command("play " + channel_id +":" +res_id +"" +"[full]")
+      signal_client.handle_command("play " + channel_id +":" +res_id +" full")
     else:
        signal_client.handle_command("play " + channel_id +":" +res_id)
     return HttpResponse(u"OK", content_type='application/json')

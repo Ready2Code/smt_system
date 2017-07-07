@@ -11,6 +11,8 @@ import platform
 from datetime import datetime, timedelta
 from threading import Timer, Thread, Event
 from subprocess import call,Popen,PIPE,STDOUT
+from utils import functions
+
 
 FNULL = open(os.devnull, 'w')
 DEFAULT = object()
@@ -118,7 +120,9 @@ def call_ffplay(res):
                                                                                                 str_avlogext) 
     print ffplay_command
     #p = Popen(shlex.split(ffplay_command))
-    pffplay = Popen(shlex.split(ffplay_command), stdout=FNULL, stderr=STDOUT)
+    pffplay = ffplay_command
+    os.system(ffplay_command)
+    #pffplay = Popen(shlex.split(ffplay_command), stdout=FNULL, stderr=STDOUT)
     if(related == 'true'):
         time.sleep(2) 
         prompt_add()
@@ -221,6 +225,7 @@ def UDP_recv(port, channel_id, name):
 
         if json_data['programmer']['sequence']  == 0:
             clear_all()
+            print "*********** restart **************"
             continue
             
         if(is_continue_play and
@@ -296,7 +301,7 @@ def handle_command(command):
     if len(option) == 2:
         options[option[0]](option[1])
     elif len(option) == 3:
-        options[option[0]](option[1])(option[2])
+        options[option[0]](option[1],option[2])
     else:
         options[option[0]]()
 
@@ -419,9 +424,11 @@ def clear_all():
     global pffplay
     global sequence
     try:
-        pffplay.kill()
+        functions.kill_process_by_name(pffplay) 
+        #pffplay.kill()
     except:
         pass
+    os.system("pkill ffplay")
     pffplay = None
     sequence = 0
 
@@ -436,7 +443,8 @@ def stop_play(val = DEFAULT):
         print bcolors.FAIL + "missing operand: need channel_id" + bcolors.ENDC
         return
     if ":" not in val:
-        pffplay.kill()
+        functions.kill_process_by_name(pffplay) 
+        #pffplay.kill()
         pffplay = None
         return
 
