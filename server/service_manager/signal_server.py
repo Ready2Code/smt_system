@@ -97,7 +97,7 @@ def update_delta_time(tt, now):
 
 def first_signal(dest):
     str  = '{"programmer": {"sequence": 0}}'
-    counter = 200
+    counter = 300
     while counter > 0:
         s.sendto(str, dest)
         counter = counter - 1
@@ -271,7 +271,9 @@ def start_smt_system(programs_file=CONFIG_FILE_NAME,
     global cachetime
     global programmers
     global stopFlag
+    global signal_timer_thread_flag 
 
+    signal_timer_thread_flag = 1
     start_system_flag=1
     #destination = destip
     json_data = load(programs_file)
