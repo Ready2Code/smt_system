@@ -14,6 +14,7 @@ from datetime import datetime, timedelta
 from threading import Timer, Thread, Event
 from subprocess import call,Popen,PIPE,STDOUT
 from itertools import cycle
+from utils import functions
 
 # This is a throwaway variable to deal with a python bug
 throwaway = datetime.strptime('20110101','%Y%m%d')
@@ -189,10 +190,10 @@ def call_ffmpeg(file_dir, res, port, resource_broadcast_ip, ffplay_port, avlogex
         p = Popen(shlex.split(ffmpeg_command), stdout=FNULL, stderr=FNULL)
     except:
         print "error ---------------------------------------" 
-    ffmpeg_list.append(p)
+    ffmpeg_list.append(ffmpeg_command)
     time.sleep(delta.seconds+1)
     print delta.seconds, "passed  resource [", res['id'], "] is closed"
-    ffmpeg_list.pop(0)  
+    ffmpeg_list.pop(ffmpeg_command)  
     p.kill()
     p.wait()
 
@@ -212,8 +213,9 @@ def stop_all():
     print start_system_flag
     print range(len(ffmpeg_list))
     for i in range(len(ffmpeg_list)):
-        ffmpeg_list[i].kill()
-        ffmpeg_list[i].wait()
+        #ffmpeg_list[i].kill()
+        #ffmpeg_list[i].wait()
+        functions.kill_process_by_name(ffmpeg_list[i])
     del ffmpeg_list[:]
 def delay_broadcast(s, packet, des):
     if len(packet) == 0:

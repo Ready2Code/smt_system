@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'service_manager',
     'resources',
     'ts_adapter',
+    'utils',
 ]
 
 MIDDLEWARE = [
