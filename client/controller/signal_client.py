@@ -447,7 +447,7 @@ def stop_play(val = DEFAULT):
     programmers = channels_info[vals[0]]
     for res in programmers['programmer']['resources']:
         if (res['id'] == vals[1]):
-            if(res['type'] == 'broadband'):
+            #if(res['type'] == 'broadband'):
                 t = Thread(target=del_ffplay, args=(res, ))
                 t.setDaemon(True)
                 t.start()
