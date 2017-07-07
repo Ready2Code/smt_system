@@ -109,6 +109,12 @@ def convert_signal(json_file, resource_broadcast_ip, resource_broadband_ip,avlog
     global resource_num
     global sequence_number
     global packet
+    global ffmpeg_list
+ 
+    for i in range(len(ffmpeg_list)):
+        functions.kill_process_by_name(ffmpeg_list[i])
+    del ffmpeg_list[:]
+
     json_data = json.loads(json_file)
     sequence_number += json_data['programmer']['sequence']
     json_data['programmer']['sequence'] = sequence_number
@@ -186,22 +192,26 @@ def call_ffmpeg(file_dir, res, port, resource_broadcast_ip, ffplay_port, avlogex
     
     print ffmpeg_command
 
+    ffmpeg_list.append(ffmpeg_command)
     try:
-        p = Popen(shlex.split(ffmpeg_command), stdout=FNULL, stderr=FNULL)
+        #p = Popen(shlex.split(ffmpeg_command), stdout=FNULL, stderr=FNULL)
+        os.system(ffmpeg_command)
     except:
         print "error ---------------------------------------" 
-    ffmpeg_list.append(ffmpeg_command)
-    time.sleep(delta.seconds+1)
-    print delta.seconds, "passed  resource [", res['id'], "] is closed"
-    ffmpeg_list.pop(ffmpeg_command)  
-    p.kill()
-    p.wait()
+    #ffmpeg_list.append(ffmpeg_command)
+    #time.sleep(delta.seconds+1)
+    #print delta.seconds, "passed  resource [", res['id'], "] is closed"
+    #ffmpeg_list.pop(ffmpeg_command)  
+    #functions.kill_process_by_name(ffmpeg_command)
+    #p.kill()
+    #p.wait()
 
 def stop_all():
     global signal_timer_thread_flag
     global start_system_flag
     global stopFlag
     global packet
+    global ffmpeg_list
 
     signal_timer_thread_flag=0
     start_system_flag=0
@@ -308,6 +318,12 @@ def start_smt_system(programs_file=CONFIG_FILE_NAME,
         #print convert
         endtime = convert['programmer']['end'] - timedelta(milliseconds=(aheadtime+cachetime))
         print 'endtime = ', endtime
+        while (endtime - datetime.now()).seconds > 0.05:
+            if start_system_flag==0:
+                return
+            time.sleep((endtime - datetime.now()).seconds)
+        if start_system_flag==0:
+            return
         time.sleep((endtime - datetime.now()).seconds)
         program_num += 1
         program_num = program_num % 10
