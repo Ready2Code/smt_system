@@ -212,9 +212,11 @@ def stop_all():
     global stopFlag
     global packet
     global ffmpeg_list
+    global sequence_number
 
     signal_timer_thread_flag=0
     start_system_flag=0
+    sequence_number = 0
     stopFlag.set()
     packet = ''
 
