@@ -51,6 +51,7 @@ def get_screen_resolution():
     global SCREEN_WIDTH
     global SCREEN_HEIGHT
     if platform.system() == "Linux":
+        os.environ['DISPLAY'] = ':0.0'
         output = Popen('xrandr | grep "\*" | cut -d" " -f4',shell=True, stdout=PIPE, stderr=PIPE).communicate()[0]
         resolution = output.split()[0].split(b'x')
         SCREEN_WIDTH = int(resolution[0])
