@@ -176,8 +176,7 @@
 			          $("#addprogramme_list").hide()
 		    	})
 			}
-
-
+            
             function set_global_value(programme_path,add_delete_flag){
 			  path=programme_path
 			  add_delete_up_down=add_delete_flag
@@ -214,7 +213,9 @@
 				    path= $(this).attr('path')
 				    path=path.split("file://")
 				    path=path.join('')
+		            set_global_value(path, add_delete_up_down)
                     get_programme_info(path)
+				    $("#content_list").show()
 		    	})
 
 			   var $down=$(".down")
@@ -320,6 +321,7 @@
 				   set_global_info_value(type_val,url_val,new_posx,new_posy,new_width,new_height,new_number)
 		           set_programme_info(path)
 				   $("#layout_list").hide()
+				   $("#content_list").hide()
                       
 			   })
 			}
