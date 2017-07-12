@@ -55,6 +55,8 @@ programmers  = {}
 signal_timer_thread_flag=1
 start_system_flag=1
 ffmpeg_list=list()
+ext_callbacks ={}
+
 class SignalTimerThread(Thread):
     def __init__(self, event, dest):
         Thread.__init__(self)
@@ -63,11 +65,20 @@ class SignalTimerThread(Thread):
 
     def run(self):
         global signal_timer_thread_flag
+        global ext_callbacks
+
+        if ext_callbacks.has_key('before_ffmpeg'):
+            ext_callbacks['before_ffmpeg']('broadcast', self.dest[0]+':'+str(self.dest[1]))
+
         while not self.stopped.wait(BROADCASE_TIME_INTERVAL):
             if signal_timer_thread_flag==1:
               delay_broadcast(s, packet, self.dest)
             else:
               break
+
+        if ext_callbacks.has_key('after_ffmpeg'):
+            ext_callbacks['after_ffmpeg'](res_type, str_output)
+
 
 class DateTimeEncoder(json.JSONEncoder):
     def default(self, o):
@@ -176,6 +187,8 @@ def call_ffmpeg(file_dir, res, port, resource_broadcast_ip, ffplay_port, avlogex
     ffmpeg_command = ''
     playlist = ''
     str_avlogext = ''
+    str_output = ''
+    str_port = ''
     if('playlist' in res.keys()): playlist = '-f concat'
     if platform.system() == "Windows":
         ffmpeg_command = SETTING_RELATIVE_PATH + 'ffmpeg.exe'
@@ -186,25 +199,29 @@ def call_ffmpeg(file_dir, res, port, resource_broadcast_ip, ffplay_port, avlogex
         str_avlogext = '-avlogext ' + avlogext + ' -deviceinfo ' + res['id']
 
     if(res_type == 'broadcast'):
-        ffmpeg_command = ffmpeg_command + ' -re {4} -port {6} -i {0} -begintime {1} {5} -c:v copy -c:a aac -f mpu smt://{2}:{3}'.format(file_dir, begintime, resource_broadcast_ip, ffplay_port, playlist, str_avlogext, port)
+        #str_port ='' 
+        str_port ='-port %s' % port
+        str_output = 'smt://%s:%s' % (resource_broadcast_ip, ffplay_port)
     elif(res_type == 'broadband'):
-        ffmpeg_command = ffmpeg_command + ' -re -port {1} {5} -i {0} -begintime {2} {6} -c:v copy -c:a aac -f mpu smt://{3}:{4}'.format(file_dir, port, begintime, BROADBAND_SERVER_IP, 1, playlist, str_avlogext) 
-    
+        str_port ='-port %s' % port
+        str_output = 'smt://%s:%s' % (BROADBAND_SERVER_IP, 1)
+   
+    ffmpeg_command = ffmpeg_command + ' -re {0} {1} -i {2} -begintime {3} {4} -c:v copy -c:a aac -f mpu {5}'.format(str_port, playlist, file_dir, begintime, str_avlogext, str_output) 
+
     print ffmpeg_command
 
     ffmpeg_list.append(ffmpeg_command)
+
+    if ext_callbacks.has_key('before_ffmpeg'):
+        ext_callbacks['before_ffmpeg'](res_type, str_output)
+
     try:
-        #p = Popen(shlex.split(ffmpeg_command), stdout=FNULL, stderr=FNULL)
         os.system(ffmpeg_command)
     except:
         print "error ---------------------------------------" 
-    #ffmpeg_list.append(ffmpeg_command)
-    #time.sleep(delta.seconds+1)
-    #print delta.seconds, "passed  resource [", res['id'], "] is closed"
-    #ffmpeg_list.pop(ffmpeg_command)  
-    #functions.kill_process_by_name(ffmpeg_command)
-    #p.kill()
-    #p.wait()
+
+    if ext_callbacks.has_key('after_ffmpeg'):
+        ext_callbacks['after_ffmpeg'](res_type, str_output)
 
 def stop_all():
     global signal_timer_thread_flag
@@ -275,7 +292,8 @@ def start_smt_system(programs_file=CONFIG_FILE_NAME,
                      resource_broadband_ip = BROADBAND_SERVER_IP ,
                      avlogext_ip           = AVLOGEXT_IP,
                      avlogext_port         = AVLOGEXT_PORT,
-                     static_resource_host  = ''):
+                     static_resource_host  = '',
+                     callbacks = {}):
     global program_num
     global resource_num
     global packet
@@ -286,10 +304,13 @@ def start_smt_system(programs_file=CONFIG_FILE_NAME,
     global programmers
     global stopFlag
     global signal_timer_thread_flag 
+    global ext_callbacks
 
     signal_timer_thread_flag = 1
     start_system_flag=1
-    #destination = destip
+
+
+    ext_callbacks = callbacks 
     json_data = load(programs_file)
     print "load file <" , programs_file , "> successful \n"
 

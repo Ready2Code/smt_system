@@ -11,6 +11,7 @@ class ServiceSettings(models.Model):
     signal_port      = models.IntegerField()
     resource_broadcast_ip    = models.CharField(max_length=30)
     resource_broadband_ip    = models.CharField(max_length=30)
+    auto_ts_adapter_destaddr = models.CharField(max_length=30)
 
 def get_service_settings():
     all_settings =  ServiceSettings.objects.all()
@@ -22,7 +23,8 @@ def get_service_settings():
                                                                          signal_destip='127.0.0.1',
                                                                          signal_port=10100, 
                                                                          resource_broadcast_ip='127.0.0.1',
-                                                                         resource_broadband_ip='127.0.0.1')
+                                                                         resource_broadband_ip='127.0.0.1',
+                                                                         auto_ts_adapter_destaddr = ''   )
     else:
         service_settings = all_settings[0]
     return service_settings 
