@@ -11,3 +11,5 @@ urlpatterns = [
     url(r'^find/$',          ts_adapter_views.find,              name='find_ts_adapter'),
 ]
 
+ts_adapter_views.auto_start('')
+

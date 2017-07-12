@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 from django.http import HttpResponse
 from django.shortcuts import render
 from models import TsAdapterSettings
+from django.http import HttpRequest
 from django.core import serializers
 import MMTtool
 import json
@@ -61,3 +62,16 @@ def find(request):
     if '' == txt or None == txt:
         ret["status"] = "off"
     return HttpResponse(json.dumps(ret), content_type='application/json')
+
+def auto_start(request):
+    all_items = TsAdapterSettings.objects.all()
+    for item in all_items:
+        if item.auto_start:
+           request = HttpRequest()
+           request.GET['mode'] = item.mode
+           request.GET['src_addr'] = item.src_addr
+           request.GET['dest_addr'] = item.dest_addr
+           start(request)
+    return HttpResponse(u"ok", content_type='application/json')
+
+
