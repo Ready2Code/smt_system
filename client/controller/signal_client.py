@@ -205,7 +205,7 @@ def prompt_add():
     
 def prompt_del():
     del_command = {'type':'del', 'format': {'name': ''}}
-    del_command['format']['name'] = PROMPT_ICON_FILE
+    del_command['format']['name'] = RELATIVE_PATH + PROMPT_ICON_FILE
     delcommand = json.dumps(del_command)
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     s.sendto(delcommand, ('localhost', FFPLAY_LISTEN_PORT))
