@@ -65,13 +65,16 @@ def find(request):
 
 def auto_start(request):
     all_items = TsAdapterSettings.objects.all()
-    for item in all_items:
-        if item.auto_start:
-           request = HttpRequest()
-           request.GET['mode'] = item.mode
-           request.GET['src_addr'] = item.src_addr
-           request.GET['dest_addr'] = item.dest_addr
-           start(request)
+    try:
+        for item in all_items:
+           if item.auto_start:
+              request = HttpRequest()
+              request.GET['mode'] = item.mode
+              request.GET['src_addr'] = item.src_addr
+              request.GET['dest_addr'] = item.dest_addr
+              start(request)
+    except:
+    	  pass
     return HttpResponse(u"ok", content_type='application/json')
 
 
