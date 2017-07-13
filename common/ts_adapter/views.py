@@ -20,11 +20,19 @@ def update_list(request):
 def modify_item(request):
     srcaddr         = request.GET['src_addr']
     destaddr         = request.GET['dest_addr']
+    autoStart         = request.GET['auto_start']
+    mode         = request.GET['mode']
+    if autoStart=='true':
+      autoStart=True
+    else:
+      autoStart=False
     try:
         item = TsAdapterSettings.objects.get(src_addr=srcaddr)
     except:
         item = TsAdapterSettings(src_addr = srcaddr)
     item.dest_addr = destaddr
+    item.auto_start = autoStart
+    item.mode = mode
     item.save()
     return HttpResponse(u"ok", content_type='application/json')
 

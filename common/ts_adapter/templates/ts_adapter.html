@@ -19,6 +19,7 @@
             <td> operater</td>
             <td> selected </td>
             <td> go </td>
+            <td> auto start </td>
         </table>
         
         <p/>
@@ -41,10 +42,11 @@
                fa = $(this).parent().parent()
                srcaddr = fa.find('input.srcaddr')[0]
                destaddr = fa.find('input.destaddr')[0]
+               auto_start_value= fa.find('input.auto_start')[0].checked
                if('' == srcaddr.value || '' == destaddr.value) {
                    alert('empty value')
                } else {
-                   $.get("modify/",{ src_addr:srcaddr.value, dest_addr: destaddr.value})
+                   $.get("modify/",{ src_addr:srcaddr.value, dest_addr: destaddr.value,mode:$("#mode").val(),auto_start:auto_start_value})
                }
 
             }
@@ -140,6 +142,7 @@
 			   newtr = newtr + "<td>" + "<input class='selected' type='checkbox' checked=true />" + "</td>"
 			   newtr = newtr + "<td> <font class='operator'> ☆ </font >" + " <button class='start'>Start</button>"  +
 			                            "<button class='stop'>Stop</button>" + "</td>"
+			   newtr = newtr + "<td>" + "<input class='auto_start' type='checkbox' checked=true />" + "</td>"
 			   newtr = newtr + "</tr>"
 			}
                         $("#ts_adapter_list").append(newtr)

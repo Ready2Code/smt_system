@@ -31,6 +31,7 @@ def modify_service_settings(request):
     service_settings.resource_broadband_ip   =request.GET['resource_broadband_ip']
     service_settings.programs                = request.GET['programs_file_path']
     service_settings.resource_file_path      = request.GET['resource_file_path']
+    service_settings.auto_ts_adapter_destaddr      = request.GET['auto_ts_adapter_destaddr']
     service_settings.save()
 
     monitor_settings = get_monitor_settings()   
