@@ -126,6 +126,7 @@
                         $("tr.list_info").remove()
                         addr_list = ret
                         var newtr = ""
+						var autostart=true
 			for(var i = 0; i< addr_list.length + 1; i++) {
                            if(i == addr_list.length) {
                                srcaddr = ""
@@ -133,6 +134,7 @@
                            } else {
                                srcaddr = addr_list[i].fields.src_addr
                                destaddr = addr_list[i].fields.dest_addr
+                               autoStart = addr_list[i].fields.auto_start
                            }
 			   newtr = newtr + "<tr class='list_info'> "
 			   newtr = newtr + "<td>" + "<input class='srcaddr' type='text' value='"+srcaddr+"'/>" + "</td>"
@@ -142,7 +144,11 @@
 			   newtr = newtr + "<td>" + "<input class='selected' type='checkbox' checked=true />" + "</td>"
 			   newtr = newtr + "<td> <font class='operator'> ☆ </font >" + " <button class='start'>Start</button>"  +
 			                            "<button class='stop'>Stop</button>" + "</td>"
-			   newtr = newtr + "<td>" + "<input class='auto_start' type='checkbox' checked=true />" + "</td>"
+			   if(autoStart){
+			     newtr = newtr + "<td>" + "<input class='auto_start' type='checkbox' checked=true/>" + "</td>"
+			   }else{
+			     newtr = newtr + "<td>" + "<input class='auto_start' type='checkbox'/>" + "</td>"
+			   }
 			   newtr = newtr + "</tr>"
 			}
                         $("#ts_adapter_list").append(newtr)

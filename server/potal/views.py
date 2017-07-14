@@ -84,6 +84,7 @@ def get_file_list(request):
        for file in files:
          path=os.path.join(root,file)
          if "program.json" in path:
-             allpath+=path+";"
+            if "program.json" == os.path.basename(path):
+               allpath+=path+";"
     return HttpResponse(json.dumps(allpath), content_type='application/json')
 
