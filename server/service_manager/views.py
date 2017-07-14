@@ -30,6 +30,8 @@ def call_ts_adapter_before_ffmepg(res_type, src_addr):
     else:
         request.GET['src_addr'] = src_addr
     request.GET['dest_addr'] = service_settings.auto_ts_adapter_destaddr 
+    request.GET['mode'] = 'ip2ts' 
+    request.GET['auto_start'] = False 
     ts_adapter_views.modify_item(request)
     ts_adapter_views.start(request)
 
