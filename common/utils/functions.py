@@ -2,8 +2,9 @@
 from ctypes import *
 import thread
 from threading import Thread
-import os
+import os, platform
 import re
+import urllib
 
 def find_process_by_name(name):
     name = name.replace('-',' ')
@@ -23,3 +24,25 @@ def kill_process_by_name(name):
     cmd="kill %s"%' '.join(ids)
     print cmd
     os.system(cmd)
+
+
+def url2pathname(url):
+    print 'url=',url
+    if len(url) < 7: return url
+    elif url[:7] != 'file://': return url
+    else:
+        path = url[7:]
+    if platform.system() == "Windows":
+        path = '\\' + path
+    path = urllib.url2pathname(path)
+    return path
+
+
+
+def pathname2url(path):
+    url = urllib.pathname2url(path)
+    if platform.system() == "Windows":
+        url = url[2:]
+    url = 'file://' + url
+    return url
+  

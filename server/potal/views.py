@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
+from utils import functions
 
 from django.shortcuts import render
 from service_manager.models import ServiceSettings
@@ -46,15 +47,12 @@ def modify_service_settings(request):
 def get_config_file(request):
     global filepath
     filepath=request.GET["path"].encode('UTF8')
-    print  filepath
     service_settings_info = get_service_settings()
     print  service_settings_info.programs
     if filepath=='programmes.json':
 	   filepath=service_settings_info.programs
-    print  "/*************************filepath*******************************/"
-    print  filepath
-    print  "/********************************************************/"
-    file=codecs.open(filepath,'r','utf-8')
+    filepath2 = functions.url2pathname(filepath)
+    file=codecs.open(filepath2,'r','utf-8')
     data = ''
     try:
        data=file.read()
@@ -66,8 +64,8 @@ def set_config_file(request):
     global filepath
     data=request.POST["text"].encode('UTF8')
     data=json.dumps(json.loads(data,object_pairs_hook=OrderedDict),ensure_ascii=False,indent=4,sort_keys=False)
-    print filepath
-    file=codecs.open(filepath,'w','utf-8')
+    filepath2 = functions.url2pathname(filepath)
+    file=codecs.open(filepath2,'w','utf-8')
     try:
        data=file.write(data)
     finally:
@@ -86,7 +84,7 @@ def get_file_list(request):
          path=os.path.join(root,file)
          if "program.json" in path:
             if "program.json" == os.path.basename(path):
-               allpath+=path+";"
+               allpath+=(functions.pathname2url(path)+";")
     return HttpResponse(json.dumps(allpath), content_type='application/json')
 def get_broadcast_max_bandwidth( request):
    service_settings_bandwidth = get_service_settings()

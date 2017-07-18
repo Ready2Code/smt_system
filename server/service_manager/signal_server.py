@@ -15,6 +15,7 @@ from threading import Timer, Thread, Event
 from subprocess import call,Popen,PIPE,STDOUT
 from itertools import cycle
 from utils import functions
+import urllib, urlparse
 
 # This is a throwaway variable to deal with a python bug
 throwaway = datetime.strptime('20110101','%Y%m%d')
@@ -23,7 +24,11 @@ FNULL = open(os.devnull, 'w')
 
 LOCAL_PORT = 8001
 FILE_RELATIVE_PATH = './'
-SETTING_RELATIVE_PATH = '../related/'
+if platform.system() == "Windows":
+    SETTING_RELATIVE_PATH = '..\\related\\'
+elif platform.system() == "Linux":
+    SETTING_RELATIVE_PATH = '../related/'
+
 CHANNEL_FILE_NAME = SETTING_RELATIVE_PATH + 'channels.json'
 CONFIG_FILE_NAME =  SETTING_RELATIVE_PATH + 'programs.json'
 POSTER_PATH = 'resources/static/'
@@ -115,7 +120,7 @@ def first_signal(dest):
         counter = counter - 1
         time.sleep(0.01)
     
-def convert_signal(json_file, resource_broadcast_ip, resource_broadband_ip,avlogext='',static_resource_host=''):
+def convert_signal(json_file, resource_broadcast_ip, resource_broadband_ip,avlogext='',static_resource_host='', dir_name='/'):
 #def convert_signal(json_file, resource_broadcast_ip, resource_broadband_ip,static_resource_host,avlogext=''):
     global resource_num
     global sequence_number
@@ -345,9 +350,9 @@ def start_smt_system(programs_file=CONFIG_FILE_NAME,
         url = i['url']
         print "processing", i['name'], url
         program_data = url_load(url)
-        #print json.loads(program_data) 
+        dir_name = os.path.dirname(functions.url2pathname(url))
         resource_num = 1
-        convert = convert_signal(program_data, resource_broadcast_ip, resource_broadband_ip, avlogext_ip+':'+str(avlogext_port),static_resource_host)
+        convert = convert_signal(program_data, resource_broadcast_ip, resource_broadband_ip, avlogext_ip+':'+str(avlogext_port),static_resource_host,dir_name)
         packet = convert
         #print convert
         endtime = convert['programmer']['end'] - timedelta(milliseconds=(aheadtime+cachetime))
