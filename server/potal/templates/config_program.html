@@ -28,6 +28,7 @@
 		   <hr/>
 			 <table id='content_list' border="1" > 
 			   <td>名字 </td>
+			   <td>码率 </td>
 			   <td> 网络</td>
 			   <td> 路径</td>
 			   <td> 布局</td>
@@ -35,6 +36,20 @@
 		   <hr/>
 			 <table id='addprogramme_list' border="1" > 
 			   <td>名称</td>
+		   <hr/>
+			 <table id='broadcast_info_list' border="0" >
+			  <tr>
+			   <td>广播总带宽:</td>
+			   <td>25M</td>
+			  </tr>
+			  <tr>
+			   <td>已用带宽:</td>
+			   <td>15M</td>
+			  </tr>
+			  <tr>
+			   <td>剩余带宽:</td>
+			   <td>10M</td>
+			  </tr>
 		   <hr/>
 			 <table id='layout_list' border="1" > 
 			   <td>横坐标 </td>
@@ -52,6 +67,7 @@
 			var path=""
 			var add_delete_up_down="init"
 		    type_info=""
+		    bitrate_info=""
 			url_info=""
 			posx_info=""
 			posy_info=""
@@ -134,6 +150,7 @@
                resource=jsonObj.programmer.resources			   
 		       resource[resource_num].type= type_info 
 		       resource[resource_num].url= url_info 
+		       resource[resource_num].bitrate= bitrate_info 
 		       resource[resource_num].layout.posx= posx_info 
 		       resource[resource_num].layout.posy= posy_info 
 		       resource[resource_num].layout.width= width_info 
@@ -181,7 +198,7 @@
 			  path=programme_path
 			  add_delete_up_down=add_delete_flag
 			}
-            function set_global_info_value(type,url,posx,posy,width,height,num){
+            function set_global_info_value(type,url,posx,posy,width,height,num,bitrate){
 			  type_info=type
 			  url_info=url
 			  posx_info=posx
@@ -189,6 +206,7 @@
 			  width_info=width
 			  height_info=height
 			  resource_num=num
+			  bitrate_info=bitrate
 			}
             function get_programme_list(name,path){
 		      console.log("get_programme_list!!###############" )
@@ -216,6 +234,8 @@
 		            set_global_value(path, add_delete_up_down)
                     get_programme_info(path)
 				    $("#content_list").show()
+                    $("#broadcast_info_list").before($("#content_list").append())
+			        $("#broadcast_info_list").show()
 		    	})
 
 			   var $down=$(".down")
@@ -258,16 +278,30 @@
 			  })
 					   
 			}
-
+            function get_broadcast_max_bandwidth(){
+		      $.get("/config_program/get_broadcast_max_bandwidth/", function(ret){	
+                var tb=document.getElementById('broadcast_info_list')
+			    var total_bandwidth=tb.rows[0].cells[1]
+                total_bandwidth.innerHTML=ret
+			  })
+			}
+            function get_bitrate(bitrate){
+			  return parseInt(bitrate.replace(/[^0-9]/ig,""))
+			}
             function get_content_list(jsonObj){
                resource=jsonObj.programmer.resources			   
                $("tr.content_list").remove()
+               $("tr.broadcast_info_list").remove()
 			   console.log("get content list file!!")
 			   var newtr = ""
+			   var used_bitrate=0
 			   for(var i=0; i< resource.length; i++) {
 			     newtr = newtr + "<tr class='content_list'> "
 				 newtr = newtr + "<td >"+resource[i].name+"</td>"
+				 newtr = newtr + "<td ><input type='text' id='bitrate"+i+"' value="+resource[i].bitrate+"></td>"
 			     if(resource[i].type=='broadcast'){
+				   used_bitrate +=get_bitrate(resource[i].bitrate)
+				   console.log(used_bitrate)
 				   newtr = newtr + "<td ><select id='select"+i+"'>"+"<option value='"+resource[i].type+"'>广播</option>"+"<option value='broadband'>宽带</option>"+"</select></td>"
 			     }else{
 				   newtr = newtr + "<td ><select id='select"+i+"'>"+"<option value='"+resource[i].type+"'>宽带</option>"+"<option value='broadcast'>广播</option>"+"</select></td>"
@@ -275,9 +309,16 @@
 			     }
 				 newtr = newtr + "<td ><input type='text' id='text"+i+"' value="+resource[i].url+"></td>"
 				 newtr = newtr + "<td ><button type='button' id='layout"+i+"'  posx='"+resource[i].layout.posx+"'  posy='"+resource[i].layout.posy+"'  width='"+resource[i].layout.width+"'   height='"+resource[i].layout.height+"'"+" class='process_resource_layout'>布局</button></td>"
-				 newtr = newtr + "<td ><button type='button' number='"+i+"'   text_id='text"+i+"' layout_id='layout"+i+"' select_id='select"+i+"'  path="+resource[i].url+""+" name='"+resource[i].name+" '"+"  posx='"+resource[i].layout.posx+"'"+"  posy='"+resource[i].layout.posy+"'"+"  width='"+resource[i].layout.width+"'"+"  height='"+resource[i].layout.height+"'"+" class='process_resource_submit'>提交</button></td>"
+				 newtr = newtr + "<td ><button type='button' number='"+i+"' bitrate_id='bitrate"+i+"'  text_id='text"+i+"' layout_id='layout"+i+"' select_id='select"+i+"'  path="+resource[i].url+""+" name='"+resource[i].name+" '"+"  posx='"+resource[i].layout.posx+"'"+"  posy='"+resource[i].layout.posy+"'"+"  width='"+resource[i].layout.width+"'"+"  height='"+resource[i].layout.height+"'"+" class='process_resource_submit'>提交</button></td>"
 		      }
 			  $("#content_list").append(newtr)
+              
+              var tb=document.getElementById('broadcast_info_list')
+			  var total_bandwidth=get_bitrate(tb.rows[0].cells[1].innerHTML)
+			  var td_used_bandwidth=tb.rows[1].cells[1]
+			  var td_surplus_bandwidth=tb.rows[2].cells[1]
+              td_used_bandwidth.innerHTML=used_bitrate +'M'
+              td_surplus_bandwidth.innerHTML=(total_bandwidth-used_bitrate)+'M'
 		      $("button.process_resource_layout").unbind('click').bind('click',function(){
 		          console.log( $(this).attr('posx') )
                    $("tr.layout_list").remove()
@@ -299,11 +340,31 @@
 					var new_posy=""
 					var new_width=""
 					var new_height=""
+
+                    var tb=document.getElementById('broadcast_info_list')
+                    var tb_content_list=document.getElementById('content_list')
+					var now_used_bitrate=0
+					for(i=1;i<tb_content_list.rows.length;i++){
+			          var type=tb_content_list.rows[i].cells[2].childNodes[0].value
+					  var bitrate=tb_content_list.rows[i].cells[1].childNodes[0].value
+					  if(type=='broadcast'){
+                        now_used_bitrate +=get_bitrate(bitrate)					     
+					  }
+               		}
+			        var total_bandwidth=tb.rows[0].cells[1].innerHTML
+					total_bandwidth=get_bitrate(total_bandwidth)
+					if(total_bandwidth - now_used_bitrate < 0){
+					   alert("超过最大带宽,请重新设置!")
+					   return
+					}
+
 					text_id="#"+$(this).attr('text_id')	
+					bitrate_id="#"+$(this).attr('bitrate_id')	
 					layout_id=$(this).attr('layout_id')
 				    select_id="#"+$(this).attr('select_id')
 					new_number=$(this).attr('number')	
 				    url_val=$(text_id).val()
+				    bitrate_val=$(bitrate_id).val()
 				    type_val=$(select_id).val()
 				    father_id= $("#input_posx").attr('father_id')
 					console.log(father_id)
@@ -318,11 +379,11 @@
 					  new_width=$(this).attr('width')	
 					  new_height=$(this).attr('height')	
 					}
-				   set_global_info_value(type_val,url_val,new_posx,new_posy,new_width,new_height,new_number)
+				   set_global_info_value(type_val,url_val,new_posx,new_posy,new_width,new_height,new_number,bitrate_val)
 		           set_programme_info(path)
 				   $("#layout_list").hide()
 				   $("#content_list").hide()
-                      
+			       $("#broadcast_info_list").hide()                      
 			   })
 			}
             clean_addprogramme_list=false
@@ -417,12 +478,13 @@
 				 $("#addprogramme_list").show()
 				   
 			   })
-
+               get_broadcast_max_bandwidth()
 			   set_programmes_file()
 			   set_programme_process_response()
 			   $("#layout_list").hide()
 			   $("#addprogramme_list").hide()
 			   $("#content_list").hide()
+			   $("#broadcast_info_list").hide()
 			   $("#start").click(function(){
 			      $.get("/start_server/",function(ret){})
 			   })

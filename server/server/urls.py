@@ -38,4 +38,5 @@ urlpatterns = [
     url(r'^start_server/$', service_manager_views.start_server,       name='start_server'),
     url(r'^stop_server/$', service_manager_views.stop_server,       name='stop_server'),
     url(r'^ts_adapter/',               include('ts_adapter.urls')),
+	url(r'^config_program/get_broadcast_max_bandwidth/$',potal_views.get_broadcast_max_bandwidth,   name='get_broadcast_max_bandwidth'),
 ]

@@ -32,6 +32,7 @@ def modify_service_settings(request):
     service_settings.programs                = request.GET['programs_file_path']
     service_settings.resource_file_path      = request.GET['resource_file_path']
     service_settings.auto_ts_adapter_destaddr      = request.GET['auto_ts_adapter_destaddr']
+    service_settings.broadcast_max_bandwidth      = request.GET['broadcast_max_bandwidth']
     service_settings.save()
 
     monitor_settings = get_monitor_settings()   
@@ -87,4 +88,8 @@ def get_file_list(request):
             if "program.json" == os.path.basename(path):
                allpath+=path+";"
     return HttpResponse(json.dumps(allpath), content_type='application/json')
+def get_broadcast_max_bandwidth( request):
+   service_settings_bandwidth = get_service_settings()
+   bandwidth=service_settings_bandwidth.broadcast_max_bandwidth
+   return HttpResponse(json.dumps(bandwidth), content_type='application/json')
 
