@@ -145,8 +145,10 @@ def convert_signal(json_file, resource_broadcast_ip, resource_broadband_ip,avlog
         elif ('playlist' in res.keys()): localfile = res['playlist']
         if ('bk' in res.keys()): 
             bkfile = res['bk']
-            if bkfile.encode('ascii', 'ignore').startswith('./'):
-                bkfile = bkfile.replace('./', FILE_RELATIVE_PATH)  
+            if not os.path.isabs(bkfile):
+                bkfile = os.path.normpath(dir_name+'/'+bkfile)
+            #if bkfile.encode('ascii', 'ignore').startswith('./'):
+            #    bkfile = bkfile.replace('./', FILE_RELATIVE_PATH)  
             t = Thread(target=call_ffmpeg, args=(bkfile, res, ffmpeg_port, resource_broadcast_ip, ffplay_port, avlogext))
             t.daemon = True
             t.start()
@@ -154,8 +156,10 @@ def convert_signal(json_file, resource_broadcast_ip, resource_broadband_ip,avlog
             resource_num = resource_num % 10
             time.sleep(0.1) 
         if(localfile == ''): print 'error url or playlist has to been assigned' 
-        if localfile.encode('ascii', 'ignore').startswith('./'):
-            localfile = localfile.replace('./', FILE_RELATIVE_PATH)
+        if not os.path.isabs(localfile):
+            localfile = os.path.normpath(dir_name+'/'+localfile)
+        #if localfile.encode('ascii', 'ignore').startswith('./'):
+        #    localfile = localfile.replace('./', FILE_RELATIVE_PATH)
         ffplay_port = '{0}{1}{2}{3}{4}'.format(RESERVED_POS_ONE,RESERVED_POS_TWO, CHANNEL_NUM, program_num, resource_num)
         ffmpeg_port = '{0}{1}{2}{3}{4}'.format(RESERVED_POS_ONE, 1, CHANNEL_NUM, program_num, resource_num)
         if(res['type'] == 'broadcast'):
