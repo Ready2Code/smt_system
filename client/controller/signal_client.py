@@ -21,7 +21,6 @@ COMMAND_LISTEN_PORT = 9999
 FFPLAY_LISTEN_PORT = 8080
 RELATIVE_PATH = "../related/"
 CHANNEL_FILE = "channels.json"
-PROMPT_ICON_FILE = "prompt.png"
 
 SCREEN_WIDTH = 3840
 SCREEN_HEIGHT = 2160
@@ -194,22 +193,13 @@ def del_ffplay(res):
     s.sendto(delcommand, ('localhost', FFPLAY_LISTEN_PORT))
 
 def prompt_add():    
-    add_command = {'type':'add', 'format': {'name': '','posx':'','posy':'','width':'','height':''}}
-    add_command['format']['name'] = RELATIVE_PATH + PROMPT_ICON_FILE
-    add_command['format']['posx'] = cal_screen_value('80%', True)
-    add_command['format']['posy'] = cal_screen_value('80%', False)
-    add_command['format']['width'] = 60
-    add_command['format']['height'] = 60
+    add_command = {'type':'reddot','format': {'name': ''}}
     addcommand = json.dumps(add_command)
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     s.sendto(addcommand,("localhost", FFPLAY_LISTEN_PORT))
     
 def prompt_del():
-    del_command = {'type':'del', 'format': {'name': ''}}
-    del_command['format']['name'] = RELATIVE_PATH + PROMPT_ICON_FILE
-    delcommand = json.dumps(del_command)
-    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    s.sendto(delcommand, ('localhost', FFPLAY_LISTEN_PORT))
+    prompt_add()
     
 def UDP_recv(port, channel_id, name):
     global sequence
