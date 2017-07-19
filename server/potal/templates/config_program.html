@@ -65,7 +65,6 @@
          <script>
             var name=""
 			var path=""
-			var add_delete_up_down="init"
 		    type_info=""
 		    bitrate_info=""
 			url_info=""
@@ -74,106 +73,70 @@
 			width_info=""
 			height_info=""
 			resource_num=0
-		    function write_programmes_file(data){
+			programmes_path='programmes.json'//tell server get  programmes.json path
+			function add_programmes(data,name,path){
 			  var jsonObj=JSON.parse(data)
 			  var add_json={}
-			 /*********************add  object***********************/ 
-			  if(add_delete_up_down=="add"){
-                add_json['name']=name
-                add_json['url']= path
-                add_json['begin']="00:00:00"
-                add_json['end']="00:00:00"
-			    jsonObj.programmers.push(add_json)
-			  }else if(add_delete_up_down=="del"){
-			 /*********************delete object***********************/ 
-			    add_delete_up_down="add"
-		        for(i=0;i<jsonObj.programmers.length;i++){  
-				  str="file://"+path
-				  str=path
-				  str2=jsonObj.programmers[i].url
-				  if(str==str2){
+              add_json['name']=name
+              add_json['url']= path
+              add_json['begin']="00:00:00"
+              add_json['end']="00:00:00"
+			  jsonObj.programmers.push(add_json)
+			  var json_data=JSON.stringify(jsonObj).replace(/\\n/g,"\\n").replace(/\\r/g,"\\n")
+			  set_config_file(json_data,programmes_path)
+			}
+            function del_programmes(data,index,path){
+			  var jsonObj=JSON.parse(data)
+			  str=path
+		      for(i=0;i<jsonObj.programmers.length;i++){  
+			      str2=jsonObj.programmers[i].url
+				  if(i==index && str==str2){
 				    jsonObj.programmers.splice(i,1)  
 				  }	  
-				}
-			  }else if(add_delete_up_down=="up"){
-			 /*********************up object***********************/ 
-			    add_delete_up_down="add"
-		        for(i=0;i<jsonObj.programmers.length;i++){  
-				  str="file://"+path
-				  str=path
-				  str2=jsonObj.programmers[i].url
-				  if(str==str2){
+		      }
+			  var json_data=JSON.stringify(jsonObj).replace(/\\n/g,"\\n").replace(/\\r/g,"\\n")
+			  set_config_file(json_data,programmes_path)
+			}
+            function init_programmes(data){
+			  var jsonObj=JSON.parse(data)	
+			  for(i=0;i<jsonObj.programmers.length;i++){  
+				    pro_name=jsonObj.programmers[i].name
+				    pro_url=jsonObj.programmers[i].url
+                    get_programme_list(pro_name,pro_url)  
+			  }
+			}
+            function up_programmes(data,index,path){
+			  var jsonObj=JSON.parse(data)	
+		      for(i=0;i<jsonObj.programmers.length;i++){  
+				str=path
+				str2=jsonObj.programmers[i].url
+				if(str==str2 && i==index){
 		            var tem_arr={}		   
 				    tmp_arr=jsonObj.programmers[i]
 				    jsonObj.programmers[i]= jsonObj.programmers[i-1]
 				    jsonObj.programmers[i-1]=tmp_arr
-				  }	  
-				}
-			  }else if(add_delete_up_down=="down"){
-			 /*********************down object***********************/ 
-			    add_delete_up_down="add"
-		        for(i=0;i<jsonObj.programmers.length;i++){  
-				  str="file://"+path
-				  str=path
-				  str2=jsonObj.programmers[i].url
-				  if(str==str2 && i!=jsonObj.programmers.length-1){
+				 }	  
+		      }	
+			  var json_data=JSON.stringify(jsonObj).replace(/\\n/g,"\\n").replace(/\\r/g,"\\n")
+			  set_config_file(json_data,programmes_path)
+			}
+            function down_programmes(data,index,path){
+			  var jsonObj=JSON.parse(data)	
+		      for(i=0;i<jsonObj.programmers.length;i++){  
+			    str=path
+				str2=jsonObj.programmers[i].url
+				if(str==str2 && i==index){
 		            var tem_arr={}		   
 				    tmp_arr=jsonObj.programmers[i]
 				    jsonObj.programmers[i]= jsonObj.programmers[i+1]
 				    jsonObj.programmers[i+1]=tmp_arr
-					break
-				  }	  
-				}
-			  }else if(add_delete_up_down=="init") {
-			  
-				 for(i=0;i<jsonObj.programmers.length;i++){  
-				    pro_name=jsonObj.programmers[i].name
-				    pro_url=jsonObj.programmers[i].url
-                    get_programme_list(pro_name,pro_url)  
-				 }
-				 return
-			  
-			  
-			  }else{
-			      return  
+				 }	  
 			  }
 			  var json_data=JSON.stringify(jsonObj).replace(/\\n/g,"\\n").replace(/\\r/g,"\\n")
-			  set_config_file(json_data)
+			  set_config_file(json_data,programmes_path)
 			}
 
-		    function write_programme_info(data){
-			   var jsonObj=JSON.parse(data)
-			  console.log(type_info )
-			  console.log( url_info  )
-			  console.log(posx_info  )
-			  console.log(posy_info  )
-			  console.log( width_info  )
-			  console.log(height_info )
-			  console.log(resource_num)
-               resource=jsonObj.programmer.resources			   
-		       resource[resource_num].type= type_info 
-		       resource[resource_num].url= url_info 
-		       resource[resource_num].bitrate= bitrate_info 
-		       resource[resource_num].layout.posx= posx_info 
-		       resource[resource_num].layout.posy= posy_info 
-		       resource[resource_num].layout.width= width_info 
-		       resource[resource_num].layout.height= height_info 
-			   var json_data=JSON.stringify(jsonObj).replace(/\\n/g,"\\n").replace(/\\r/g,"\\n")
-			  set_config_file(json_data)
-			}
-		    function set_programmes_file(){
-		     	
-               var path="programmes.json"
-			   $.ajax({
-				 type:"GET",
-				 dataType:"json",
-				 url:"/config_program/get_config_file/",
-				 data:{path:path},
-				 async:false,
-				 success:write_programmes_file,					   
-			    });
-			
-			}
+
 		    function set_programme_info(path){
 			   $.ajax({
 				 type:"GET",
@@ -181,25 +144,43 @@
 				 url:"/config_program/get_config_file/",
 				 data:{path:path},
 				 async:false,
-				 success:write_programme_info,					   
+				 success:function(data){
+			       var jsonObj=JSON.parse(data)
+			       console.log(type_info )
+			       console.log( url_info  )
+			       console.log(posx_info  )
+			       console.log(posy_info  )
+			       console.log( width_info  )
+			       console.log(height_info )
+			       console.log(resource_num)
+                   resource=jsonObj.programmer.resources			   
+		           resource[resource_num].type= type_info 
+		           resource[resource_num].url= url_info 
+		           resource[resource_num].bitrate= bitrate_info 
+		           resource[resource_num].layout.posx= posx_info 
+		           resource[resource_num].layout.posy= posy_info 
+		           resource[resource_num].layout.width= width_info 
+		           resource[resource_num].layout.height= height_info 
+			       var json_data=JSON.stringify(jsonObj).replace(/\\n/g,"\\n").replace(/\\r/g,"\\n")
+			       set_config_file(json_data,path)
+				 }					   
 			    });	
 			}
             
 		    function set_programme_process_response() {
 		        $("button.process_resource").unbind('click').bind('click',function(){
-		              name=$(this).attr('programmename')
-		              path=$(this).attr('path')
-					  add_delete_up_down="add"
+		              var name=$(this).attr('programmename')
+		              var path=$(this).attr('path')
 		              console.log(path)
                       get_programme_list(name,path)
-					  set_programmes_file()
+					  var data = set_programmes_file()
+					  add_programmes(data,name,path)
 			          $("#addprogramme_list").hide()
 		    	})
 			}
             
-            function set_global_value(programme_path,add_delete_flag){
+            function set_global_value(programme_path){
 			  path=programme_path
-			  add_delete_up_down=add_delete_flag
 			}
             function set_global_info_value(type,url,posx,posy,width,height,num,bitrate){
 			  type_info=type
@@ -225,8 +206,8 @@
 			    $("#programme_list").append(newtr)
 
 		       $("button.process_resource_programme").unbind('click').bind('click',function(){
-		          console.log( $(this).attr('programmename') )
-				   $("#addprogramme_list").show()
+		         //  console.log( $(this).attr('programmename') )
+				 //  $("#addprogramme_list").show()
 		    	})
 
 		       $("button.process_resource_info").unbind('click').bind('click',function(){
@@ -234,7 +215,7 @@
 				    path= $(this).attr('path')
 				    path=path.split("file://")
 				    path=path.join('')
-		            set_global_value(path, add_delete_up_down)
+		            set_global_value(path)
                     get_programme_info(path)
 				    $("#content_list").show()
                     $("#broadcast_info_list").before($("#content_list").append())
@@ -244,36 +225,44 @@
 			   var $down=$(".down")
 			   var len=$down.length
 		       $("button.process_resource_down").unbind('click').bind('click',function(){
+			       var currentIndex=event.srcElement.parentNode.parentNode.rowIndex
+				   var tab=document.getElementById("programme_list")
+				   var rows=tab.rows.length
+				   if(currentIndex==rows-1){
+				      return
+				   }
                    var $tr=$(this).parents("tr")
 				   if($tr.index()!=len-1){
 				     $tr.fadeOut().fadeIn()
 					 $tr.next().after($tr) 
-				     path= $(this).attr('path')
-				     path=path.split("file://")
-				     path=path.join('')
-				     set_global_value(path,"down")
-				     set_programmes_file()
+				     var path= $(this).attr('path')
+				     set_global_value(path)
+				     var data=set_programmes_file()
+					 down_programmes(data,currentIndex-1,path)
 				   }		   
 					   
 			   })
 		       $("button.process_resource_up").unbind('click').bind('click',function(){
+			       var currentIndex=event.srcElement.parentNode.parentNode.rowIndex
                    var $tr=$(this).parents("tr")
 			       console.log($tr.index())
 				   if($tr.index()>1){
 				     $tr.fadeOut().fadeIn()
 					 $tr.prev().before($tr) 
-				     path= $(this).attr('path')
-				     set_global_value(path,"up")
-				     set_programmes_file()
+				     var path= $(this).attr('path')
+				     set_global_value(path)
+				     var data=set_programmes_file()
+					 up_programmes(data,currentIndex-1,path)
 				   }		   
 			  })
 		       $("button.process_resource_delete").unbind('click').bind('click',function(){
 
 			     var currentIndex=event.srcElement.parentNode.parentNode.rowIndex
 			     document.all.programme_list.deleteRow(currentIndex)
-				 path= $(this).attr('path')
-				 set_global_value(path,"del")
-				 set_programmes_file()
+				 var path= $(this).attr('path')
+				 set_global_value(path)
+				 var data = set_programmes_file()
+				 del_programmes(data, currentIndex-1,path)
 			  })
 					   
 			}
@@ -461,12 +450,12 @@
 			 //  console.log(data)
 			}
 			
-            function set_config_file(text){
+            function set_config_file(text,filepath){
 				$.ajax({
 				 type:"POST",
 				 dataType:"json",
 				 url:"/config_program/set_config_file/",
-				 data:{text:text},
+				 data:{text:text,path:filepath},
 				 success: set_config_file_response,				   
 			    });	
 			}
@@ -478,7 +467,8 @@
 				   
 			   })
                get_broadcast_max_bandwidth()
-			   set_programmes_file()
+			   var data=set_programmes_file()
+			   init_programmes(data)
 			   set_programme_process_response()
 			   $("#layout_list").hide()
 			   $("#addprogramme_list").hide()
