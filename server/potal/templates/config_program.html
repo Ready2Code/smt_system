@@ -135,7 +135,22 @@
 			  var json_data=JSON.stringify(jsonObj).replace(/\\n/g,"\\n").replace(/\\r/g,"\\n")
 			  set_config_file(json_data,programmes_path)
 			}
-
+		    function set_programmes_file(){
+		     	
+               var path=programmes_path
+			   var result=''
+			   $.ajax({
+				 type:"GET",
+				 dataType:"json",
+				 url:"/config_program/get_config_file/",
+				 data:{path:path},
+				 async:false,
+				 success:function(data){
+				   result=data
+				 }					   
+			    });
+			   return result
+			}
 
 		    function set_programme_info(path){
 			   $.ajax({
