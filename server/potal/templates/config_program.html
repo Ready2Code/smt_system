@@ -33,7 +33,8 @@
 			   <td> 路径</td>
 			   <td> 布局</td>
 			   <td> 提交</td>
-		   <hr/>
+			   <td> 关闭</td>
+		   <hr style="border:none"/>
 			 <table id='addprogramme_list' border="1" > 
 			   <td>名称</td>
 		   <hr/>
@@ -278,6 +279,9 @@
 				 set_global_value(path)
 				 var data = set_programmes_file()
 				 del_programmes(data, currentIndex-1,path)
+				 $("#layout_list").hide()
+				 $("#content_list").hide()
+			     $("#broadcast_info_list").hide()                      
 			  })
 					   
 			}
@@ -314,6 +318,7 @@
 				 newtr = newtr + "<td ><button type='button' id='layout"+i+"'  posx='"+resource[i].layout.posx+"'  posy='"+resource[i].layout.posy+"'  width='"+resource[i].layout.width+"'   height='"+resource[i].layout.height+"'"+" class='process_resource_layout'>布局</button></td>"
 				 newtr = newtr + "<td ><button type='button' number='"+i+"' bitrate_id='bitrate"+i+"'  text_id='text"+i+"' layout_id='layout"+i+"' select_id='select"+i+"'  path="+resource[i].url+""+" name='"+resource[i].name+" '"+"  posx='"+resource[i].layout.posx+"'"+"  posy='"+resource[i].layout.posy+"'"+"  width='"+resource[i].layout.width+"'"+"  height='"+resource[i].layout.height+"'"+" class='process_resource_submit'>提交</button></td>"
 		      }
+			  newtr=newtr+"<td rowspan='2'><button type='button' id='close'>关闭</button></td>"
 			  $("#content_list").append(newtr)
               
               var tb=document.getElementById('broadcast_info_list')
@@ -322,6 +327,11 @@
 			  var td_surplus_bandwidth=tb.rows[2].cells[1]
               td_used_bandwidth.innerHTML=used_bitrate +'M'
               td_surplus_bandwidth.innerHTML=(total_bandwidth-used_bitrate)+'M'
+			  $('#close').click(function(){
+				   $("#layout_list").hide()
+				   $("#content_list").hide()
+			       $("#broadcast_info_list").hide()                      
+			   })
 		      $("button.process_resource_layout").unbind('click').bind('click',function(){
 		          console.log( $(this).attr('posx') )
                    $("tr.layout_list").remove()
@@ -383,10 +393,7 @@
 					  new_height=$(this).attr('height')	
 					}
 				   set_global_info_value(type_val,url_val,new_posx,new_posy,new_width,new_height,new_number,bitrate_val)
-		           set_programme_info(path)
-				   $("#layout_list").hide()
-				   $("#content_list").hide()
-			       $("#broadcast_info_list").hide()                      
+		           set_programme_info(path)                    
 			   })
 			}
             clean_addprogramme_list=false
