@@ -141,7 +141,7 @@ def convert_signal(json_file, resource_broadcast_ip, resource_broadband_ip,avlog
     for res in resources:
         localfile = ''
         bkfile = ''
-        if ('url' in res.keys()): localfile = res['url']
+        if 'url' in res.keys(): localfile = res['url']
         elif ('playlist' in res.keys()): localfile = res['playlist']
         if ('bk' in res.keys()): 
             bkfile = res['bk']
@@ -149,13 +149,8 @@ def convert_signal(json_file, resource_broadcast_ip, resource_broadband_ip,avlog
                 bkfile = os.path.normpath(dir_name+'/'+bkfile)
             #if bkfile.encode('ascii', 'ignore').startswith('./'):
             #    bkfile = bkfile.replace('./', FILE_RELATIVE_PATH)  
-            t = Thread(target=call_ffmpeg, args=(bkfile, res, ffmpeg_port, resource_broadcast_ip, ffplay_port, avlogext))
-            t.daemon = True
-            t.start()
-            resource_num += 1
-            resource_num = resource_num % 10
-            time.sleep(0.1) 
         if(localfile == ''): print 'error url or playlist has to been assigned' 
+        localfile.replace('?' , '-' + res['type'] )
         if not os.path.isabs(localfile):
             localfile = os.path.normpath(dir_name+'/'+localfile)
         #if localfile.encode('ascii', 'ignore').startswith('./'):
@@ -165,7 +160,13 @@ def convert_signal(json_file, resource_broadcast_ip, resource_broadband_ip,avlog
         if(res['type'] == 'broadcast'):
             res['url'] = 'smt://{0}:{1}'.format(resource_broadcast_ip, ffplay_port)
             if ('bk' in res.keys()):
-                res['bk']='smt://{0}:{1}@:{2}'.format(resource_broadband_ip, ffmpeg_port,ffplay_port)
+                ffplaybk_port = '{0}{1}{2}{3}{4}'.format(RESERVED_POS_ONE,2, CHANNEL_NUM, program_num, resource_num)
+                ffmpegbk_port = '{0}{1}{2}{3}{4}'.format(RESERVED_POS_ONE, 3, CHANNEL_NUM, program_num, resource_num)
+                t = Thread(target=call_ffmpeg, args=(bkfile, res, ffmpegbk_port, '', ffplaybk_port, avlogext))
+                t.daemon = True
+                t.start()
+                time.sleep(1.5)                 
+                res['bk']='smt://{0}:{1}@:{2}'.format(resource_broadband_ip, ffmpegbk_port,ffplaybk_port)
         elif(res['type'] == 'broadband'):
             res['url'] = 'smt://{0}:{1}@:{2}'.format(resource_broadband_ip, ffmpeg_port,ffplay_port)
         else:
@@ -218,16 +219,14 @@ def call_ffmpeg(file_dir, res, port, resource_broadcast_ip, ffplay_port, avlogex
     if(len(avlogext) != 0):
         str_avlogext = '-avlogext ' + avlogext + ' -deviceinfo ' + res['id']
 
-    if(res_type == 'broadcast'):
-        #str_port ='' 
-        str_port ='-port %s' % port
-        str_output = 'smt://%s:%s' % (resource_broadcast_ip, ffplay_port)
-    elif(res_type == 'broadband'):
+    if(res_type == 'broadband' or resource_broadcast_ip == ''):
         str_port ='-port %s' % port
         str_output = 'smt://%s:%s' % (BROADBAND_SERVER_IP, 1)
-   
-    ffmpeg_command = ffmpeg_command + ' -re {0} {1} -i {2} -begintime {3} {4} -c:v copy -c:a aac -f mpu {5}'.format(str_port, playlist, file_dir, begintime, str_avlogext, str_output) 
+    elif(res_type == 'broadcast'):
+        str_port ='-port %s' % port
+        str_output = 'smt://%s:%s' % (resource_broadcast_ip, ffplay_port)
 
+    ffmpeg_command = ffmpeg_command + ' -re {0} {1} -i {2} -begintime {3} {4} -c:v copy -c:a aac -f mpu {5}'.format(str_port, playlist, file_dir, begintime, str_avlogext, str_output) 
     print ffmpeg_command
 
     ffmpeg_list.append(ffmpeg_command)
