@@ -176,6 +176,8 @@ def convert_signal(json_file, resource_broadcast_ip, resource_broadband_ip,avlog
         res['end'] = update_delta_time(res['end'], endtime)
 
         if 'poster' in res.keys():
+            if not os.path.isabs(res['poster']):
+                res['poster'] = os.path.normpath(dir_name+'/' + res['poster'])
             (path, name) = os.path.split(res['poster'])
             shutil.copy(res['poster'], POSTER_PATH + name)
             res['poster'] = 'http://' + static_resource_host + '/static/' + name
