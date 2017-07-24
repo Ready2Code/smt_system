@@ -162,12 +162,13 @@ def convert_signal(json_file, resource_broadcast_ip, resource_broadband_ip,avlog
             if ('bk' in res.keys()):
                 ffplaybk_port = '{0}{1}{2}{3}{4}'.format(RESERVED_POS_ONE,2, CHANNEL_NUM, program_num, resource_num)
                 ffmpegbk_port = '{0}{1}{2}{3}{4}'.format(RESERVED_POS_ONE, 3, CHANNEL_NUM, program_num, resource_num)
-                res_bk = res.copy()
-                res_bk["type"] = "broadband"
-                t = Thread(target=call_ffmpeg, args=(bkfile, res_bk, ffmpegbk_port, '', ffplaybk_port, avlogext))
+                old_type = res["type"]
+                res["type"] = "broadband"  #bk mast broadband
+                t = Thread(target=call_ffmpeg, args=(bkfile, res, ffmpegbk_port, '', ffplaybk_port, avlogext))
                 t.daemon = True
                 t.start()
-                time.sleep(1.5)                 
+                time.sleep(1.5) 
+                res["type"] = old_type
                 res['bk']='smt://{0}:{1}@:{2}'.format(resource_broadband_ip, ffmpegbk_port,ffplaybk_port)
         elif(res['type'] == 'broadband'):
             res['url'] = 'smt://{0}:{1}@:{2}'.format(resource_broadband_ip, ffmpeg_port,ffplay_port)
