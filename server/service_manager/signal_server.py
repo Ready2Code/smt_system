@@ -150,7 +150,7 @@ def convert_signal(json_file, resource_broadcast_ip, resource_broadband_ip,avlog
             #if bkfile.encode('ascii', 'ignore').startswith('./'):
             #    bkfile = bkfile.replace('./', FILE_RELATIVE_PATH)  
         if(localfile == ''): print 'error url or playlist has to been assigned' 
-        localfile.replace('?' , '-' + res['type'] )
+        localfile = localfile.replace('?' , '-' + res['type'] )
         if not os.path.isabs(localfile):
             localfile = os.path.normpath(dir_name+'/'+localfile)
         #if localfile.encode('ascii', 'ignore').startswith('./'):
