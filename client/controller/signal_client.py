@@ -230,12 +230,12 @@ def UDP_recv(port, channel_id, name):
             print bcolors.WARNING + "\n{1} id [{0}] have an updated signaling ...".format(channel_id, name.encode('utf-8').strip()) + bcolors.ENDC
             if 'related' in json_data['programmer'].keys(): 
                 related = json_data['programmer']['related']
-                if related == 'true' and pffplay is not None:
-                    t = Thread(target=prompt_add)
-                    t.start()
-                if related == 'false' and pffplay is not None:
-                    t = Thread(target=prompt_del)
-                    t.start()                
+               # if related == 'true' and pffplay is not None:
+                #    t = Thread(target=prompt_add)
+                 #   t.start()
+               # if related == 'false' and pffplay is not None:
+                #    t = Thread(target=prompt_del)
+                 #   t.start()                
     #print json_data
     #print current_json 
 
@@ -274,6 +274,15 @@ def play_json(json_data):
                 t.setDaemon(True)
                 t.start()
                 break
+
+    if 'related' in json_data['programmer'].keys(): 
+        related = json_data['programmer']['related']
+        print "red dot"
+        time.sleep(2)
+        if related == 'true' and pffplay is not None:
+            print "show dot"
+            t = Thread(target=prompt_add)
+            t.start()
 
 def exception():
     global exception
