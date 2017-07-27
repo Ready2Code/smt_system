@@ -41,7 +41,7 @@ def url2pathname(url):
 
 def pathname2url(path):
     if not os.path.isabs(path):
-        path = os.path.normpath(os.path.abspath('.')+'/'+path)
+        path = os.path.abspath(path)
     url = urllib.pathname2url(path)
     if platform.system() == "Windows":
         url = url[2:]
