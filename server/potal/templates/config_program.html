@@ -241,13 +241,13 @@
 			   var $down=$(".down")
 			   var len=$down.length
 		       $("button.process_resource_down").unbind('click').bind('click',function(){
-			       var currentIndex=event.srcElement.parentNode.parentNode.rowIndex
 				   var tab=document.getElementById("programme_list")
 				   var rows=tab.rows.length
+                   var $tr=$(this).parents("tr")
+				   var currentIndex=$tr.index()
 				   if(currentIndex==rows-1){
 				      return
 				   }
-                   var $tr=$(this).parents("tr")
 				   if($tr.index()!=len-1){
 				     $tr.fadeOut().fadeIn()
 					 $tr.next().after($tr) 
@@ -259,8 +259,8 @@
 					   
 			   })
 		       $("button.process_resource_up").unbind('click').bind('click',function(){
-			       var currentIndex=event.srcElement.parentNode.parentNode.rowIndex
                    var $tr=$(this).parents("tr")
+				   var currentIndex=$tr.index()
 			       console.log($tr.index())
 				   if($tr.index()>1){
 				     $tr.fadeOut().fadeIn()
@@ -273,7 +273,8 @@
 			  })
 		       $("button.process_resource_delete").unbind('click').bind('click',function(){
 
-			     var currentIndex=event.srcElement.parentNode.parentNode.rowIndex
+			     var $tr=$(this).parents("tr")
+				 var currentIndex=$tr.index()
 			     document.all.programme_list.deleteRow(currentIndex)
 				 var path= $(this).attr('path')
 				 set_global_value(path)
@@ -293,7 +294,7 @@
 			  })
 			}
             function get_bitrate(bitrate){
-			  return parseInt(bitrate.replace(/[^0-9]/ig,""))
+			  return parseFloat(bitrate)
 			}
             function get_content_list(jsonObj){
                resource=jsonObj.programmer.resources			   

@@ -82,7 +82,8 @@ class SignalTimerThread(Thread):
               break
 
         if ext_callbacks.has_key('after_ffmpeg'):
-            ext_callbacks['after_ffmpeg'](res_type, str_output)
+            ext_callbacks['after_ffmpeg']('broadcast', self.dest[0]+':'+str(self.dest[1]))
+            #ext_callbacks['after_ffmpeg'](res_type, str_output)
 
 
 class DateTimeEncoder(json.JSONEncoder):
@@ -113,10 +114,13 @@ def update_delta_time(tt, now):
     return tt 
 
 def first_signal(dest):
-    str  = '{"programmer": {"sequence": 0}}'
+    string  = '{"programmer": {"sequence": 0}}'
     counter = 300
+
+    if ext_callbacks.has_key('before_ffmpeg'):
+        ext_callbacks['before_ffmpeg']('broadcast', dest[0]+':'+str(dest[1]))
     while counter > 0:
-        s.sendto(str, dest)
+        s.sendto(string, dest)
         counter = counter - 1
         time.sleep(0.01)
     
@@ -141,6 +145,8 @@ def convert_signal(json_file, resource_broadcast_ip, resource_broadband_ip,avlog
     for res in resources:
         localfile = ''
         bkfile = ''
+        ffplaybk_port = ''
+        ffmpegbk_port = ''
         if 'url' in res.keys(): localfile = res['url']
         elif ('playlist' in res.keys()): localfile = res['playlist']
         if ('bk' in res.keys()): 
@@ -150,7 +156,7 @@ def convert_signal(json_file, resource_broadcast_ip, resource_broadband_ip,avlog
             #if bkfile.encode('ascii', 'ignore').startswith('./'):
             #    bkfile = bkfile.replace('./', FILE_RELATIVE_PATH)  
         if(localfile == ''): print 'error url or playlist has to been assigned' 
-        localfile.replace('?' , '-' + res['type'] )
+        localfile = localfile.replace('?' , '-' + res['type'] )
         if not os.path.isabs(localfile):
             localfile = os.path.normpath(dir_name+'/'+localfile)
         #if localfile.encode('ascii', 'ignore').startswith('./'):
@@ -162,10 +168,6 @@ def convert_signal(json_file, resource_broadcast_ip, resource_broadband_ip,avlog
             if ('bk' in res.keys()):
                 ffplaybk_port = '{0}{1}{2}{3}{4}'.format(RESERVED_POS_ONE,2, CHANNEL_NUM, program_num, resource_num)
                 ffmpegbk_port = '{0}{1}{2}{3}{4}'.format(RESERVED_POS_ONE, 3, CHANNEL_NUM, program_num, resource_num)
-                t = Thread(target=call_ffmpeg, args=(bkfile, res, ffmpegbk_port, '', ffplaybk_port, avlogext))
-                t.daemon = True
-                t.start()
-                time.sleep(1.5)                 
                 res['bk']='smt://{0}:{1}@:{2}'.format(resource_broadband_ip, ffmpegbk_port,ffplaybk_port)
         elif(res['type'] == 'broadband'):
             res['url'] = 'smt://{0}:{1}@:{2}'.format(resource_broadband_ip, ffmpeg_port,ffplay_port)
@@ -190,6 +192,19 @@ def convert_signal(json_file, resource_broadcast_ip, resource_broadband_ip,avlog
         resource_num += 1
         resource_num = resource_num % 10
         time.sleep(0.1)
+
+        if ('bk' in res.keys()):
+            res_bk = res.copy()
+            res_bk["type"] = "broadband"
+            res_bk["begin"] = res["begin"] 
+            res_bk["end"] = res["end"] 
+            if('playlist' in res.keys()): res_bk["playlist"] = res["playlist"] 
+            time.sleep(1.5)
+            t = Thread(target=call_ffmpeg, args=(bkfile, res_bk, ffmpegbk_port, '', ffplaybk_port, avlogext))
+            t.daemon = True
+            t.start()
+            time.sleep(0.1)
+
     return json_data
 
 def get_begin_time_string(begin_time, zone_offset='default'):
