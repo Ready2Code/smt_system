@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+    <head>
+           <title>current progtammers</title>
+		   <script src="{{STATIC_URL}}jquery.min.js"  ></script>
+        </head>
+        <body >
+        <button  type="button" id="currentprogramme" style="width:80px;height:40px;">节目</button>
+
+			 <table id='programmeinfo' border="1" > 
+			   <td style="display:none;">name</td>
+			   <td style="display:none;"> open</td>
+			   <td style="display:none;"> close</td>
+			   <td></td>
+         <script>
+		 function  get_programme()
+         {
+		     path=""
+			 $.ajax({                                            
+             type:"GET",
+			 dataType:"json",
+			 url:"/current_program/get_current_programme/",
+			 data:{path:path},
+			 async:false, 
+			 success:function(data){                                              result=data
+			 console.log(result)
+			 
+			 var jsonObj=JSON.parse(data)
+			  resources = jsonObj.programmer.resources
+			  $("tr.programme_info").remove() 
+			  var newtr=""
+			  for(i=1;i<resources.length;i++){
+			    newtr = newtr + "<tr class='programme_info'>"
+				console.log(resources[i].poster)
+				 newtr = newtr + "<td > <a href='#'> <img src=" + resources[i].poster + " </td>"
+                  newtr = newtr + "<td > <button resource_id='" + resources[i].id + "' "
+				   + "channel_id='" + jsonObj.channel_id + "' "
+				   + "resource_url='" + resources[i].url + "' "
+				   + "command='play' "+ "class='process_resource'>打开</button> </td>"
+				  newtr = newtr + "<td > <button resource_id='" + resources[i].id + "' "
+				  + "channel_id='" +   jsonObj.channel_id + "' "
+				  + "command='stop' "
+				  + "class='process_resource'>关闭</button> </td>"
+				  newtr = newtr + "</tr>" 
+			  }
+			  $("#programmeinfo").append(newtr) 
+			  set_programme_process_response() 
+
+			 }	
+			   });
+		 }
+         function set_programme_process_response() { 
+		 
+		  $("button.process_resource").click(function(){
+		     window.open($(this).attr('resource_url')) 
+	     });
+							  		 
+		 }
+         function set_programme_response() {
+		  $("#currentprogramme").click(function(){
+		     get_programme()  
+		  })
+		 }
+		 $(document).ready(function(){
+		   set_programme_response()
+		   set_programme_process_response()
+		 });
+         </script>
+        </body>
+    </html>

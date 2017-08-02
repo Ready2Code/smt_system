@@ -13,6 +13,8 @@ import os
 import json
 import codecs
 from collections import OrderedDict
+from service_manager import signal_server
+from datetime import datetime, timedelta 
 def start_page(request):
     #service_settings = ServiceSettings.objects.get(name="default")
     monitor_settings = get_monitor_settings()
@@ -22,6 +24,8 @@ def start_page(request):
 
 def config_program(request):
     return render(request, 'config_program.html')
+def current_program(request):
+    return render(request, 'current_program.html')
 	
 def modify_service_settings(request):
     global programmes_path
@@ -93,4 +97,14 @@ def get_broadcast_max_bandwidth( request):
    service_settings_bandwidth = get_service_settings()
    bandwidth=service_settings_bandwidth.broadcast_max_bandwidth
    return HttpResponse(json.dumps(bandwidth), content_type='application/json')
-
+class DateTimeEncoder(json.JSONEncoder):
+      def default(self, o):
+         if isinstance(o, datetime):
+            return o.isoformat()
+         return json.JSONEncoder.default(self, o)
+def get_current_programme(request):
+   data=signal_server.get_current_programme()
+   print "****************get_current_programme*******************"
+   data=json.dumps(data, cls=DateTimeEncoder) 
+   print data
+   return HttpResponse(json.dumps(data), content_type='application/json')

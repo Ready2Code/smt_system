@@ -24,6 +24,7 @@ urlpatterns = [
     #url(r'^$', potal.views.start_page , name='startpage'),
     url(r'^$',                       potal_views.start_page ,                   name='startpage'),
 	url(r'^config_program/$',potal_views.config_program,   name='config_program'),
+	url(r'^current_program/$',potal_views.current_program,   name='current_program'),
 
     url(r'^ws/$',                    state_monitor_views.connect_websocket,    name='connect_websocket '),
     url(r'^start_state_monitor/$',   state_monitor_views.start_state_monitor,   name='start_state_monitro'),
@@ -39,4 +40,5 @@ urlpatterns = [
     url(r'^stop_server/$', service_manager_views.stop_server,       name='stop_server'),
     url(r'^ts_adapter/',               include('ts_adapter.urls')),
 	url(r'^config_program/get_broadcast_max_bandwidth/$',potal_views.get_broadcast_max_bandwidth,   name='get_broadcast_max_bandwidth'),
+    url(r'^current_program/get_current_programme/$',          potal_views.get_current_programme,       name='get_current_programme'),
 ]
