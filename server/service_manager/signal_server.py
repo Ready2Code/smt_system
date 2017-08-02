@@ -387,7 +387,7 @@ def start_smt_system(programs_file=CONFIG_FILE_NAME,
         program_num += 1
         program_num = program_num % 10
 
-def get_current_programme:
+def get_current_programme():
     return packet
 
 if __name__ == "__main__":
