@@ -3,11 +3,24 @@
     <head>
            <title>current progtammers</title>
 		   <script src="{{STATIC_URL}}jquery.min.js"  ></script>
+		   <style>
+            #programmeinfo{
+		      width:100%;
+              height:100%;
+			  margin:0;
+			  padding:0;
+			}
+           .process_resource {
+              width:100px;
+	          height:80px;
+			  font-size:25pt;
+			}
+		   </style> 
         </head>
         <body >
         <button  type="button" id="currentprogramme" style="width:80px;height:40px;">节目</button>
 
-			 <table id='programmeinfo' border="1" > 
+		<table id='programmeinfo' border="1" cellpadding="0" cellspacing="0" width="100%" > 
 			   <td style="display:none;">name</td>
 			   <td style="display:none;"> open</td>
 			   <td style="display:none;"> close</td>
