@@ -199,7 +199,7 @@ def convert_signal(json_file, resource_broadcast_ip, resource_broadband_ip,avlog
             res_bk["begin"] = res["begin"] 
             res_bk["end"] = res["end"] 
             if('playlist' in res.keys()): res_bk["playlist"] = res["playlist"] 
-            time.sleep(1.5)
+            time.sleep(2.5)
             t = Thread(target=call_ffmpeg, args=(bkfile, res_bk, ffmpegbk_port, '', ffplaybk_port, avlogext))
             t.daemon = True
             t.start()
