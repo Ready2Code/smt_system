@@ -14,19 +14,51 @@ import json
 import codecs
 from collections import OrderedDict
 from service_manager import signal_server
-from datetime import datetime, timedelta 
+from datetime import datetime, timedelta
+from django.http import HttpResponseRedirect
+from django.contrib.auth.decorators import login_required
+from potal.models import UserInfo
+from potal.models import get_userinfo_settings
+def test(requets):
+    return HttpResponseRedirect("http://192.168.0.136:8001/current_program/")
+def login(request):
+    username=request.POST['username']
+    password=request.POST['password']
+    url=request.POST['url']
+    userinfo=get_userinfo_settings()
+    for userlist in userinfo:
+       if (username==userlist.user) and (password==userlist.pwd):
+          print "login correct!!"
+          response= HttpResponseRedirect(url)
+          response.set_cookie('username',username,36000)
+          return response
+    return render(request,'login.html',{'url':url})
 def start_page(request):
-    #service_settings = ServiceSettings.objects.get(name="default")
-    monitor_settings = get_monitor_settings()
-    service_settings = get_service_settings()
-   
-    return render(request, 'startpage.html', {'service_settings':service_settings, 'monitor_settings':monitor_settings})
-
+    if "username" in request.COOKIES:
+      print "login success" 
+      print request.COOKIES 
+      monitor_settings = get_monitor_settings()
+      service_settings = get_service_settings()
+      return render(request, 'startpage.html', {'service_settings':service_settings, 'monitor_settings':monitor_settings})
+    else:
+      print "please login!!"
+      url='/'
+      return render(request,'login.html',{'url':url})
 def config_program(request):
-    return render(request, 'config_program.html')
+    if "username" in request.COOKIES:
+       print request.COOKIES["username"]
+       return render(request, 'config_program.html')
+    else:
+      print "please login!!"
+      url='/config_program/'
+      return render(request,'login.html',{'url':url})
 def current_program(request):
-    return render(request, 'current_program.html')
-	
+    if "username" in request.COOKIES:
+      return render(request, 'current_program.html')
+    else:
+      print "please login!!"
+      url='/current_program/'
+      return render(request,'login.html',{'url':url})
 def modify_service_settings(request):
     global programmes_path
     service_settings = get_service_settings()   

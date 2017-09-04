@@ -18,10 +18,21 @@ from django.contrib import admin
 from potal import views as potal_views
 from state_monitor import views as state_monitor_views
 from service_manager import views as service_manager_views
-
+from django.conf import settings
+from django.contrib.auth import views
+#if settings.DEBUG is False:
+ #   urlpatterns += patterns('',
+  #      url(r'^static/(?P<path>.*)$', 'django.views.static.serve', { 'document_root': settings.STATIC_ROOT,
+   #     }),
+   #)
 
 urlpatterns = [
     #url(r'^$', potal.views.start_page , name='startpage'),
+	url(r'^login$',potal_views.login,   name='login'),
+	url(r'^config_program/login$',potal_views.login,   name='login'),
+	url(r'^current_program/login$',potal_views.login,   name='login'),
+	url(r'^show_status/login$',potal_views.login,   name='login'),
+	url(r'^ts_adapter/login$',potal_views.login,   name='login'),
     url(r'^$',                       potal_views.start_page ,                   name='startpage'),
 	url(r'^config_program/$',potal_views.config_program,   name='config_program'),
 	url(r'^current_program/$',potal_views.current_program,   name='current_program'),
@@ -42,3 +53,4 @@ urlpatterns = [
 	url(r'^config_program/get_broadcast_max_bandwidth/$',potal_views.get_broadcast_max_bandwidth,   name='get_broadcast_max_bandwidth'),
     url(r'^current_program/get_current_programme/$',          potal_views.get_current_programme,       name='get_current_programme'),
 ]
+

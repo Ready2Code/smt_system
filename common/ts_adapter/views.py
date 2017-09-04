@@ -9,9 +9,12 @@ import MMTtool
 import json
 
 def ts_adapter(request):
-    selected_mode         = request.GET['mode']
-    return render(request, 'ts_adapter.html',{'mode': selected_mode})
-
+   if "username" in request.COOKIES:
+     selected_mode         = request.GET['mode']
+     return render(request, 'ts_adapter.html',{'mode': selected_mode})
+   else:
+     url='/ts_adapter/?mode=ip2ts'
+     return render(request,'login.html',{'url':url})
 def update_list(request):
     all_items = TsAdapterSettings.objects.all()
     json_str = serializers.serialize("json",all_items)
