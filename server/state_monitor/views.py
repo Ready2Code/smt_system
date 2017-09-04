@@ -7,9 +7,12 @@ from websocketserver import WebSocket
 from state_monitor.models import get_monitor_settings
 
 def show_status(request):
+  if "username" in request.COOKIES:
     monitor_settings = get_monitor_settings()   
     return render(request, 'index.html', {'monitor_settings':monitor_settings})
-
+  else:
+    url='/show_status'
+    return render(request,'login.html',{'url':url})
 def start_state_monitor(request):
     print 'start info server'
     monitor_settings = get_monitor_settings()   
