@@ -25,6 +25,11 @@ CHANNEL_FILE = "channels.json"
 SCREEN_WIDTH = 3840
 SCREEN_HEIGHT = 2160
 
+is_gateway = 1
+GATEWAY_IP_ADDR = '192.168.100.11'
+GATEWAY_IP_PORT = 8000
+LOCAL_IP_ADDR = '192.168.100.244'
+
 programmer_changed = 0
 sequence = 0
 channels_info = dict()
@@ -212,6 +217,10 @@ def UDP_recv(port, channel_id, name):
     while 1:
         data, address = s.recvfrom(4096)
         json_data = json.loads(data)
+	if is_gateway == 1 and json_data['programmer']['sequence'] > 0:
+        	for res in json_data['programmer']['resources']:
+            		if(res['type'] == 'broadcast'):
+        			res['url'] = res['url'][:6]+GATEWAY_IP_ADDR+':'+str(GATEWAY_IP_PORT)+'@'+res['url'][6:]        	
         channels_info[channel_id] = json_data
 
         if json_data['programmer']['sequence']  == 0:
@@ -317,6 +326,10 @@ def initial(info_collector_dest='', device_name=''):
     # each channel is assigned one thread to handle its broadcast signaling
     for channel in channel_info['channels']:
         port = int(channel['url'].split(':')[-1])
+
+	if is_gateway == 1:
+        	s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    		s.sendto('add '+ LOCAL_IP_ADDR + ':' + str(port) , (GATEWAY_IP_ADDR, GATEWAY_IP_PORT))
 
         t = Thread(target=UDP_recv, args=(port,channel['id'],channel['name']))
         t.setDaemon(True)
