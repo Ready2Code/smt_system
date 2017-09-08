@@ -19,6 +19,9 @@ function setLineChart(tag, color, charttype) {
                     if('packet_lost' == charttype) {
                         return 'column';
                         }
+					else if('bitrate' == charttype) {
+                        return 'column';
+                        }
                     else {
                         return 'spline';
 
@@ -102,7 +105,9 @@ function setLineChart(tag, color, charttype) {
             series: {
                 marker: {
                     enabled: false
-                }
+                },
+                pointWidth:10,
+                pointPadding:2
             }
         },
         series: [{
@@ -115,7 +120,25 @@ function setLineChart(tag, color, charttype) {
 
                 for (i = -19; i <= 0; i++) {
                     data.push({
-                        x: time + i * interval,
+                        x:0,// time + i * interval,
+                        y:0// Math.random()*100                                        
+                        //y: 0
+                    });
+                }
+                return data;
+            })()
+        },
+        {
+            name: ' ',
+            data: (function() {
+                // generate an array of random data                             
+                var data = [],
+                time = (new Date()).getTime(),
+                i;
+
+                for (i = -19; i <= 0; i++) {
+                    data.push({
+                        x: 0//time + i * interval,
                         //y: Math.random()*100                                        
                         y: 0
                     });
@@ -133,9 +156,9 @@ function setLineChart(tag, color, charttype) {
 
                 for (i = -19; i <= 0; i++) {
                     data.push({
-                        x: time + i * interval,
-                        //y: Math.random()*100                                        
-                        y: 0
+                        x:0,//time + i * interval,
+                        y:0// Math.random()*100                                        
+                      //  y: 0
                     });
                 }
                 return data;
@@ -151,27 +174,9 @@ function setLineChart(tag, color, charttype) {
 
                 for (i = -19; i <= 0; i++) {
                     data.push({
-                        x: time + i * interval,
-                        //y: Math.random()*100                                        
-                        y: 0
-                    });
-                }
-                return data;
-            })()
-        },
-        {
-            name: ' ',
-            data: (function() {
-                // generate an array of random data                             
-                var data = [],
-                time = (new Date()).getTime(),
-                i;
-
-                for (i = -19; i <= 0; i++) {
-                    data.push({
-                        x: time + i * interval,
-                        //y: Math.random()*100                                        
-                        y: 0
+                        x:0,//time + i * interval,
+                        y:0 //Math.random()*100                                        
+                       // y: 0
                     });
                 }
                 return data;
@@ -188,8 +193,25 @@ function getdata(obj) {
 
 function drawbitrateCharts() {
     var time = (new Date()).getTime(); // current time  
-    var chartArray = bitrateCharts[0];
-    for (var i in chartArray.series) {
+    var thechartArray = bitrateCharts;
+	var chartArra;
+  
+	for(var i in thechartArray){
+	  
+	  if(thechartArray.filename !='undefined' ){
+         filename= thechartArray[i].filename;
+         type= filename.split(':');
+	     if(type[2]=='1'){
+	//	   console.log("filename@@@@@@@@@@@@@@@==1")
+		   chartArray=thechartArray[1]
+	     }else{
+		   chartArray=thechartArray[0]
+	//	   console.log("filename@@@@@@@@@@@@@@@==0",filename)
+	     }
+	   chartArray.yAxis[0].options.tickInterval=2;
+	   chartArray.yAxis[0].options.min=0;
+	   chartArray.yAxis[0].options.max=30;
+       for (var i in chartArray.series) {
         var timecount = 0;
         var numbercount = 0.00000000001;
         if (typeof(chartArray.series[i].sList) != 'undefined') {
@@ -206,12 +228,20 @@ function drawbitrateCharts() {
                 thepoint = thepoint.pre;
             }
         } else {
-            chartArray.series[i].hide();
+          //  chartArray.series[i].hide();
         }
 
-        chartArray.series[i].addPoint([time, timecount / (numbercount)], true, true);
+		var data=[];
+	    if(type[2]=='1'){
+		  data.push([ chartArray.series[i].name,timecount / (numbercount)]);		  
+          chartArray.series[i].setData(data);
+		}else{
+           chartArray.series[i].setData([ chartArray.series[i].name, timecount / (numbercount)]);
+		}     
 
+      }
     }
+   }
 }
 /* for draw delay */
 /*
@@ -439,6 +469,7 @@ function showdiv(targetid,dis){
 $(function() {
     $(document).ready(function() {
         setLineChart('.left-main1', ['#FF8040', '#73BF00', '#66B3FF', '#ffff00'], 'bitrate');
+        setLineChart('.left-main2', ['#FF8040', '#73BF00', '#66B3FF', '#ffff00'], 'bitrate');
         setLineChart('.center-main1', ['#FF8040', '#73BF00', '#66B3FF', '#ffff00'], 'delay');
         setLineChart('.center-main2', ['#FF8040', '#73BF00', '#66B3FF', '#ffff00'], 'delay');
         setLineChart('.center-main3', ['#FF8040', '#73BF00', '#66B3FF', '#ffff00'], 'delay');
@@ -516,8 +547,20 @@ $(function() {
                 } else if (typeof(obj.bitrate) != 'undefined') {
                     vpoint = parseFloat(obj.bitrate);
                     filename = obj.device;
+					nettype=obj.filename;
+                    type= nettype.split(':');
+                    console.log("type=",type[2])				
                     thetime = parseInt(obj.time) / 1000;
-                    addNewPoint2BitrateChart(bitrateCharts[0], filename, vpoint, thetime);
+                    if(type[2]=='1'){
+                   //   thetime = parseInt(obj.time) / 1000;
+                      console.log("vpoint=",vpoint)				
+                      addNewPoint2BitrateChart(bitrateCharts[1], filename, vpoint, thetime);
+				      bitrateCharts[1].filename=obj.filename;
+					}else{
+                     // thetime = parseInt(obj.time) / 1000;
+                      addNewPoint2BitrateChart(bitrateCharts[0], filename, vpoint, thetime);
+					  bitrateCharts[0].filename=obj.filename;
+					}
                 } else if (typeof(obj.delay) != 'undefined') {
                     //console.log('data=', data);
                     vpoint = parseInt(obj.delay) / 1000.0;
