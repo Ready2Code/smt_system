@@ -138,7 +138,7 @@ function setLineChart(tag, color, charttype) {
 
                 for (i = -19; i <= 0; i++) {
                     data.push({
-                        x: 0//time + i * interval,
+                        x: 0,//time + i * interval,
                         //y: Math.random()*100                                        
                         y: 0
                     });
