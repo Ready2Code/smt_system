@@ -95,7 +95,7 @@ def call_ffplay(res):
     delta = endtime - begintime
     ffplay_command = ''
     str_avlogext=''
-    
+
     if platform.system() == "Windows":
         ffplay_command = RELATIVE_PATH + 'ffplay.exe'
     if platform.system() == "Linux":
@@ -103,12 +103,12 @@ def call_ffplay(res):
 
     if g_info_collector_dest != '' and g_device_name != '':
         str_avlogext = '-avlogext ' + g_info_collector_dest + ' -deviceinfo ' + g_device_name
-        
+
     if(res_type == 'broadcast'):
         #-sync smt 
         if ('bk' in res.keys()):
             ffplay_command = ffplay_command + ' -sync smt {6} {0},{1},{2},{3},{4} -port {5} -bk {7}'.format(res['url'],
-                                                                                                        cal_screen_value(res['layout']['posx'], True), 
+                                                                                                            cal_screen_value(res['layout']['posx'], True), 
                                                                                                         cal_screen_value(res['layout']['posy'], False), 
                                                                                                         cal_screen_value(res['layout']['width'], True), 
                                                                                                         cal_screen_value(res['layout']['height'], False), 
@@ -117,7 +117,7 @@ def call_ffplay(res):
                                                                                                         res['bk']) 
         else:
             ffplay_command = ffplay_command + ' -sync smt {6} {0},{1},{2},{3},{4} -port {5}'.format(res['url'],
-                                                                                                cal_screen_value(res['layout']['posx'], True), 
+                                                                                                    cal_screen_value(res['layout']['posx'], True), 
                                                                                                 cal_screen_value(res['layout']['posy'], False), 
                                                                                                 cal_screen_value(res['layout']['width'], True), 
                                                                                                 cal_screen_value(res['layout']['height'], False), 
@@ -202,10 +202,10 @@ def prompt_add():
     addcommand = json.dumps(add_command)
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     s.sendto(addcommand,("localhost", FFPLAY_LISTEN_PORT))
-    
+
 def prompt_del():
     prompt_add()
-    
+
 def UDP_recv(port, channel_id, name):
     global sequence
     global related
@@ -217,17 +217,17 @@ def UDP_recv(port, channel_id, name):
     while 1:
         data, address = s.recvfrom(4096)
         json_data = json.loads(data)
-	if is_gateway == 1 and json_data['programmer']['sequence'] > 0:
-        	for res in json_data['programmer']['resources']:
-            		if(res['type'] == 'broadcast'):
-        			res['url'] = res['url'][:6]+GATEWAY_IP_ADDR+':'+str(GATEWAY_IP_PORT)+'@'+res['url'][6:]        	
+        if is_gateway == 1 and json_data['programmer']['sequence'] > 0:
+            for res in json_data['programmer']['resources']:
+                if(res['type'] == 'broadcast'):
+                    res['url'] = res['url'][:6]+GATEWAY_IP_ADDR+':'+str(GATEWAY_IP_PORT)+'@'+res['url'][6:]        	
         channels_info[channel_id] = json_data
 
         if json_data['programmer']['sequence']  == 0:
             clear_all()
             print "*********** restart **************"
             continue
-            
+
         if(is_continue_play and
            continue_play_channel == channel_id and
            json_data['programmer']['sequence'] > sequence):
@@ -239,12 +239,12 @@ def UDP_recv(port, channel_id, name):
             print bcolors.WARNING + "\n{1} id [{0}] have an updated signaling ...".format(channel_id, name.encode('utf-8').strip()) + bcolors.ENDC
             if 'related' in json_data['programmer'].keys(): 
                 related = json_data['programmer']['related']
-               # if related == 'true' and pffplay is not None:
+                # if related == 'true' and pffplay is not None:
                 #    t = Thread(target=prompt_add)
-                 #   t.start()
-               # if related == 'false' and pffplay is not None:
+                    #   t.start()
+                # if related == 'false' and pffplay is not None:
                 #    t = Thread(target=prompt_del)
-                 #   t.start()                
+                    #   t.start()                
     #print json_data
     #print current_json 
 
@@ -327,9 +327,9 @@ def initial(info_collector_dest='', device_name=''):
     for channel in channel_info['channels']:
         port = int(channel['url'].split(':')[-1])
 
-	if is_gateway == 1:
-        	s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    		s.sendto('add '+ LOCAL_IP_ADDR + ':' + str(port) , (GATEWAY_IP_ADDR, GATEWAY_IP_PORT))
+        if is_gateway == 1:
+            s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            s.sendto('add '+ LOCAL_IP_ADDR + ':' + str(port) , (GATEWAY_IP_ADDR, GATEWAY_IP_PORT))
 
         t = Thread(target=UDP_recv, args=(port,channel['id'],channel['name']))
         t.setDaemon(True)
@@ -402,7 +402,7 @@ def play_programmer(val = DEFAULT, full = DEFAULT):
                 exception = vals[0] + ':' + res['exception']
             else:
                 exception = ''
-                
+
             if full == 'full':
                 res['layout']['posx'] = 0
                 res['layout']['posy'] = 0
@@ -469,9 +469,9 @@ def stop_play(val = DEFAULT):
     for res in programmers['programmer']['resources']:
         if (res['id'] == vals[1]):
             #if(res['type'] == 'broadband'):
-                t = Thread(target=del_ffplay, args=(res, ))
-                t.setDaemon(True)
-                t.start()
+            t = Thread(target=del_ffplay, args=(res, ))
+            t.setDaemon(True)
+            t.start()
 
 def render():
     render_command = {'type':'render','format': {'name': ''}}
