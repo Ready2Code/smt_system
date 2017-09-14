@@ -36,6 +36,7 @@ channels_info = dict()
 continue_play_channel = '0'
 is_continue_play = 0
 pffplay = None
+ffplay_pid = 0    #to distinguish ffplay, it is not a true process ID
 related = 'false'
 exception = ''
 channel_info = {}
@@ -87,6 +88,7 @@ def load(name):
 def call_ffplay(res):
     global pffplay
     global related
+    global ffplay_pid
     #print 'call_ffplay', res
     print 'res is ', res
     begintime = datetime.strptime(res['begin'], '%Y-%m-%dT%H:%M:%S.%f')
@@ -126,6 +128,7 @@ def call_ffplay(res):
     print ffplay_command
     #p = Popen(shlex.split(ffplay_command))
     pffplay = ffplay_command
+    ffplay_pid = ffplay_pid + 1
     os.system(ffplay_command)
     #pffplay = Popen(shlex.split(ffplay_command), stdout=FNULL, stderr=STDOUT)
     if(related == 'true'):
@@ -134,12 +137,13 @@ def call_ffplay(res):
     # add 1 more second    
     time.sleep(delta.seconds + 1)
     print delta.seconds, "passed  resource [", res['name'], "] is closed"
-    del_ffplay(res)
+    del_ffplay(res, ffplay_pid)
 
 
 def add_ffplay(res):
     #print res
     global related
+    global ffplay_pid
     begintime = datetime.strptime(res['begin'], '%Y-%m-%dT%H:%M:%S.%f')
     endtime = datetime.strptime(res['end'], '%Y-%m-%dT%H:%M:%S.%f')
     curr_time = datetime.now()
@@ -177,13 +181,17 @@ def add_ffplay(res):
     # add 1 more second 
     time.sleep(delta.seconds + 1)
     print delta.seconds, "passed  resource [", res['name'], "] is closed"
-    del_ffplay(res)
+    del_ffplay(res, ffplay_pid)
 
-def del_ffplay(res):
+def del_ffplay(res, pid=0):
+    global ffplay_pid
     server_ip = ''
     name = ''
     url = res['url']
+    if(pid !=0 and pid !=ffplay_pid):
+       return
     if(res['type'] == 'broadcast'):
+        #wrong pid, ffplay has been killed
         name = url
     else:
         server_ip = url.split('@')[0].split('://')[1]
@@ -452,6 +460,7 @@ def stop_all():
 
 def stop_play(val = DEFAULT):
     global pffplay
+    global ffplay_pid
     if val is DEFAULT:
         print bcolors.FAIL + "missing operand: need channel_id" + bcolors.ENDC
         return
@@ -469,7 +478,7 @@ def stop_play(val = DEFAULT):
     for res in programmers['programmer']['resources']:
         if (res['id'] == vals[1]):
             #if(res['type'] == 'broadband'):
-            t = Thread(target=del_ffplay, args=(res, ))
+            t = Thread(target=del_ffplay, args=(res, ffplay_pid))
             t.setDaemon(True)
             t.start()
 
