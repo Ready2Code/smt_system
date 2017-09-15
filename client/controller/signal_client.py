@@ -135,9 +135,10 @@ def call_ffplay(res):
         time.sleep(2) 
         prompt_add()
     # add 1 more second    
+    cur_ffplay_id = ffplay_pid
     time.sleep(delta.seconds + 1)
     print delta.seconds, "passed  resource [", res['name'], "] is closed"
-    del_ffplay(res, ffplay_pid)
+    del_ffplay(res, cur_ffplay_id)
 
 
 def add_ffplay(res):
@@ -179,9 +180,10 @@ def add_ffplay(res):
         prompt_add()
     delta = endtime - curr_time
     # add 1 more second 
+    cur_ffplay_id = ffplay_pid
     time.sleep(delta.seconds + 1)
     print delta.seconds, "passed  resource [", res['name'], "] is closed"
-    del_ffplay(res, ffplay_pid)
+    del_ffplay(res, cur_ffplay_id)
 
 def del_ffplay(res, pid=0):
     global ffplay_pid
