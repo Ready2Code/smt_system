@@ -131,9 +131,9 @@ def convert_signal(json_file, resource_broadcast_ip, resource_broadband_ip,avlog
     global packet
     global ffmpeg_list
  
-    for i in range(len(ffmpeg_list)):
-        functions.kill_process_by_name(ffmpeg_list[i])
-    del ffmpeg_list[:]
+#    for i in range(len(ffmpeg_list)):
+#        functions.kill_process_by_name(ffmpeg_list[i]["cmd"])
+#    del ffmpeg_list[:]
 
     json_data = json.loads(json_file)
     sequence_number += json_data['programmer']['sequence']
@@ -246,7 +246,7 @@ def call_ffmpeg(file_dir, res, port, resource_broadcast_ip, ffplay_port, avlogex
     ffmpeg_command = ffmpeg_command + ' -re {0} {1} -i {2} -begintime {3} {4} -c:v copy -c:a aac -f mpu {5}'.format(str_port, playlist, file_dir, begintime, str_avlogext, str_output) 
     print ffmpeg_command
 
-    ffmpeg_list.append(ffmpeg_command)
+    ffmpeg_list.append({"cmd":ffmpeg_command, "end":res['end']})
 
     if ext_callbacks.has_key('before_ffmpeg'):
         ext_callbacks['before_ffmpeg'](res_type, str_output)
@@ -280,7 +280,7 @@ def stop_all():
     for i in range(len(ffmpeg_list)):
         #ffmpeg_list[i].kill()
         #ffmpeg_list[i].wait()
-        functions.kill_process_by_name(ffmpeg_list[i])
+        functions.kill_process_by_name(ffmpeg_list[i]["cmd"])
     del ffmpeg_list[:]
 def delay_broadcast(s, packet, des):
     if len(packet) == 0:
@@ -295,6 +295,17 @@ def delay_broadcast(s, packet, des):
     else:
         print 'no proper signal to send...'
         #pass
+
+def command_timer():
+    global ffmpeg_list
+    while start_system_flag != 0:
+        for i in range(len(ffmpeg_list)-1, -1, -1):
+            delta = ffmpeg_list[i]['end'] - datetime.now()
+            #if delta.seconds < 0:
+            if ffmpeg_list[i]['end'] < datetime.now():
+                functions.kill_process_by_name(ffmpeg_list[i]['cmd'])
+                ffmpeg_list.pop(i)
+        time.sleep(0.1)
 
 def main():
     if len(sys.argv) != 4 and len(sys.argv) != 1:
@@ -361,6 +372,9 @@ def start_smt_system(programs_file=CONFIG_FILE_NAME,
     thread = SignalTimerThread(stopFlag, signal_destination)
     thread.setDaemon(True)
     thread.start()
+    t = Thread(target=command_timer)
+    t.daemon = True
+    t.start()
 
     endtime = datetime.now()
     for i in programmers:
