@@ -39,6 +39,7 @@ def start_page(request):
       print request.COOKIES 
       monitor_settings = get_monitor_settings()
       service_settings = get_service_settings()
+      set_aheadtime_cachetime(service_settings,0)
       return render(request, 'startpage.html', {'service_settings':service_settings, 'monitor_settings':monitor_settings})
     else:
       print "please login!!"
@@ -59,11 +60,31 @@ def current_program(request):
       print "please login!!"
       url='/current_program/'
       return render(request,'login.html',{'url':url})
+def set_aheadtime_cachetime(service_settings,modify):
+    filepath = functions.url2pathname(service_settings.programs)
+    file=codecs.open(filepath,'r','utf-8')
+    data=file.read()
+    data=json.loads(data,object_pairs_hook=OrderedDict)
+    file.close()
+    if modify:
+      data['aheadtime']=service_settings.aheadtime
+      data['cachetime']=service_settings.cachetime
+    else:
+      service_settings.aheadtime= data['aheadtime']
+      service_settings.cachetime= data['cachetime']
+      service_settings.save()
+      return
+    file=codecs.open(filepath,'w','utf-8')
+    setdata=json.dumps(data,indent=4,sort_keys=False)
+    data=file.write(setdata)
+    file.close()
 def modify_service_settings(request):
     global programmes_path
     service_settings = get_service_settings()   
     service_settings.signal_destip   = request.GET['signal_destip']
     service_settings.signal_port     = request.GET['signal_port']
+    service_settings.aheadtime     = request.GET['aheadtime']
+    service_settings.cachetime    = request.GET['cachetime']
     service_settings.resource_broadcast_ip   = request.GET['resource_broadcast_ip']
     service_settings.resource_broadband_ip   =request.GET['resource_broadband_ip']
     service_settings.programs                = request.GET['programs_file_path']
@@ -71,6 +92,7 @@ def modify_service_settings(request):
     service_settings.auto_ts_adapter_destaddr      = request.GET['auto_ts_adapter_destaddr']
     service_settings.broadcast_max_bandwidth      = request.GET['broadcast_max_bandwidth']
     service_settings.save()
+    set_aheadtime_cachetime(service_settings,1)
 
     monitor_settings = get_monitor_settings()   
     monitor_settings.info_collector_ip      = request.GET['info_collector_ip']
