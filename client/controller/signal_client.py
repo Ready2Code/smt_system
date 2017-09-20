@@ -42,6 +42,9 @@ exception = ''
 channel_info = {}
 g_info_collector_dest = ''
 g_device_name = ''
+#g_sync='smt'
+g_sync=''
+
 class bcolors:
     HEADER = '\033[95m'
     OKBLUE = '\033[94m'
@@ -89,6 +92,7 @@ def call_ffplay(res):
     global pffplay
     global related
     global ffplay_pid
+    global g_sync
     #print 'call_ffplay', res
     print 'res is ', res
     begintime = datetime.strptime(res['begin'], '%Y-%m-%dT%H:%M:%S.%f')
@@ -97,34 +101,37 @@ def call_ffplay(res):
     delta = endtime - begintime
     ffplay_command = ''
     str_avlogext=''
-
+    str_bk=''
+    str_sync=''
+    str_port=''
+    str_quick='-fflags nobuffer  -analyzeduration 100 -probesize 50 -framedrop'
+    
     if platform.system() == "Windows":
-        ffplay_command = RELATIVE_PATH + 'ffplay.exe'
+        ffplay_command = RELATIVE_PATH + 'ffplay.exe' + ' '
     if platform.system() == "Linux":
-        ffplay_command = RELATIVE_PATH + 'ffplay'
+        ffplay_command = RELATIVE_PATH + 'ffplay' + ' '
 
     if g_info_collector_dest != '' and g_device_name != '':
-        str_avlogext = '-avlogext ' + g_info_collector_dest + ' -deviceinfo ' + g_device_name
+        str_avlogext = '-avlogext ' + g_info_collector_dest + ' -deviceinfo ' + g_device_name + ' '
 
+
+    if g_sync != '':
+        str_sync='-sync ' + g_sync + ' '
+
+    str_port ='-port '+ str(FFPLAY_LISTEN_PORT)+ ' '
     if(res_type == 'broadcast'):
         #-sync smt 
         if ('bk' in res.keys()):
-            ffplay_command = ffplay_command + ' -sync smt {6} {0},{1},{2},{3},{4} -port {5} -bk {7}'.format(res['url'],
-                                                                                                            cal_screen_value(res['layout']['posx'], True), 
-                                                                                                        cal_screen_value(res['layout']['posy'], False), 
-                                                                                                        cal_screen_value(res['layout']['width'], True), 
-                                                                                                        cal_screen_value(res['layout']['height'], False), 
-                                                                                                        FFPLAY_LISTEN_PORT,
-                                                                                                        str_avlogext,
-                                                                                                        res['bk']) 
-        else:
-            ffplay_command = ffplay_command + ' -sync smt {6} {0},{1},{2},{3},{4} -port {5}'.format(res['url'],
-                                                                                                    cal_screen_value(res['layout']['posx'], True), 
-                                                                                                cal_screen_value(res['layout']['posy'], False), 
-                                                                                                cal_screen_value(res['layout']['width'], True), 
-                                                                                                cal_screen_value(res['layout']['height'], False), 
-                                                                                                FFPLAY_LISTEN_PORT,
-                                                                                                str_avlogext) 
+            str_bk = '-bk '+ res['bk'] + ' '
+        #ffplay_command =(ffplay_command + str_sync + str_avlogext + res['url'] + ',' 
+        ffplay_command =(ffplay_command + str_sync + str_avlogext + 'udp://127.0.0.1:18888' + ',' 
+                                        + str(cal_screen_value(res['layout']['posx'], True))   + ',' 
+                                        + str(cal_screen_value(res['layout']['posy'], False))  + ',' 
+                                        + str(cal_screen_value(res['layout']['width'], True))  + ','
+                                        + str(cal_screen_value(res['layout']['height'], False))+ ' '
+                                        + str_port + str_bk + str_quick)
+ 
+
     print ffplay_command
     #p = Popen(shlex.split(ffplay_command))
     pffplay = ffplay_command
