@@ -42,8 +42,7 @@ exception = ''
 channel_info = {}
 g_info_collector_dest = ''
 g_device_name = ''
-#g_sync='smt'
-g_sync=''
+g_sync='smt'
 
 class bcolors:
     HEADER = '\033[95m'
@@ -104,8 +103,9 @@ def call_ffplay(res):
     str_bk=''
     str_sync=''
     str_port=''
-    str_quick='-fflags nobuffer  -analyzeduration 100 -probesize 50 -framedrop'
-    
+    #str_quick='-fflags nobuffer  -analyzeduration 100 -probesize 50 -framedrop '
+    str_quick=' -analyzeduration 100 -probesize 50 -framedrop '
+        
     if platform.system() == "Windows":
         ffplay_command = RELATIVE_PATH + 'ffplay.exe' + ' '
     if platform.system() == "Linux":
@@ -123,8 +123,7 @@ def call_ffplay(res):
         #-sync smt 
         if ('bk' in res.keys()):
             str_bk = '-bk '+ res['bk'] + ' '
-        #ffplay_command =(ffplay_command + str_sync + str_avlogext + res['url'] + ',' 
-        ffplay_command =(ffplay_command + str_sync + str_avlogext + 'udp://127.0.0.1:18888' + ',' 
+        ffplay_command =(ffplay_command + str_sync + str_avlogext + res['url'] + ',' 
                                         + str(cal_screen_value(res['layout']['posx'], True))   + ',' 
                                         + str(cal_screen_value(res['layout']['posy'], False))  + ',' 
                                         + str(cal_screen_value(res['layout']['width'], True))  + ','
