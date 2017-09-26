@@ -174,7 +174,7 @@ def add_ffplay(res):
     add_command['format']['posy'] = cal_screen_value(res['layout']['posy'], False)
     add_command['format']['width'] = cal_screen_value(res['layout']['width'], True)
     add_command['format']['height'] = cal_screen_value(res['layout']['height'], False)
-    if is_continue_play == 1 and res['type'] == 'broadcast':
+    if add_command['format']['width'] == SCREEN_WIDTH and add_command['format']['height'] == SCREEN_HEIGHT:
         add_command['format']['kind'] = 'all'
     addcommand = json.dumps(add_command)
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -197,7 +197,7 @@ def del_ffplay(res, pid=0):
     name = ''
     url = res['url']
     if(pid !=0 and pid !=ffplay_pid):
-       return
+        return
     if(res['type'] == 'broadcast'):
         #wrong pid, ffplay has been killed
         name = url
