@@ -424,6 +424,7 @@ def play_programmer(val = DEFAULT, full = DEFAULT):
                 res['layout']['posy'] = 0
                 res['layout']['width'] = '100%'
                 res['layout']['height'] = '100%'            
+                programmers['programmer']['fullscreen-resource'] = res['id']
             if pffplay is not None:
                 t = Thread(target=add_ffplay, args=(res, ))
                 t.setDaemon(True)
@@ -431,7 +432,8 @@ def play_programmer(val = DEFAULT, full = DEFAULT):
             else:
                 t = Thread(target=call_ffplay, args=(res, ))
                 t.setDaemon(True)
-                t.start()            
+                t.start()   
+                programmers['programmer']['fullscreen-resource'] = res['id']
 
 def help():
     print bcolors.HEADER + 'all commands are listed:' + bcolors.ENDC
