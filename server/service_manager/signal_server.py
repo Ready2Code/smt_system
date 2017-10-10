@@ -362,8 +362,8 @@ def start_smt_system(programs_file=CONFIG_FILE_NAME,
     print "load file <" , programs_file , "> successful \n"
 
     signal_destination = (signal_destip, int(signal_port))
-    aheadtime = json_data['aheadtime']
-    cachetime = json_data['cachetime']
+    aheadtime = int(json_data['aheadtime'])
+    cachetime = int(json_data['cachetime'])
     programmers = json_data['programmers']
     print 'aheadtime =', aheadtime , 'cachetime =', cachetime,'start_system_flag=',start_system_flag
 
