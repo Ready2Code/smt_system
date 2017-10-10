@@ -45,7 +45,10 @@ def get_current_programme_info(request):
     return HttpResponse(json.dumps(ret), content_type='application/json')
 
 def related_operator(request):
-    return render(request, 'related_operator.html')
+    return render(request, 'related_operator2.html')
+
+def program_list(request):
+    return render(request, 'program_list.html')
 
 def play_channel(request, channel_id, res_id,full_id='0'):
     if full_id=='1':
