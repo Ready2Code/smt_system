@@ -89,8 +89,9 @@ function get_program_list_data() {
         }
     newtr = newtr + "</tr>"
         }
-    $("#programmeinfo").append(newtr)
-        set_programme_process_response()
+    $("#programmeinfo").append(newtr);
+    $("#programmeinfo").trigger('create');
+    set_programme_process_response()
 
     })
 }
