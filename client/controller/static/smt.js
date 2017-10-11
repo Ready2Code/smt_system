@@ -26,6 +26,7 @@ function set_programme_process_response() {
         $.get("/" + $(this).attr('command') +"/"+$(this).attr('channel_id')+"/"+$(this).attr('resource_id')+"/"+full_id+"/",function(ret){
 
         })
+        window.reload_related_operator = true
         $("#device_window").popup("close")
         window.history.back(-1)
     });
@@ -33,6 +34,7 @@ function set_programme_process_response() {
         console.log("small screen button click")		   
         $.get("/" + $(this).attr('command') +"/"+$(this).attr('channel_id')+"/"+$(this).attr('resource_id')+"/",function(ret){
         })
+        window.reload_related_operator = true
         $("#device_window").popup("close")
     })
     $("#pad").click(function(){
@@ -68,7 +70,7 @@ function get_program_list_data() {
         $("tr.programme_info").remove()
         resources = ret.programmer.resources
         set_resources(resources)
-        console.log(resources)
+        console.log(ret.programmer)
         var newtr = ""
         for(var i=0; i< resources.length; i++) {
             newtr = newtr + "<tr class='programme_info'> "
@@ -99,6 +101,7 @@ function get_program_list_data() {
 
 function process_resource_open() {
     console.log(getFnName(arguments.callee))
+    window.jxj = 2
     resources = get_resources()
     if(null == resources) { return }
     $("button.devicelist").remove()

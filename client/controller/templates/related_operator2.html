@@ -20,6 +20,16 @@
             $(document).ready(function(){
                 //get_related()
                 //set_programme_response()
+                window.reload_related_operator = false
+                if(history.pushState) {
+                    window.addEventListener("popstate", function() { 
+                        if(true == window.reload_related_operator){  
+                            console.log('reload related_operator.html')
+                            window.reload_related_operator = false
+                            window.location.reload();  
+                        }
+                    })
+                }
 
             })
         </script>
