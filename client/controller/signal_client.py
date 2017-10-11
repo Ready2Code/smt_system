@@ -424,7 +424,8 @@ def get_current_programme():
     global continue_play_channel
     cur_programme = show_channel(continue_play_channel)
     window_stack = window_stack_get()
-    cur_programme['programmer']['window_stack'] = window_stack 
+    if cur_programme.has_key('programmer'):
+        cur_programme['programmer']['window_stack'] = window_stack 
     return cur_programme
 
 def play_programmer(val = DEFAULT, full = DEFAULT):
