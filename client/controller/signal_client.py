@@ -234,7 +234,7 @@ def del_ffplay(res, pid=0):
         server_ip = url.split('@')[0].split('://')[1]
         name = url.replace(server_ip, '')
 
-    window_stack_pop(res[id])
+    window_stack_pop(res['id'])
     if(related == 'true'):    prompt_del()
     del_command = {'type':'del', 'server': '', 'format': {'name': ''}}
     del_command['server'] = server_ip
