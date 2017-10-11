@@ -43,6 +43,7 @@ channel_info = {}
 g_info_collector_dest = ''
 g_device_name = ''
 g_sync='smt'
+window_stack_list = []
 
 class bcolors:
     HEADER = '\033[95m'
@@ -72,6 +73,28 @@ def get_screen_resolution():
         print "can't get platform type"
     print 'screen resolution: '+ str(SCREEN_WIDTH)+ ' * '+ str(SCREEN_HEIGHT) 
 
+# window ={'id': xxxxx, 'type': 'fullscreen' or 'normal'
+def window_stack_push(wid, wtype='normal'):
+    global window_stack_list
+    window = {'id': wid, 'type': wtype}
+    window_stack_list.append(window)
+
+def window_stack_pop(wid=''):
+    global window_stack_list
+    for i in range(len(window_stack_list)-1,-1,-1):
+        if wid == '' or wid == window_stack_list[i]['id']:
+            del window_stack_list[i]
+            break
+
+def window_stack_get():
+    return window_stack_list
+
+def window_stack_clean():
+    window_stack_list = []
+
+
+           
+     
 def cal_screen_value(val, is_width = True):
     if isinstance(val, int):
         return val
@@ -132,6 +155,8 @@ def call_ffplay(res):
  
 
     print ffplay_command
+    window_stack_clean()
+    window_stack_push(res['id'],'fullscreen')
     #p = Popen(shlex.split(ffplay_command))
     pffplay = ffplay_command
     ffplay_pid = ffplay_pid + 1
@@ -176,6 +201,9 @@ def add_ffplay(res):
     add_command['format']['height'] = cal_screen_value(res['layout']['height'], False)
     if add_command['format']['width'] == SCREEN_WIDTH and add_command['format']['height'] == SCREEN_HEIGHT:
         add_command['format']['kind'] = 'all'
+        window_stack_push(res[id], 'fullscreen')
+    else:
+        window_stack_push(res[id], 'normal')
     addcommand = json.dumps(add_command)
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     print "addcommand=%s" % addcommand
@@ -205,6 +233,7 @@ def del_ffplay(res, pid=0):
         server_ip = url.split('@')[0].split('://')[1]
         name = url.replace(server_ip, '')
 
+    window_stack_pop(res[id])
     if(related == 'true'):    prompt_del()
     del_command = {'type':'del', 'server': '', 'format': {'name': ''}}
     del_command['server'] = server_ip
@@ -225,6 +254,7 @@ def prompt_del():
 def UDP_recv(port, channel_id, name):
     global sequence
     global related
+    global channels_info
     last_sequence = sequence
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     s.bind(('', port))
@@ -371,11 +401,13 @@ def main():
 
 ##############################################################
 def show_channels():
+    global channels_info
     for key, value in channels_info.iteritems():
         print bcolors.HEADER + "channel id [", key, "] :" + bcolors.ENDC
         print bcolors.OKBLUE + json.dumps(value, ensure_ascii=False,indent=4, sort_keys=True) + bcolors.ENDC
 
 def show_channel(channel_id = DEFAULT):
+    global channels_info
     ret = object()
     if channel_id is DEFAULT:
         print bcolors.FAIL + "missing operand: need channel_id" + bcolors.ENDC
@@ -389,11 +421,15 @@ def show_channel(channel_id = DEFAULT):
 
 def get_current_programme():
     global continue_play_channel
-    return show_channel(continue_play_channel)
+    cur_programme = show_channel(continue_play_channel)
+    window_stack = window_stack_get()
+    cur_programme['programmer']['window_stack'] = window_stack 
+    return cur_programme
 
 def play_programmer(val = DEFAULT, full = DEFAULT):
     global related
     global exception
+    global channels_info
     # to play the whole channel broadcast resources
     if val is DEFAULT:
         print bcolors.FAIL + "missing operand: need channel_id" + bcolors.ENDC
@@ -424,7 +460,6 @@ def play_programmer(val = DEFAULT, full = DEFAULT):
                 res['layout']['posy'] = 0
                 res['layout']['width'] = '100%'
                 res['layout']['height'] = '100%'            
-                programmers['programmer']['fullscreen-resource'] = res['id']
             if pffplay is not None:
                 t = Thread(target=add_ffplay, args=(res, ))
                 t.setDaemon(True)
@@ -433,7 +468,6 @@ def play_programmer(val = DEFAULT, full = DEFAULT):
                 t = Thread(target=call_ffplay, args=(res, ))
                 t.setDaemon(True)
                 t.start()   
-                programmers['programmer']['fullscreen-resource'] = res['id']
 
 def help():
     print bcolors.HEADER + 'all commands are listed:' + bcolors.ENDC
@@ -471,6 +505,7 @@ def stop_all():
 def stop_play(val = DEFAULT):
     global pffplay
     global ffplay_pid
+    global channels_info
     if val is DEFAULT:
         print bcolors.FAIL + "missing operand: need channel_id" + bcolors.ENDC
         return
