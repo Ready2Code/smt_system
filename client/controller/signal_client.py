@@ -78,6 +78,7 @@ def window_stack_push(wid, wtype='normal'):
     global window_stack_list
     window = {'id': wid, 'type': wtype}
     window_stack_list.append(window)
+    print 'window_stack_list=',window_stack_list
 
 def window_stack_pop(wid=''):
     global window_stack_list
@@ -201,9 +202,9 @@ def add_ffplay(res):
     add_command['format']['height'] = cal_screen_value(res['layout']['height'], False)
     if add_command['format']['width'] == SCREEN_WIDTH and add_command['format']['height'] == SCREEN_HEIGHT:
         add_command['format']['kind'] = 'all'
-        window_stack_push(res[id], 'fullscreen')
+        window_stack_push(res['id'], 'fullscreen')
     else:
-        window_stack_push(res[id], 'normal')
+        window_stack_push(res['id'], 'normal')
     addcommand = json.dumps(add_command)
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     print "addcommand=%s" % addcommand
