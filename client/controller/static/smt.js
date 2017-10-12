@@ -140,5 +140,8 @@ function process_resource_open() {
 function set_pause() {
    $.get("/show_channels/command/",{ command:"render"})
 }
+function set_hide() {
+   $.get("/show_channels/command/",{ command:"hide"})
+}
 
 
