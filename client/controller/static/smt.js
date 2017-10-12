@@ -137,6 +137,8 @@ function process_resource_open() {
     set_programme_process_response()
 }
 
-
+function set_pause() {
+   $.get("/show_channels/command/",{ command:"render"})
+}
 
 

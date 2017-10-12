@@ -30,8 +30,11 @@
                 set_programme_process_response()
                 setInterval("get_related()",1000)
               // showImg() 
-		       $("button.process_resource_ad").click(function(){
+             $("button.process_resource_ad").click(function(){
 	            window.open( $(this).attr('ad_url'))		
+             })
+             $("#pause").click(function(){
+                 set_pause()
              })
                
                 window.reload_related_operator = true
