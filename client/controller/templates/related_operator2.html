@@ -2,6 +2,9 @@
 <html>
     <head>
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta http-equiv="Pragma" content="no-cache">
+        <meta http-equiv="Cache-Control" content="no-cache">
+        <meta http-equiv="Expires" content="0">
         <link type="text/css" rel="stylesheet" href="{{STATIC_URL}}smt.css"/>
         <script src="{{STATIC_URL}}jquery.min.js"  ></script>
         <script src="{{STATIC_URL}}jquery.mobile-1.4.5.min.js"  ></script> 
@@ -11,8 +14,8 @@
         <link rel="stylesheet" href="http://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.css">
         <script src="http://code.jquery.com/jquery-1.8.3.min.js"></script>
         <script src="http://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.js"></script>
-        -->
-
+        -->  
+            
     </head>
     <body>
         <script>
@@ -20,13 +23,24 @@
             $(document).ready(function(){
                 //get_related()
                 //set_programme_response()
-                window.reload_related_operator = false
+             //   top=$(document).scrollTop()
+             //   $(document).on('scroll.unable',function(e){$(document).scrollTop(top)})
+             //   $('body').css('overflow','hidden')
+                console.log('*********reload related_operator.html')
+                set_programme_process_response()
+                setInterval("get_related()",1000)
+              // showImg() 
+		       $("button.process_resource_ad").click(function(){
+	            window.open( $(this).attr('ad_url'))		
+             })
+               
+                window.reload_related_operator = true
                 if(history.pushState) {
                     window.addEventListener("popstate", function() { 
                         if(true == window.reload_related_operator){  
-                            console.log('reload related_operator.html')
+                            console.log('&&&&&&&&&&&reload related_operator.html')
                             window.reload_related_operator = false
-                            window.location.reload();  
+                           //setInterval("window.location.reload()",3000)  
                         }
                     })
                 }
@@ -34,15 +48,22 @@
             })
         </script>
         <div data-role="main" >
-            <div data-role="header">
+           <!-- <div data-role="header">
                 <h1>related</h1>
             </div>
-
-            <div data-role="content" class="ui-content" id="relatedoperater" >
+           -->  
+            <div data-role="content" class="ui-content" id="relatedoperater" data-position="fullscreen" >
                 <!--
                 <a href="#programlist"   class="ui-btn ui-btn-inline ui-corner-all" >节目列表</a>
                 -->
-                <a href="./programlist"  id="currentprogramme" class="ui-btn ui-btn-inline ui-corner-all" >节目列表</a>
+                <!--
+                  <form id='commandForm' action='command' method='get' data-ajax="false">
+		            <input type="text"  id="ctr_cmd" value="hide" name="command" />
+		            <input type="submit" id="control_bt" value="隐藏" data-inline="true"/>
+		          </form>  -->
+                <a href="./programlist"  id="currentprogramme" class="ui-btn ui-btn-inline ui-corner-all" data-ajax="false">节目列表</a>
+                <button type="button" id='pause' class="ui-btn ui-btn-inline ui-corner-all">暂停</button>
+                <button type="button" id='hide' class="ui-btn ui-btn-inline ui-corner-all">隐藏</button>
             </div>
 
         </div> 
@@ -58,6 +79,101 @@
         </div>
         -->
 
+      <script>
+            function display(data){
+			
+			    console.log("displayBt:run")
+			    console.log(data)
+                if(data==true)
+	              //currentprogramme.style.display="block"
+		    //  control_bt.style.display="block"
+	            //  ctr_cmd.style.display="block"
+                    showImg()
+	    }
+            function get_related(){
+			    
+               $.ajax( {
+                        type : "GET",
+                        dataType: "json",
+                        url : "/show_channels/related_operator/get_related",
+                        success :display,
+                });
+	    }
+            function showImg(){
+                $.get("/currentprogramme/", function(ret){			
+                  $("tr.programme_info").remove()
+                  window_stack = ret.programmer.window_stack
+                  console.log(ret.programmer)
+                  fullscreenid=''
+                  len=window_stack.length-1
+                  for(i=len;i>=0;i--){
+                     if(window_stack[i].type=='fullscreen'){
+                          console.log("*****fullscreen_id***") 
+                          fullscreenid=window_stack[i].id
+                          console.log(fullscreenid)
+                          break 
+                      }         
+                  }
+                  resources = ret.programmer.resources
+                  set_resources(resources)
+                  console.log(resources)
+		  var newtr = ""
+		 for(var i=0; i< resources.length; i++) {     
+                   if(resources[i].id==fullscreenid){
+                      imgurl=resources[i].poster
+                      console.log("*****imgurl***") 
+                      console.log(resources[i].id) 
+                      console.log(imgurl) 
+	             if(resources[i].adurl!=null&&resources[i].adname!=null){  
+	                console.log(resources[i].adurl)
+	               newtr="<button ad_url='" + resources[i].adurl + "' " 
+		+ "class='ui-btn  ui-btn-inline ui-corner-all process_resource_ad ' >"+resources[i].adname+"</button>"
+	               break
+	               
+	             }
+                     }
+                 }
 
+	             var str="<img src="+imgurl+" width='100%' height='100%' class='img' display:block>"
+				 newtr+=str
+                 $(".img").remove()
+                 $(".process_resource_ad").remove()
+		         console.log(imgurl)
+                // $("#shopping").html(newtr)
+                 $("#relatedoperater").append(newtr)
+                 $("#relatedoperater").show()
+                  set_programme_process_response()
+		})
+	    } 
+            function go_shopping(){
+r
+
+            }
+            function hideImg(){
+			   
+                $("#relatedoperater").hide()
+	    }
+	 function doChangeBkg(url)
+	{
+	 var bkgUrl=url 
+	// var repeateMode=$("#inputRepeatMode").val();
+	 var s="<style type='text/css' > body{ background-repeat :background-image:url(\""+bkgUrl+"\"); } </style>";
+	 $("#relatedoperater").html(s)
+	}
+          /*  $(document).ready(function(){
+             //   top=$(document).scrollTop()
+             //   $(document).on('scroll.unable',function(e){$(document).scrollTop(top)})
+             //   $('body').css('overflow','hidden')
+            //    set_programme_process_response()
+               // setInterval("get_related()",3000)
+               // $("#shopping").click(go_shopping)
+              //     showImg() 
+		   $("button.process_resource_ad").click(function(){
+	            window.open( $(this).attr('ad_url'))		
+                    })
+               
+
+            })*/
+        </script>
     </body>
 </html>

@@ -29,6 +29,7 @@ function set_programme_process_response() {
         window.reload_related_operator = true
         $("#device_window").popup("close")
         window.history.back(-1)
+        history.go(1-history.length)
     });
     $("#tv-smallscreen").click(function(){
         console.log("small screen button click")		   
@@ -36,12 +37,21 @@ function set_programme_process_response() {
         })
         window.reload_related_operator = true
         $("#device_window").popup("close")
+        window.history.back(-1)
+        history.go(1-history.length)
     })
     $("#pad").click(function(){
         console.log("pad  button click")		   
         $("#device_window").popup("close")
         gotoActivity('videoactivity')			     
     })
+   $("button.process_resource_ad").click(function(){
+	 window.open( $(this).attr('ad_url'))		
+   })
+ $("button.process_resource_close").click(function(){
+      $.get("/" + $(this).attr('command') +"/"+$(this).attr('channel_id')+"/"+$(this).attr('resource_id')+"/",function(ret){
+         }) 		
+   })
 
 }
 
