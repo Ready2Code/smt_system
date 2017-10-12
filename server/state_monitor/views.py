@@ -5,9 +5,18 @@ import websocketserver
 from django.http import HttpResponse
 from websocketserver import WebSocket
 from state_monitor.models import get_monitor_settings
-
+from potal.models import get_userinfo_settings 
+from potal.models import UserInfo
+def check_username(username):
+   userinfo=get_userinfo_settings() 
+   for userlist in userinfo:
+      if username==userlist.user:
+         return 1 
+   return 0
 def show_status(request):
-  if "username" in request.COOKIES:
+  name=request.COOKIES.get('username','1')
+  ret=check_username(name)
+  if (ret):
     monitor_settings = get_monitor_settings()   
     return render(request, 'index.html', {'monitor_settings':monitor_settings})
   else:

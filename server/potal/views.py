@@ -19,8 +19,14 @@ from django.http import HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
 from potal.models import UserInfo
 from potal.models import get_userinfo_settings
-def test(requets):
-    return HttpResponseRedirect("http://192.168.0.136:8001/current_program/")
+def test(request):
+      return render(request, 'test.html')
+def check_username(username):
+    userinfo=get_userinfo_settings()
+    for userlist in userinfo:
+       if username==userlist.user:
+          return 1
+    return 0
 def login(request):
     username=request.POST['username']
     password=request.POST['password']
@@ -34,9 +40,11 @@ def login(request):
           return response
     return render(request,'login.html',{'url':url})
 def start_page(request):
-    if "username" in request.COOKIES:
+    name=request.COOKIES.get('username','1')
+    ret=check_username(name)
+    if (ret):
       print "login success" 
-      print request.COOKIES 
+      service_settings = get_service_settings()
       monitor_settings = get_monitor_settings()
       service_settings = get_service_settings()
       set_aheadtime_cachetime(service_settings,0)
@@ -46,15 +54,18 @@ def start_page(request):
       url='/'
       return render(request,'login.html',{'url':url})
 def config_program(request):
-    if "username" in request.COOKIES:
-       print request.COOKIES["username"]
+    name=request.COOKIES.get('username','1')
+    ret=check_username(name)
+    if (ret):
        return render(request, 'config_program.html')
     else:
       print "please login!!"
       url='/config_program/'
       return render(request,'login.html',{'url':url})
 def current_program(request):
-    if "username" in request.COOKIES:
+    name=request.COOKIES.get('username','1')
+    ret=check_username(name)
+    if (ret):
       return render(request, 'current_program.html')
     else:
       print "please login!!"

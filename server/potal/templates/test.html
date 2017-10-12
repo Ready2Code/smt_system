@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+    <head>
+           <title>config progtammers</title>
+		   <script src="{{STATIC_URL}}jquery.min.js"  ></script>
+		   <style type="text/css">
+		    #file_path
+            {
+			  width:100%;
+			}
+            #file_text
+            {
+			   width:100%;
+			   height:100%;
+			}
+		   </style>
+        </head>
+        <body >
+		   <hr/>
+		      <button  type="button" id="get_program" style="width:80px;height:40px;">readfile</button> 
+		      <button  type="button" id="set_program" style="width:80px;height:40px;">writefile</button>
+		   <br/>
+		      <input  type="text" id="filepath" value="please input file path" style="width:100%;height:40px;">
+		   <br/>
+			  <textarea id="displayfile"  style="width: 100%;height: 1000px;"></textarea>
+         <script>
+          	function set_config_file_response(){
+			  console.log(data)
+			}	
+            function set_config_file(text,filepath){
+				$.ajax({
+				 type:"POST",
+				 dataType:"json",
+				 url:"/config_program/set_config_file/",
+				 data:{text:text,path:filepath},
+				 success: set_config_file_response,				   
+			    });	
+			}
+            function get_config_file_test(path){
+               current_path=path
+			   $.ajax({
+				 type:"GET",
+				 dataType:"json",
+				 url:"/config_program/get_config_file/",
+				 data:{path:path},
+				 async:false,
+				 success: function(data){
+				 document.getElementById("displayfile").innerText=data
+				 }					   
+			    });
+			}
+/*****************************for test******************************/
+
+			$(document).ready(function(){
+			  
+			   $("#get_program").click(function(){
+				   path=$("#filepath").val()
+                   get_config_file_test(path)
+			   })
+			   $("#set_program").click(function(){
+				   path=$("#filepath").val()
+				   data=$("#displayfile").val()
+				   set_config_file(data,path)
+			   })
+
+		   });
+         </script>
+        </body>
+    </html>
