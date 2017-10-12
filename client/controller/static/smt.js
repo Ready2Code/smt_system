@@ -28,8 +28,10 @@ function set_programme_process_response() {
         })
         window.reload_related_operator = true
         $("#device_window").popup("close")
-        window.history.back(-1)
-        history.go(1-history.length)
+	    if($(this).attr('resource_adurl')!='undefined'){
+          window.history.back(-1)
+          history.go(1-history.length)
+		}
     });
     $("#tv-smallscreen").click(function(){
         console.log("small screen button click")		   
@@ -37,8 +39,10 @@ function set_programme_process_response() {
         })
         window.reload_related_operator = true
         $("#device_window").popup("close")
-        window.history.back(-1)
-        history.go(1-history.length)
+	    if($(this).attr('resource_adurl')!='undefined'){
+          window.history.back(-1)
+          history.go(1-history.length)
+		}
     })
     $("#pad").click(function(){
         console.log("pad  button click")		   
@@ -89,6 +93,7 @@ function get_program_list_data() {
         newtr = newtr + "<td > <button resource_id='" + resources[i].id + "' " 
         + "channel_id='" + ret.channel_id + "' "
         + "resource_url='" + resources[i].url + "' "
+		+ "resource_adurl='" + resources[i].adurl +"'"
         + "command='play' " 
         + "class='ui-btn process_resource'>打开</button> </td>"
         newtr = newtr + "<td > <button resource_id='" + resources[i].id + "' " 
@@ -118,11 +123,13 @@ function process_resource_open() {
     newtr = " <li><button  id='tv-fullscreen'"  + "resource_id='" 
         + $(this).attr('resource_id') + "' " 
         + "channel_id='" + $(this).attr('channel_id') + "' "
+        + "resource_adurl='" + $(this).attr('resource_adurl') + "' "
         + "class='ui-btn ui-btn-icon-right ui-icon-carat-r devicelist' "
         + "command='play'" +">电视(全屏）</button></li>" 
         + " <li><button  id='tv-smallscreen'"  + "resource_id='" 
         + $(this).attr('resource_id') + "' " 
         + "channel_id='" + $(this).attr('channel_id') + "' "
+        + "resource_adurl='" + $(this).attr('resource_adurl') + "' "
         + "class='ui-btn ui-btn-icon-right ui-icon-carat-r devicelist' "
         + "command='play'" +">电视(小屏）</button></li>" 
         + "<li> <button  id='pad'" +"'" + "resource_id='" 
