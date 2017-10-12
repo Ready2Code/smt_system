@@ -43,7 +43,7 @@ function set_programme_process_response() {
     $("#pad").click(function(){
         console.log("pad  button click")		   
         $("#device_window").popup("close")
-        gotoActivity('videoactivity')			     
+        window.open($(this).attr('resource_url'))			     
     })
    $("button.process_resource_ad").click(function(){
 	 window.open( $(this).attr('ad_url'))		

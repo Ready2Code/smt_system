@@ -416,7 +416,7 @@ def show_channel(channel_id = DEFAULT):
     if channel_id not in channels_info.keys():
         print bcolors.FAIL + "unknown channel_id" + bcolors.ENDC
     else:
-        print bcolors.OKBLUE + json.dumps(channels_info[channel_id], ensure_ascii=False,indent=4,sort_keys=True) + bcolors.ENDC
+        #print bcolors.OKBLUE + json.dumps(channels_info[channel_id], ensure_ascii=False,indent=4,sort_keys=True) + bcolors.ENDC
         ret = channels_info[channel_id] 
     return ret
 
