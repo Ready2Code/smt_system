@@ -95,10 +95,10 @@ function get_program_list_data() {
         + "channel_id='" + ret.channel_id + "' "
         + "command='stop' " 
         + "class='ui-btn process_resource_close'>关闭</button> </td>"
-        if(resources[i].adurl!=null&&resources[i].adname!=null){
+       /* if(resources[i].adurl!=null&&resources[i].adname!=null){
             newtr = newtr + "<td > <button ad_url='" + resources[i].adurl + "' " 
         + "class='process_resource_ad'>"+resources[i].adname+"</button> </td>"
-        }
+        }*/
     newtr = newtr + "</tr>"
         }
     $("#programmeinfo").append(newtr);
@@ -139,9 +139,6 @@ function process_resource_open() {
 
 function set_pause() {
    $.get("/show_channels/command/",{ command:"render"})
-}
-function set_hide() {
-   $.get("/show_channels/command/",{ command:"hide"})
 }
 
 
