@@ -93,8 +93,19 @@ def window_stack_get():
 def window_stack_clean():
     window_stack_list = []
 
-
-           
+def window_stack_check_type(wid):
+    global window_stack_list
+    for i in range(len(window_stack_list)-1,-1,-1):
+        if wid == window_stack_list[i]['id']:
+            return window_stack_list[i]['type']
+    return
+      
+def window_stack_modify_type(wid):
+    global window_stack_list
+    for i in range(len(window_stack_list)-1,-1,-1):
+        if wid == window_stack_list[i]['id']:
+            if(window_stack_list[i]['type'] == 'fullscreen'):  window_stack_list[i]['type'] = 'normal'
+            else: window_stack_list[i]['type'] = 'fullscreen'
      
 def cal_screen_value(val, is_width = True):
     if isinstance(val, int):
@@ -251,6 +262,13 @@ def prompt_add():
 
 def prompt_del():
     prompt_add()
+    
+def fullscreen(res):    
+    global window_stack_list
+    full_command = {'type':'full','format': {'name': res['url']}}
+    fullcommand = json.dumps(full_command)
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    s.sendto(fullcommand,("localhost", FFPLAY_LISTEN_PORT))
 
 def UDP_recv(port, channel_id, name):
     global sequence
@@ -456,16 +474,33 @@ def play_programmer(val = DEFAULT, full = DEFAULT):
                 exception = vals[0] + ':' + res['exception']
             else:
                 exception = ''
-
+            # the screen has already been opened, cannot open twice
+            # only normal -> fullscreen is allowed
+            if(window_stack_check_type(res['id']) == 'fullscreen' or
+               (window_stack_check_type(res['id']) == 'normal' and full != 'full')):
+                return
             if full == 'full':
                 res['layout']['posx'] = 0
                 res['layout']['posy'] = 0
                 res['layout']['width'] = '100%'
                 res['layout']['height'] = '100%'            
             if pffplay is not None:
-                t = Thread(target=add_ffplay, args=(res, ))
-                t.setDaemon(True)
-                t.start()
+                if(window_stack_check_type(res['id']) == 'normal' and full == 'full'):
+                    fullscreen(res)
+                    # once fullscreen, we need to remove all th background screen
+                    time.sleep(0.1)
+                    for i in range(len(window_stack_list)-1,-1,-1):
+                        if wid == res['id']:
+                            window_stack_list[i]['type'] = 'fullscreen'
+                        else:
+                            for res in programmers['programmer']['resources']:
+                                del_ffplay(res)   
+                                time.sleep(0.1)
+                    return
+                else:
+                    t = Thread(target=add_ffplay, args=(res, ))
+                    t.setDaemon(True)
+                    t.start()
             else:
                 t = Thread(target=call_ffplay, args=(res, ))
                 t.setDaemon(True)
