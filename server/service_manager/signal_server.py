@@ -61,6 +61,7 @@ signal_timer_thread_flag=1
 start_system_flag=1
 ffmpeg_list=list()
 ext_callbacks ={}
+signal_destination = ('127.0.0.1',9999)
 
 class SignalTimerThread(Thread):
     def __init__(self, event, dest):
@@ -243,7 +244,7 @@ def call_ffmpeg(file_dir, res, port, resource_broadcast_ip, ffplay_port, avlogex
         str_port ='-port %s' % port
         str_output = 'smt://%s:%s' % (resource_broadcast_ip, ffplay_port)
 
-    ffmpeg_command = ffmpeg_command + ' -re {0} {1} -i {2} -begintime {3} {4} -c:v copy -c:a aac -f mpu {5}'.format(str_port, playlist, file_dir, begintime, str_avlogext, str_output) 
+    ffmpeg_command = ffmpeg_command + ' -re {0} {1} -t {6} -i {2} -begintime {3} {4} -c:v copy -c:a aac -f mpu {5}'.format(str_port, playlist, file_dir, begintime, str_avlogext, str_output, delta) 
     print ffmpeg_command
 
     ffmpeg_list.append({"cmd":ffmpeg_command, "end":res['end']})
@@ -266,6 +267,7 @@ def stop_all():
     global packet
     global ffmpeg_list
     global sequence_number
+    global signal_destination 
 
     signal_timer_thread_flag=0
     start_system_flag=0
@@ -282,7 +284,10 @@ def stop_all():
         #ffmpeg_list[i].wait()
         functions.kill_process_by_name(ffmpeg_list[i]["cmd"])
     del ffmpeg_list[:]
+
+no_signal_print_couter = 0
 def delay_broadcast(s, packet, des):
+    global no_signal_print_couter
     if len(packet) == 0:
         return
 
@@ -292,7 +297,11 @@ def delay_broadcast(s, packet, des):
         sp = json.dumps(packet, cls=DateTimeEncoder)#.encode('utf8')
         s.sendto(sp, des)
         #print sp
+        no_signal_print_couter = 0
     else:
+        if no_signal_print_couter >= 5:
+            return
+        no_signal_print_couter = no_signal_print_couter + 1
         print 'no proper signal to send...'
         #pass
 
@@ -352,6 +361,9 @@ def start_smt_system(programs_file=CONFIG_FILE_NAME,
     global stopFlag
     global signal_timer_thread_flag 
     global ext_callbacks
+    global signal_destination 
+    global start_system_flag
+
 
     signal_timer_thread_flag = 1
     start_system_flag=1
@@ -377,7 +389,7 @@ def start_smt_system(programs_file=CONFIG_FILE_NAME,
     t.start()
 
     endtime = datetime.now()
-    for i in programmers:
+    for i in cycle(programmers):
       if start_system_flag==0:
         break
       else:
@@ -385,8 +397,14 @@ def start_smt_system(programs_file=CONFIG_FILE_NAME,
         print "processing", i['name'], url
         program_data = url_load(url)
         json_data=json.loads(program_data)
-        aheadtime =int( json_data['programmer']['aheadtime'])
-        cachetime =int( json_data['programmer']['cachetime'])
+        try:
+            aheadtime =int( json_data['programmer']['aheadtime'])
+        except:
+            print 'no aheadtime in program.json'
+        try:
+            cachetime =int( json_data['programmer']['cachetime'])
+        except:
+            print 'no cachetime in program.json'
         dir_name = os.path.dirname(functions.url2pathname(url))
         resource_num = 1
         convert = convert_signal(program_data, resource_broadcast_ip, resource_broadband_ip, avlogext_ip+':'+str(avlogext_port),static_resource_host,dir_name)

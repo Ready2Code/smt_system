@@ -8,6 +8,7 @@ import urllib2
 import shlex
 import os
 import platform
+import thread
 from datetime import datetime, timedelta
 from threading import Timer, Thread, Event
 from subprocess import call,Popen,PIPE,STDOUT
@@ -74,16 +75,16 @@ def get_screen_resolution():
     print 'screen resolution: '+ str(SCREEN_WIDTH)+ ' * '+ str(SCREEN_HEIGHT) 
 
 # window ={'id': xxxxx, 'type': 'fullscreen' or 'normal'
-def window_stack_push(wid, wtype='normal'):
+def window_stack_push(wid, url, wtype='normal'):
     global window_stack_list
-    window = {'id': wid, 'type': wtype}
+    window = {'id': wid, 'type': wtype, 'url':url}
     window_stack_list.append(window)
     print 'window_stack_list=',window_stack_list
 
-def window_stack_pop(wid=''):
+def window_stack_pop(url=''):
     global window_stack_list
     for i in range(len(window_stack_list)-1,-1,-1):
-        if wid == '' or wid == window_stack_list[i]['id']:
+        if url == '' or url == window_stack_list[i]['url']:
             del window_stack_list[i]
             break
 
@@ -132,7 +133,11 @@ def call_ffplay(res):
     begintime = datetime.strptime(res['begin'], '%Y-%m-%dT%H:%M:%S.%f')
     endtime = datetime.strptime(res['end'], '%Y-%m-%dT%H:%M:%S.%f')
     res_type = res['type']
-    delta = endtime - begintime
+
+    curr_time_with_timezone = datetime.now()
+    curr_time = time_remove_timezone(curr_time_with_timezone)
+    delta = endtime - curr_time
+
     ffplay_command = ''
     str_avlogext=''
     str_bk=''
@@ -168,11 +173,14 @@ def call_ffplay(res):
 
     print ffplay_command
     window_stack_clean()
-    window_stack_push(res['id'],'fullscreen')
+    window_stack_push(res['id'],res['url'],'fullscreen')
     #p = Popen(shlex.split(ffplay_command))
     pffplay = ffplay_command
     ffplay_pid = ffplay_pid + 1
-    os.system(ffplay_command)
+    try:
+       thread.start_new_thread( os.system, (ffplay_command, ) )
+    except:
+           print "Error: unable to start thread"
     #pffplay = Popen(shlex.split(ffplay_command), stdout=FNULL, stderr=STDOUT)
     if(related == 'true'):
         time.sleep(2) 
@@ -183,27 +191,42 @@ def call_ffplay(res):
     print delta.seconds, "passed  resource [", res['name'], "] is closed"
     del_ffplay(res, cur_ffplay_id)
 
+def time_remove_timezone(stime, zone_offset='default'):
+     if 'default' == zone_offset:
+         now_stamp = time.time()
+         local_time = datetime.fromtimestamp(now_stamp)
+         utc_time = datetime.utcfromtimestamp(now_stamp)
+         zone_offset = local_time - utc_time
+     time_with_zone_offset = stime - zone_offset
+     return time_with_zone_offset 
 
+def get_ip_and_name_from_url(url):
+    server_ip = ''
+    name = ''
+    if '@' in url:
+        server_ip = url.split('@')[0].split('://')[1]
+        name = url.replace(server_ip, '')
+        name = name.replace('@', '')
+    else:
+        name = url
+    return (server_ip, name)
+
+ 
 def add_ffplay(res):
     #print res
     global related
     global ffplay_pid
     begintime = datetime.strptime(res['begin'], '%Y-%m-%dT%H:%M:%S.%f')
     endtime = datetime.strptime(res['end'], '%Y-%m-%dT%H:%M:%S.%f')
-    curr_time = datetime.now()
+    curr_time_with_timezone = datetime.now()
+    curr_time = time_remove_timezone(curr_time_with_timezone)
     #if(curr_time < begintime or curr_time > endtime):
     #    print 'cannot add this resource: time stamp is not valid'
     #    return
     url = res['url']
     server_ip = ''
     name = ''
-
-    if '@' in url:
-        server_ip = url.split('@')[0].split('://')[1]
-        name = url.replace(server_ip, '')
-    else:
-        name = url
-
+    (server_ip, name) = get_ip_and_name_from_url(url)
     add_command = {'type':'add', 'server': '', 'format': {'name': '','posx':'','posy':'','width':'','height':'','kind':'video'}}
     add_command['server'] = server_ip
     add_command['format']['name'] = name
@@ -213,9 +236,9 @@ def add_ffplay(res):
     add_command['format']['height'] = cal_screen_value(res['layout']['height'], False)
     if add_command['format']['width'] == SCREEN_WIDTH and add_command['format']['height'] == SCREEN_HEIGHT:
         add_command['format']['kind'] = 'all'
-        window_stack_push(res['id'], 'fullscreen')
+        window_stack_push(res['id'], res['url'], 'fullscreen')
     else:
-        window_stack_push(res['id'], 'normal')
+        window_stack_push(res['id'], res['url'], 'normal')
     addcommand = json.dumps(add_command)
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     print "addcommand=%s" % addcommand
@@ -238,14 +261,9 @@ def del_ffplay(res, pid=0):
     url = res['url']
     if(pid !=0 and pid !=ffplay_pid):
         return
-    if(res['type'] == 'broadcast'):
-        #wrong pid, ffplay has been killed
-        name = url
-    else:
-        server_ip = url.split('@')[0].split('://')[1]
-        name = url.replace(server_ip, '')
+    (server_ip, name) = get_ip_and_name_from_url(url)
 
-    window_stack_pop(res['id'])
+    window_stack_pop(res['url'])
     if(related == 'true'):    prompt_del()
     del_command = {'type':'del', 'server': '', 'format': {'name': ''}}
     del_command['server'] = server_ip
