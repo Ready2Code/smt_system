@@ -2,7 +2,6 @@ var program_info_resources = null
 
 function get_resources() {
     return program_info_resources
-}
 
 function set_resources(rs) {
     program_info_resources = rs
@@ -52,7 +51,7 @@ function set_programme_process_response() {
    $("button.process_resource_ad").click(function(){
 	 window.open( $(this).attr('ad_url'))		
    })
- $("button.process_resource_close").click(function(){
+ $("button.process_resource_close").unbind('click').bind('click',function(){
       $.get("/" + $(this).attr('command') +"/"+$(this).attr('channel_id')+"/"+$(this).attr('resource_id')+"/",function(ret){
          }) 		
    })
