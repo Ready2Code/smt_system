@@ -107,6 +107,7 @@ def window_stack_modify_type(wid):
         if wid == window_stack_list[i]['id']:
             if(window_stack_list[i]['type'] == 'fullscreen'):  window_stack_list[i]['type'] = 'normal'
             else: window_stack_list[i]['type'] = 'fullscreen'
+            break
      
 def cal_screen_value(val, is_width = True):
     if isinstance(val, int):
@@ -178,9 +179,9 @@ def call_ffplay(res):
     pffplay = ffplay_command
     ffplay_pid = ffplay_pid + 1
     try:
-       thread.start_new_thread( os.system, (ffplay_command, ) )
+        thread.start_new_thread( os.system, (ffplay_command, ) )
     except:
-           print "Error: unable to start thread"
+        print "Error: unable to start thread"
     #pffplay = Popen(shlex.split(ffplay_command), stdout=FNULL, stderr=STDOUT)
     if(related == 'true'):
         time.sleep(2) 
@@ -192,13 +193,13 @@ def call_ffplay(res):
     del_ffplay(res, cur_ffplay_id)
 
 def time_remove_timezone(stime, zone_offset='default'):
-     if 'default' == zone_offset:
-         now_stamp = time.time()
-         local_time = datetime.fromtimestamp(now_stamp)
-         utc_time = datetime.utcfromtimestamp(now_stamp)
-         zone_offset = local_time - utc_time
-     time_with_zone_offset = stime - zone_offset
-     return time_with_zone_offset 
+    if 'default' == zone_offset:
+        now_stamp = time.time()
+        local_time = datetime.fromtimestamp(now_stamp)
+        utc_time = datetime.utcfromtimestamp(now_stamp)
+        zone_offset = local_time - utc_time
+    time_with_zone_offset = stime - zone_offset
+    return time_with_zone_offset 
 
 def get_ip_and_name_from_url(url):
     server_ip = ''
