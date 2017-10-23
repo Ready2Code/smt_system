@@ -135,9 +135,7 @@ def call_ffplay(res):
     endtime = datetime.strptime(res['end'], '%Y-%m-%dT%H:%M:%S.%f')
     res_type = res['type']
 
-    curr_time_with_timezone = datetime.now()
-    curr_time = time_remove_timezone(curr_time_with_timezone)
-    delta = endtime - curr_time
+
 
     ffplay_command = ''
     str_avlogext=''
@@ -187,8 +185,12 @@ def call_ffplay(res):
         time.sleep(2) 
         prompt_add()
     # add 1 more second    
+    curr_time_with_timezone = datetime.now()
+    curr_time = time_remove_timezone(curr_time_with_timezone)
+    delta = endtime - curr_time 
+    
     cur_ffplay_id = ffplay_pid
-    time.sleep(delta.seconds + 1)
+    time.sleep(delta.seconds)
     print delta.seconds, "passed  resource [", res['name'], "] is closed"
     del_ffplay(res, cur_ffplay_id)
 
@@ -251,7 +253,7 @@ def add_ffplay(res):
     delta = endtime - curr_time
     # add 1 more second 
     cur_ffplay_id = ffplay_pid
-    time.sleep(delta.seconds + 1)
+    time.sleep(delta.seconds)
     print delta.seconds, "passed  resource [", res['name'], "] is closed"
     del_ffplay(res, cur_ffplay_id)
 
