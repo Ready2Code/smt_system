@@ -283,7 +283,6 @@ def prompt_del():
     prompt_add()
     
 def fullscreen(res):    
-    global window_stack_list
     full_command = {'type':'full','format': {'name': res['url']}}
     fullcommand = json.dumps(full_command)
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -508,13 +507,12 @@ def play_programmer(val = DEFAULT, full = DEFAULT):
                     fullscreen(res)
                     # once fullscreen, we need to remove all th background screen
                     time.sleep(0.1)
-                    for i in range(len(window_stack_list)-1,-1,-1):
-                        if wid == res['id']:
-                            window_stack_list[i]['type'] = 'fullscreen'
+                    for del_res in programmers['programmer']['resources']:
+                        if del_res['id'] == res['id']:
+                            window_stack_modify_type(res['id'])
                         else:
-                            for res in programmers['programmer']['resources']:
-                                del_ffplay(res)   
-                                time.sleep(0.1)
+                            del_ffplay(del_res)   
+                            time.sleep(0.1)
                     return
                 else:
                     t = Thread(target=add_ffplay, args=(res, ))
