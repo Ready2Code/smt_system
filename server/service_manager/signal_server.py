@@ -222,7 +222,7 @@ def call_ffmpeg(file_dir, res, port, resource_broadcast_ip, ffplay_port, avlogex
     time.sleep(aheadtime/1000)
     begintime = get_begin_time_string(res['begin'],timedelta(hours=8))
     res_type = res['type']
-    delta = res['end'] - datetime.now()
+    delta = res['end'] - res['begin']
     ffmpeg_command = ''
     playlist = ''
     str_avlogext = ''
@@ -415,7 +415,7 @@ def start_smt_system(programs_file=CONFIG_FILE_NAME,
             while (endtime - datetime.now()).seconds > 0.05:
                 if start_system_flag==0:
                     return
-                time.sleep((endtime - datetime.now()).seconds)
+                time.sleep(0.05)
             if start_system_flag==0:
                 return
             time.sleep((endtime - datetime.now()).seconds)
