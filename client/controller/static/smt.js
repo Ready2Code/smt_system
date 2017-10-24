@@ -2,7 +2,7 @@ var program_info_resources = null
 
 function get_resources() {
     return program_info_resources
-
+}
 function set_resources(rs) {
     program_info_resources = rs
 }
