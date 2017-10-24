@@ -198,7 +198,7 @@ function drawbitrateCharts() {
   
 	for(var i in thechartArray){
 	  
-	  if(thechartArray.filename !='undefined' ){
+	  if(typeof(thechartArray[i].filename) !='undefined' ){
          filename= thechartArray[i].filename;
          type= filename.split(':');
 	     if(type[2]=='1'){
