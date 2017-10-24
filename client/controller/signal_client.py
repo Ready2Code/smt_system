@@ -266,6 +266,9 @@ def del_ffplay(res, pid=0):
         return
     (server_ip, name) = get_ip_and_name_from_url(url)
 
+    # full screen cannot be closed
+    if window_stack_check_type(res['url']) == 'fullscreen' : return
+    
     window_stack_pop(res['url'])
     if(related == 'true'):    prompt_del()
     del_command = {'type':'del', 'server': '', 'format': {'name': ''}}
