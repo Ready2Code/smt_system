@@ -101,13 +101,15 @@ def window_stack_check_type(wid):
             return window_stack_list[i]['type']
     return
       
-def window_stack_modify_type(wid):
+def window_stack_fullscreen_type(wid):
     global window_stack_list
     for i in range(len(window_stack_list)-1,-1,-1):
         if wid == window_stack_list[i]['id']:
             if(window_stack_list[i]['type'] == 'fullscreen'):  window_stack_list[i]['type'] = 'normal'
             else: window_stack_list[i]['type'] = 'fullscreen'
-            break
+        else:
+            if(window_stack_list[i]['type'] == 'fullscreen'):  window_stack_list[i]['type'] = 'normal'
+    
      
 def cal_screen_value(val, is_width = True):
     if isinstance(val, int):
@@ -135,8 +137,6 @@ def call_ffplay(res):
     endtime = datetime.strptime(res['end'], '%Y-%m-%dT%H:%M:%S.%f')
     res_type = res['type']
 
-
-
     ffplay_command = ''
     str_avlogext=''
     str_bk=''
@@ -162,14 +162,8 @@ def call_ffplay(res):
         #-sync smt 
         if ('bk' in res.keys()):
             str_bk = '-bk '+ res['bk'] + ' '
-        ffplay_command =(ffplay_command + str_sync + str_avlogext + res['url'] + ',' 
-                                        + str(cal_screen_value(res['layout']['posx'], True))   + ',' 
-                                        + str(cal_screen_value(res['layout']['posy'], False))  + ',' 
-                                        + str(cal_screen_value(res['layout']['width'], True))  + ','
-                                        + str(cal_screen_value(res['layout']['height'], False))+ ' '
-                                        + str_port + str_bk + str_quick)
+        ffplay_command =(ffplay_command + str_sync + str_avlogext + res['url'] + ' ' + str_port + str_bk + str_quick)
  
-
     print ffplay_command
     window_stack_clean()
     window_stack_push(res['id'],res['url'],'fullscreen')
@@ -215,7 +209,7 @@ def get_ip_and_name_from_url(url):
     return (server_ip, name)
 
  
-def add_ffplay(res):
+def add_ffplay(res, full = DEFAULT):
     #print res
     global related
     global ffplay_pid
@@ -230,18 +224,21 @@ def add_ffplay(res):
     server_ip = ''
     name = ''
     (server_ip, name) = get_ip_and_name_from_url(url)
-    add_command = {'type':'add', 'server': '', 'format': {'name': '','posx':'','posy':'','width':'','height':'','kind':'video'}}
+    add_command = {'type':'add', 'server': '', 'format': {'name': '','fullscreen':'','posx':'','posy':'','width':'','height':'','kind':'video'}}
     add_command['server'] = server_ip
     add_command['format']['name'] = name
+    if full == 'full': 
+        add_command['format']['fullscreen'] = 1
+        add_command['format']['kind'] = 'all'
+        window_stack_push(res['id'], res['url'], 'fullscreen')        
+    else: 
+        add_command['format']['fullscreen'] = 0
+        add_command['format']['kind'] = 'video'
+        window_stack_push(res['id'], res['url'], 'normal')
     add_command['format']['posx'] = cal_screen_value(res['layout']['posx'], True)
     add_command['format']['posy'] = cal_screen_value(res['layout']['posy'], False)
     add_command['format']['width'] = cal_screen_value(res['layout']['width'], True)
     add_command['format']['height'] = cal_screen_value(res['layout']['height'], False)
-    if add_command['format']['width'] == SCREEN_WIDTH and add_command['format']['height'] == SCREEN_HEIGHT:
-        add_command['format']['kind'] = 'all'
-        window_stack_push(res['id'], res['url'], 'fullscreen')
-    else:
-        window_stack_push(res['id'], res['url'], 'normal')
     addcommand = json.dumps(add_command)
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     print "addcommand=%s" % addcommand
@@ -497,30 +494,15 @@ def play_programmer(val = DEFAULT, full = DEFAULT):
                 exception = vals[0] + ':' + res['exception']
             else:
                 exception = ''
-            # the screen has already been opened, cannot open twice
-            # only normal -> fullscreen is allowed
-            if(window_stack_check_type(res['id']) == 'fullscreen' or
-               (window_stack_check_type(res['id']) == 'normal' and full != 'full')):
-                return
-            if full == 'full':
-                res['layout']['posx'] = 0
-                res['layout']['posy'] = 0
-                res['layout']['width'] = '100%'
-                res['layout']['height'] = '100%'            
+          
             if pffplay is not None:
                 if(window_stack_check_type(res['id']) == 'normal' and full == 'full'):
                     fullscreen(res)
-                    # once fullscreen, we need to remove all th background screen
-                    time.sleep(0.1)
-                    for del_res in programmers['programmer']['resources']:
-                        if del_res['id'] == res['id']:
-                            window_stack_modify_type(res['id'])
-                        else:
-                            del_ffplay(del_res)   
-                            time.sleep(0.1)
-                    return
+                    window_stack_fullscreen_type(res['id'])
+                elif window_stack_check_type(res['id']) == 'fullscreen':
+                    print 'invalid operations. full screen cannot be changed to normal.'
                 else:
-                    t = Thread(target=add_ffplay, args=(res, ))
+                    t = Thread(target=add_ffplay, args=(res, full))
                     t.setDaemon(True)
                     t.start()
             else:
