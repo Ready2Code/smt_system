@@ -1,4 +1,6 @@
 *.pyc
 server/db.sqlite3
 client/db.sqlite3
+related/ffplay
+related/ffmpeg
 
