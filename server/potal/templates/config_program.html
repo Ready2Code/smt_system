@@ -460,7 +460,10 @@
 			}
             current_path=""
 		    function display_file(data){
-			   var jsonObj=JSON.parse(data)
+		       try{
+			       var jsonObj=JSON.parse(data)
+			   }catch(error) {
+			   }
                get_addprogramme_list(jsonObj,current_path)
 			}
            
