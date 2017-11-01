@@ -46,6 +46,21 @@ BROADCAST_SERVER_IP = '127.0.0.1'
 AVLOGEXT_IP = '127.0.0.1'
 AVLOGEXT_PORT = 7778
 
+class PlayOrderType:
+    (singleloop, loop, onebyone, unknown) = range(0,4)
+
+    @staticmethod
+    def getType(s):
+        if(s == 'singleloop'):
+            return PlayOrderType.singleloop
+        elif(s == 'loop'):
+            return PlayOrderType.loop        
+        elif(s == 'onebyone'):
+            return PlayOrderType.onebyone  
+        else:
+            return PlayOrderType.unknown
+            
+play_order_type = PlayOrderType.onebyone
 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 packet = ''
 endtime = datetime.now()
@@ -131,7 +146,8 @@ def convert_signal(json_file, resource_broadcast_ip, resource_broadband_ip,avlog
     global sequence_number
     global packet
     global ffmpeg_list
- 
+    global play_order_type 
+    
 #    for i in range(len(ffmpeg_list)):
 #        functions.kill_process_by_name(ffmpeg_list[i]["cmd"])
 #    del ffmpeg_list[:]
@@ -148,6 +164,8 @@ def convert_signal(json_file, resource_broadcast_ip, resource_broadband_ip,avlog
         bkfile = ''
         ffplaybk_port = ''
         ffmpegbk_port = ''
+        if play_order_type == PlayOrderType.singleloop:
+            res['end'] = "d23:59:59"
         if 'url' in res.keys(): localfile = res['url']
         elif ('playlist' in res.keys()): localfile = res['playlist']
         if ('bk' in res.keys()): 
@@ -219,6 +237,7 @@ def get_begin_time_string(begin_time, zone_offset='default'):
     return begin_time_utc_string
     
 def call_ffmpeg(file_dir, res, port, resource_broadcast_ip, ffplay_port, avlogext=''):
+    global play_order_type
     time.sleep(aheadtime/1000)
     begintime = get_begin_time_string(res['begin'],timedelta(hours=8))
     res_type = res['type']
@@ -243,8 +262,18 @@ def call_ffmpeg(file_dir, res, port, resource_broadcast_ip, ffplay_port, avlogex
     elif(res_type == 'broadcast'):
         str_port ='-port %s' % port
         str_output = 'smt://%s:%s' % (resource_broadcast_ip, ffplay_port)
+        
+    str_duration = ''
+    if play_order_type == PlayOrderType.singleloop:
+        str_duration = ' -stream_loop -1'
+    else:
+        str_duration = ' -t %s' % delta
 
-    ffmpeg_command = ffmpeg_command + ' -re {0} {1} -t {6} -i {2} -begintime {3} {4} -c:v copy -c:a aac -f mpu {5}'.format(str_port, playlist, file_dir, begintime, str_avlogext, str_output, delta) 
+    #ffmpeg_command = ffmpeg_command + ' -re  {0} {1} -t {6} -i {2} -begintime {3} {4} -c:v copy -c:a aac -f mpu {5}'.format(str_port, playlist, file_dir, begintime, str_avlogext, str_output, delta) 
+    ffmpeg_command = ffmpeg_command + ' -re ' + str_port + playlist \
+                     + str_duration +' -i '+file_dir +' -begintime '+ begintime \
+                     + ' ' +str_avlogext +' -c:v copy -c:a aac -f mpu '+str_output
+
     print ffmpeg_command
 
     ffmpeg_list.append({"cmd":ffmpeg_command, "end":res['end']})
@@ -363,7 +392,7 @@ def start_smt_system(programs_file=CONFIG_FILE_NAME,
     global ext_callbacks
     global signal_destination 
     global start_system_flag
-
+    global play_order_type
 
     signal_timer_thread_flag = 1
     start_system_flag=1
@@ -397,6 +426,7 @@ def start_smt_system(programs_file=CONFIG_FILE_NAME,
             print "processing", i['name'], url
             program_data = url_load(url)
             json_data=json.loads(program_data)
+            print json_data['programmer']
             try:
                 aheadtime =int( json_data['programmer']['aheadtime'])
             except:
@@ -405,13 +435,25 @@ def start_smt_system(programs_file=CONFIG_FILE_NAME,
                 cachetime =int( json_data['programmer']['cachetime'])
             except:
                 print 'no cachetime in program.json'
+            try:
+                play_order_type = PlayOrderType.getType(json_data['programmer']['play_order_type'])
+            except:
+                print 'no play_order_type in program.json'
             dir_name = os.path.dirname(functions.url2pathname(url))
             resource_num = 1
+            
+            if play_order_type == PlayOrderType.singleloop:
+                json_data['programmer']['end'] = "d23:59:59"
+            
             convert = convert_signal(program_data, resource_broadcast_ip, resource_broadband_ip, avlogext_ip+':'+str(avlogext_port),static_resource_host,dir_name)
             packet = convert
             #print convert
+
+            #if play_order_type is singleloop, set endtime to long time later
+
             endtime = convert['programmer']['end'] - timedelta(milliseconds=(aheadtime+cachetime))
-            print 'endtime = ', endtime
+
+
             while (endtime - datetime.now()).seconds > 0.05:
                 if start_system_flag==0:
                     return
@@ -419,8 +461,16 @@ def start_smt_system(programs_file=CONFIG_FILE_NAME,
             if start_system_flag==0:
                 return
             time.sleep((endtime - datetime.now()).seconds)
+
+            if play_order_type == PlayOrderType.onebyone and i == programmers[len(programmers)-1]:
+               return
+            if play_order_type == PlayOrderType.singleloop and i != 0:
+               return               
+            
             program_num += 1
             program_num = program_num % 10
+
+            
 
 def get_current_programme():
     return packet
