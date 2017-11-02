@@ -110,3 +110,122 @@ table
     ibackground-color: #ee3333;
     background-color: #ffff00;
  }
+#bitrate_div{
+  position:absolute;
+  top:230px;
+  left:120px;
+  width:80px;
+  height:100px;
+}
+#bitrate_div1{
+  position:absolute;
+  top:510px;
+  left:340px;
+  width:80px;
+  height:100px;
+}
+#bitrate_div2{
+  position:absolute;
+  top:740px;
+  left:290px;
+  width:70px;
+  height:100px;
+}
+#delay_div{
+  position:absolute;
+  top:410px;
+  left:20px;
+  width:60px;
+  height:100px;
+}
+#delay_broadcast_div{
+  position:absolute;
+  top:130px;
+  left:620px;
+  width:200px;
+  height:100px;
+}
+#packetlost_broadcast_div{
+  position:absolute;
+  top:160px;
+  left:620px;
+  width:200px;
+  height:100px;
+}
+#delay_broadband_div{
+  position:absolute;
+  top:540px;
+  left:830px;
+  width:200px;
+  height:100px;
+}
+#packetlost_broadband_div{
+  position:absolute;
+  top:570px;
+  left:830px;
+  width:200px;
+  height:100px;
+}
+#delay_wifi_div{
+  position:absolute;
+  top:780px;
+  left:1200px;
+  width:200px;
+  height:100px;
+}
+#packetlost_wifi_div{
+  position:absolute;
+  top:810px;
+  left:1200px;
+  width:200px;
+  height:100px;
+}
+#delay_ltewifi_div{
+  position:absolute;
+  top:920px;
+  left:1200px;
+  width:200px;
+  height:100px;
+}
+#packetlost_ltewifi_div{
+  position:absolute;
+  top:950px;
+  left:1200px;
+  width:200px;
+  height:100px;
+}
+#delay_client_div{
+  position:absolute;
+  top:500px;
+  left:1090px;
+  width:100px;
+  height:100px;
+}
+#delay_broadcast_p2p_div{
+  position:absolute;
+  top:110px;
+  left:1190px;
+  width:200px;
+  height:100px;
+}
+#delay_broadband_p2p_div{
+  position:absolute;
+  top:140px;
+  left:1190px;
+  width:200px;
+  height:100px;
+}
+#delay_wifi_p2p_div{
+  position:absolute;
+  top:170px;
+  left:1190px;
+  width:200px;
+  height:100px;
+}
+#delay_lte_p2p_div{
+  position:absolute;
+  top:200px;
+  left:1195px;
+  width:200px;
+  height:100px;
+}

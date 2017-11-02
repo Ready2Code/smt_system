@@ -1,6 +1,7 @@
 bitrateCharts = new Array();
 delayCharts = new Array();
 packetLostCharts = new Array();
+json_obj=0
 var interval = 100;
 var packet_lost_log = new SinglyLinkedList();
 
@@ -457,6 +458,22 @@ function setNewTimeDisplacement(chartArray, filename, vpoint, thetime) {
 
 
 
+function display(obj){
+ if (typeof(obj.packet_lost) != 'undefined') { 
+ }
+ else if (typeof(obj.bitrate) != 'undefined') {
+   vpoint = parseFloat(obj.bitrate);
+   if(vpoint>0)
+     document.getElementById('bitrate_server').value=vpoint.toPrecision(4)+"Mb/s";  
+ }
+ else if (typeof(obj.delay) != 'undefined') {
+	 alert("delay&&&&&&&&&&&&&&&&&&&&&&")
+     vpoint = parseInt(obj.delay) / 1000.0;
+	 console.log("delay##############vpoint",vpoint)
+   if(vpoint>0)
+     document.getElementById('delay_broadcast').value=vpoint.toPrecision(4)+"s";  
+ }
+}
 function showdiv(targetid,dis){
    
     var target=document.getElementById(targetid);
@@ -495,6 +512,7 @@ $(function() {
         setInterval(drawbitrateCharts, 500);
         setInterval(drawDelayChart, 500);
         setInterval(drawPacketLostChart, 500);
+        window.setInterval(function(){display(json_obj)}, 1000);
         
         try {
             socket = new ReconnectingWebSocket(host);
@@ -509,6 +527,7 @@ $(function() {
 
                 
                 var obj = JSON.parse(data);
+				json_obj=obj;
 
                 if (typeof(obj.packet_lost) != 'undefined') {
                     if(false) {
