@@ -406,6 +406,10 @@ def start_smt_system(programs_file=CONFIG_FILE_NAME,
     aheadtime = int(json_data['aheadtime'])
     cachetime = int(json_data['cachetime'])
     programmers = json_data['programmers']
+    try:
+        play_order_type = PlayOrderType.getType(json_data['play_order_type'])
+    except:
+        print 'no play_order_type in program.json'    
     print 'aheadtime =', aheadtime , 'cachetime =', cachetime,'start_system_flag=',start_system_flag
 
     first_signal(signal_destination)
@@ -435,10 +439,7 @@ def start_smt_system(programs_file=CONFIG_FILE_NAME,
                 cachetime =int( json_data['programmer']['cachetime'])
             except:
                 print 'no cachetime in program.json'
-            try:
-                play_order_type = PlayOrderType.getType(json_data['programmer']['play_order_type'])
-            except:
-                print 'no play_order_type in program.json'
+
             dir_name = os.path.dirname(functions.url2pathname(url))
             resource_num = 1
             
