@@ -15,11 +15,14 @@ def start_page(request):
 def start_controller(request):
     global is_running
     if not is_running:
-        controller_settings = get_controller_settings()
-        info_collector_dest = controller_settings.info_collector_ip + ':' + str(controller_settings.info_collector_port)
-        device_name = controller_settings.controller_name
-        signal_client.initial(info_collector_dest, device_name)
-        is_running = True
+        try:
+            controller_settings = get_controller_settings()
+            info_collector_dest = controller_settings.info_collector_ip + ':' + str(controller_settings.info_collector_port)
+            device_name = controller_settings.controller_name
+            signal_client.initial(info_collector_dest, device_name)
+            is_running = True
+        except:
+            pass
     return HttpResponse(u"ok", content_type='application/json')
 
 def handle_command(request):

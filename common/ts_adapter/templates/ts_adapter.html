@@ -144,7 +144,8 @@
 			   newtr = newtr + "<td>" + "<input class='selected' type='checkbox' checked=true />" + "</td>"
 			   newtr = newtr + "<td> <font class='operator'> ☆ </font >" + " <button class='start'>Start</button>"  +
 			                            "<button class='stop'>Stop</button>" + "</td>"
-			   if(autoStart){
+			   
+			   if(typeof(autoStart)!="undefined" && autoStart){
 			     newtr = newtr + "<td>" + "<input class='auto_start' type='checkbox' checked=true/>" + "</td>"
 			   }else{
 			     newtr = newtr + "<td>" + "<input class='auto_start' type='checkbox'/>" + "</td>"
