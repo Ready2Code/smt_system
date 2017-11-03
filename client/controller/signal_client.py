@@ -86,10 +86,10 @@ def window_stack_push(wid, url, wtype='normal'):
     window_stack_list.append(window)
     print 'window_stack_list=',window_stack_list
 
-def window_stack_pop(url=''):
+def window_stack_pop(wid):
     global window_stack_list
     for i in range(len(window_stack_list)-1,-1,-1):
-        if url == '' or url == window_stack_list[i]['url']:
+        if wid == window_stack_list[i]['id']:
             del window_stack_list[i]
             break
 
@@ -271,7 +271,7 @@ def del_ffplay(res, pid=0):
     # full screen cannot be closed
     if cal_screen_value(res['layout']['width'], True) == SCREEN_WIDTH and cal_screen_value(res['layout']['height'], False) == SCREEN_HEIGHT:  return
     if window_stack_check_type(res['id']) == 'fullscreen' : return 
-    window_stack_pop(res['url'])
+    window_stack_pop(res['id'])
     if(related == 'true'):    prompt_del()
     del_command = {'type':'del', 'server': '', 'format': {'name': ''}}
     del_command['server'] = server_ip
