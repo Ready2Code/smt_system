@@ -467,11 +467,9 @@ function display(obj){
      document.getElementById('bitrate_server').value=vpoint.toPrecision(4)+"Mb/s";  
  }
  else if (typeof(obj.delay) != 'undefined') {
-	 alert("delay&&&&&&&&&&&&&&&&&&&&&&")
      vpoint = parseInt(obj.delay) / 1000.0;
-	 console.log("delay##############vpoint",vpoint)
    if(vpoint>0)
-     document.getElementById('delay_broadcast').value=vpoint.toPrecision(4)+"s";  
+     document.getElementById('delay_broadcast').value=vpoint.toPrecision(4)+"ms";  
  }
 }
 function showdiv(targetid,dis){
@@ -581,7 +579,7 @@ $(function() {
 					  bitrateCharts[0].filename=obj.filename;
 					}
                 } else if (typeof(obj.delay) != 'undefined') {
-                    //console.log('data=', data);
+                    console.log('delay data=', data);
                     vpoint = parseInt(obj.delay) / 1000.0;
                     vpoint += 0.2;
                     if(vpoint < 0.1) vpoint = 0.1;
