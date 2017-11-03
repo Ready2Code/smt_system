@@ -112,120 +112,120 @@ table
  }
 #bitrate_div{
   position:absolute;
-  top:230px;
-  left:120px;
+  top:240px;
+  left:310px;
   width:80px;
   height:100px;
 }
 #bitrate_div1{
   position:absolute;
-  top:510px;
-  left:340px;
+  top:520px;
+  left:520px;
   width:80px;
   height:100px;
 }
 #bitrate_div2{
   position:absolute;
   top:740px;
-  left:290px;
+  left:480px;
   width:70px;
   height:100px;
 }
 #delay_div{
   position:absolute;
-  top:410px;
-  left:20px;
+  top:450px;
+  left:190px;
   width:60px;
   height:100px;
 }
 #delay_broadcast_div{
   position:absolute;
-  top:130px;
-  left:620px;
+  top:180px;
+  left:770px;
   width:200px;
   height:100px;
 }
 #packetlost_broadcast_div{
   position:absolute;
-  top:160px;
-  left:620px;
+  top:210px;
+  left:770px;
   width:200px;
   height:100px;
 }
 #delay_broadband_div{
   position:absolute;
-  top:540px;
-  left:830px;
+  top:630px;
+  left:1030px;
   width:200px;
   height:100px;
 }
 #packetlost_broadband_div{
   position:absolute;
-  top:570px;
-  left:830px;
+  top:660px;
+  left:1030px;
   width:200px;
   height:100px;
 }
 #delay_wifi_div{
   position:absolute;
   top:780px;
-  left:1200px;
+  left:1280px;
   width:200px;
   height:100px;
 }
 #packetlost_wifi_div{
   position:absolute;
   top:810px;
-  left:1200px;
+  left:1280px;
   width:200px;
   height:100px;
 }
 #delay_ltewifi_div{
   position:absolute;
   top:920px;
-  left:1200px;
+  left:1280px;
   width:200px;
   height:100px;
 }
 #packetlost_ltewifi_div{
   position:absolute;
   top:950px;
-  left:1200px;
+  left:1280px;
   width:200px;
   height:100px;
 }
 #delay_client_div{
   position:absolute;
   top:500px;
-  left:1090px;
+  left:1310px;
   width:100px;
   height:100px;
 }
 #delay_broadcast_p2p_div{
   position:absolute;
-  top:110px;
-  left:1190px;
+  top:150px;
+  left:1420px;
   width:200px;
   height:100px;
 }
 #delay_broadband_p2p_div{
   position:absolute;
-  top:140px;
-  left:1190px;
+  top:180px;
+  left:1420px;
   width:200px;
   height:100px;
 }
 #delay_wifi_p2p_div{
   position:absolute;
-  top:170px;
-  left:1190px;
+  top:210px;
+  left:1420px;
   width:200px;
   height:100px;
 }
 #delay_lte_p2p_div{
   position:absolute;
-  top:200px;
-  left:1195px;
+  top:240px;
+  left:1425px;
   width:200px;
   height:100px;
 }
