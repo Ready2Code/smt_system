@@ -16,6 +16,13 @@
 		   </style>
         </head>
         <body >
+            播放顺序:
+            <select id="play_order_type">
+                <option value="onebyone">依次播放</option>
+                <option value="loop">全部循环</option>
+                <option value="singleloop">循环第一个</option>
+            </select>
+        </form>
 			 <table id='programme_list' border="1" > 
 			   <td><button type="button" id="addBt">添加节目</button> </td>
 			   <td>名称</td>
@@ -72,6 +79,7 @@
 			posy_info=""
 			width_info=""
 			height_info=""
+			play_order_type_info=""
 			resource_num=0
 			programmes_path='programmes.json'//tell server get  programmes.json path
             function on_bandwidth_change(bitrate) {
@@ -108,6 +116,9 @@
 			}
             function init_programmes(data){
 			  var jsonObj=JSON.parse(data)	
+              if(typeof(jsonObj.play_order_type)) {
+                  $('#play_order_type').val(jsonObj.play_order_type)
+              }
 			  for(i=0;i<jsonObj.programmers.length;i++){  
 				    pro_name=jsonObj.programmers[i].name
 				    pro_url=jsonObj.programmers[i].url
@@ -161,6 +172,26 @@
 			   return result
 			}
 
+
+		    function set_programme_info_base(thepath, obj){
+			   $.ajax({
+				 type:"GET",
+				 dataType:"json",
+				 url:"/config_program/get_config_file/",
+				 data:{path:thepath},
+				 async:false,
+				 success:function(data){
+			       var jsonObj=JSON.parse(data)
+                   for(var i in obj) {
+                       jsonObj[i] = obj[i]
+                   }
+			       var json_data=JSON.stringify(jsonObj).replace(/\\n/g,"\\n").replace(/\\r/g,"\\n")
+                   console.log("set new data",json_data,"; path is ", thepath)
+			       set_config_file(json_data,thepath)
+				 }					   
+			    });	
+            }
+
 		    function set_programme_info(path){
 			   $.ajax({
 				 type:"GET",
@@ -192,6 +223,11 @@
 			}
             
 		    function set_programme_process_response() {
+                $("#play_order_type").unbind('change').bind('change', function() {
+                        var obj = {play_order_type: $("#play_order_type").val()}
+                        set_programme_info_base(programmes_path, obj)
+                    }
+                )
 		        $("button.process_resource").unbind('click').bind('click',function(){
 		              var name=$(this).attr('programmename')
 		              var path=$(this).attr('path')
@@ -345,6 +381,7 @@
             }
             function get_content_list(jsonObj){
                resource=jsonObj.programmer.resources			   
+               console.log(jsonObj.play_order_type)
                $("tr.content_list").remove()
                $("tr.broadcast_info_list").remove()
 			   console.log("get content list file!!")
