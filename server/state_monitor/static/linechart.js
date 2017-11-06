@@ -2,6 +2,7 @@ bitrateCharts = new Array();
 delayCharts = new Array();
 packetLostCharts = new Array();
 json_obj=0
+bitrate_notchange_times=0
 var interval = 100;
 var packet_lost_log = new SinglyLinkedList();
 
@@ -203,11 +204,29 @@ function drawbitrateCharts() {
          filename= thechartArray[i].filename;
          type= filename.split(':');
 	     if(type[2]=='1'){
-	//	   console.log("filename@@@@@@@@@@@@@@@==1")
+                   var thepoint1 = chartArray.series[i].sList.last;
+                   vpoint = thepoint1.data[1];
 		   chartArray=thechartArray[1]
+                   document.getElementById('bitrate_server1').value=vpoint.toPrecision(4)+"Mb/s";
 	     }else{
 		   chartArray=thechartArray[0]
-	//	   console.log("filename@@@@@@@@@@@@@@@==0",filename)
+                 var thepoint1 = chartArray.series[i].sList.last;
+                 var thepoint2 = thepoint1.pre;
+                 vpoint = thepoint1.data[1];
+                 vpoint2 = thepoint2.data[1];
+                 var bitrate_tb=vpoint2-vpoint;
+                 if(bitrate_tb>5)
+                   document.getElementById('bitrate_server').value=vpoint2.toPrecision(4)+"Mb/s";
+                  else
+                   document.getElementById('bitrate_server').value=vpoint.toPrecision(4)+"Mb/s";
+                 if(bitrate_tb==0){
+                    bitrate_notchange_times++;
+                    if(bitrate_notchange_times>5){
+                      bitrate_notchange_times=0;
+                      document.getElementById('bitrate_server').value="";
+                    } 
+                  }
+           
 	     }
 	   chartArray.yAxis[0].options.tickInterval=2;
 	   chartArray.yAxis[0].options.min=0;
@@ -235,9 +254,9 @@ function drawbitrateCharts() {
 		var data=[];
 	    if(type[2]=='1'){
 		  data.push([ chartArray.series[i].name,timecount / (numbercount)]);		  
-          chartArray.series[i].setData(data);
+                  chartArray.series[i].setData(data);
 		}else{
-           chartArray.series[i].setData([ chartArray.series[i].name, timecount / (numbercount)]);
+                  chartArray.series[i].setData([ chartArray.series[i].name, timecount / (numbercount)]);
 		}     
 
       }
@@ -336,6 +355,7 @@ function addNewPoint2BitrateChart(chartArray, filename, vpoint, thetime) {
 
         if (typeof(chartArray.series[isFound].sList) === 'undefined') chartArray.series[isFound].sList = new SinglyLinkedList();
         chartArray.series[isFound].sList.addFirst([thetime, vpoint]);
+       // document.getElementById('bitrate_server').value=vpoint.toPrecision(4)+"Mb/s";
     }
 }
 
@@ -463,13 +483,32 @@ function display(obj){
  }
  else if (typeof(obj.bitrate) != 'undefined') {
    vpoint = parseFloat(obj.bitrate);
-   if(vpoint>0)
-     document.getElementById('bitrate_server').value=vpoint.toPrecision(4)+"Mb/s";  
+   nettype=obj.filename;
+   type= nettype.split(':');
+   console.log("display%%%%%%%%%==",type[2])
+   if(type[2]=='1'){
+     if(vpoint>0){
+        document.getElementById('bitrate_server1').value=vpoint.toPrecision(4)+"Mb/s";
+	  }
+   }
+   else{
+     if(vpoint>0){
+        document.getElementById('bitrate_server').value=vpoint.toPrecision(4)+"Mb/s";
+	 } 
+   }
  }
  else if (typeof(obj.delay) != 'undefined') {
-     vpoint = parseInt(obj.delay) / 1000.0;
-   if(vpoint>0)
-     document.getElementById('delay_broadcast').value=vpoint.toPrecision(4)+"ms";  
+   nettype=obj.filename;
+   type= nettype.split(':');
+   vpoint = parseInt(obj.delay) / 1000.0;
+   console.log("delay%%%%%%%%%==",nettype)
+   //if(type[2]=='1'){
+   if(1){
+  //   if(vpoint>0)
+      document.getElementById('delay_broadcast').value=vpoint.toPrecision(4)+"ms"; 
+   }else{
+      document.getElementById('delay_broadband').value=vpoint.toPrecision(4)+"ms"; 
+   }
  }
 }
 function showdiv(targetid,dis){
@@ -510,7 +549,7 @@ $(function() {
         setInterval(drawbitrateCharts, 500);
         setInterval(drawDelayChart, 500);
         setInterval(drawPacketLostChart, 500);
-        window.setInterval(function(){display(json_obj)}, 1000);
+       // window.setInterval(function(){display(json_obj)}, 1000);
         
         try {
             socket = new ReconnectingWebSocket(host);
