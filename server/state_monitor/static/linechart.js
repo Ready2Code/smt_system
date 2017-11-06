@@ -4,6 +4,7 @@ packetLostCharts = new Array();
 json_obj=0
 var interval = 100;
 var packet_lost_log = new SinglyLinkedList();
+var g_programmer = null
 
 function setLineChart(tag, color, charttype) {
     Highcharts.setOptions({
@@ -539,10 +540,11 @@ $(function() {
                 //console.log(msg.data);
                 var charArray;
                 data = msg.data;
-
-                
-                var obj = JSON.parse(data);
-				json_obj=obj;
+				
+                end = data.lastIndexOf('}')
+                if(end < 0) return
+                var obj = JSON.parse(data.substring(0, end+1));
+                json_obj=obj;
 
                 if (typeof(obj.packet_lost) != 'undefined') {
                     if(false) {
@@ -621,6 +623,10 @@ $(function() {
                     	  showdiv("tab1","none")
                         showdiv("tab2","block")
                     }
+                }
+                else if (typeof(obj.programmer) != 'undefined') {
+                    g_programmer = obj.programmer
+                    console.log(g_programmer)
                 }
                 else {
                     return;

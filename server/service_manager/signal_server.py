@@ -82,23 +82,27 @@ class SignalTimerThread(Thread):
     def __init__(self, event, dest):
         Thread.__init__(self)
         self.stopped = event
-        self.dest = dest
+        self.dests = [dest]
+
+    def add_dest(self, dest):
+        self.dests.append(dest)
 
     def run(self):
         global signal_timer_thread_flag
         global ext_callbacks
 
         if ext_callbacks.has_key('before_ffmpeg'):
-            ext_callbacks['before_ffmpeg']('broadcast', self.dest[0]+':'+str(self.dest[1]))
+            ext_callbacks['before_ffmpeg']('broadcast', self.dests[0][0]+':'+str(self.dests[0][1]))
 
         while not self.stopped.wait(BROADCASE_TIME_INTERVAL):
             if signal_timer_thread_flag==1:
-                delay_broadcast(s, packet, self.dest)
+                for dest in self.dests:
+                    delay_broadcast(s, packet, dest)
             else:
                 break
 
         if ext_callbacks.has_key('after_ffmpeg'):
-            ext_callbacks['after_ffmpeg']('broadcast', self.dest[0]+':'+str(self.dest[1]))
+            ext_callbacks['after_ffmpeg']('broadcast', self.dests[0][0]+':'+str(self.dests[0][1]))
             #ext_callbacks['after_ffmpeg'](res_type, str_output)
 
 
@@ -415,6 +419,7 @@ def start_smt_system(programs_file=CONFIG_FILE_NAME,
     first_signal(signal_destination)
     stopFlag = Event()
     thread = SignalTimerThread(stopFlag, signal_destination)
+    thread.add_dest((avlogext_ip, avlogext_port))
     thread.setDaemon(True)
     thread.start()
     t = Thread(target=command_timer)

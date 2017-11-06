@@ -280,7 +280,8 @@ def info_collector(host, port):
          if recv.decode('utf8').upper()=="QUIT":
             print('quit now')
             break
-         sendMessage(recv[:-1])
+         sendMessage(recv)
+
          #for connection in connectionlist.values():
          #    connection.send(recv)
          #sock.sendto('tcpServer has received your message',client_addr)
