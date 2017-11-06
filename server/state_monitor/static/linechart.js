@@ -463,8 +463,19 @@ function display(obj){
  }
  else if (typeof(obj.bitrate) != 'undefined') {
    vpoint = parseFloat(obj.bitrate);
-   if(vpoint>0)
-     document.getElementById('bitrate_server').value=vpoint.toPrecision(4)+"Mb/s";  
+   nettype=obj.filename;
+   type= nettype.split(':');
+   console.log("display%%%%%%%%%==",type[2])
+   if(type[2]=='1'){
+     if(vpoint>0){
+        document.getElementById('bitrate_server1').value=vpoint.toPrecision(4)+"Mb/s";
+	  }
+   }
+   else{
+     if(vpoint>0){
+        document.getElementById('bitrate_server').value=vpoint.toPrecision(4)+"Mb/s";
+	 } 
+   }
  }
  else if (typeof(obj.delay) != 'undefined') {
 	 alert("delay&&&&&&&&&&&&&&&&&&&&&&")
