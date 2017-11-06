@@ -478,11 +478,15 @@ function display(obj){
    }
  }
  else if (typeof(obj.delay) != 'undefined') {
-	 alert("delay&&&&&&&&&&&&&&&&&&&&&&")
+   nettype=obj.filename;
+   type= nettype.split(':');
+   if(type[2]=='1'){
      vpoint = parseInt(obj.delay) / 1000.0;
-	 console.log("delay##############vpoint",vpoint)
-   if(vpoint>0)
-     document.getElementById('delay_broadcast').value=vpoint.toPrecision(4)+"s";  
+     if(vpoint>0)
+      document.getElementById('delay_broadcast').value=vpoint.toPrecision(4)+"ms"; 
+   }else{
+      document.getElementById('delay_broadband').value=vpoint.toPrecision(4)+"ms"; 
+   }
  }
 }
 function showdiv(targetid,dis){
