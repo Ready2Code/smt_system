@@ -205,21 +205,21 @@ table
   position:absolute;
   top:150px;
   left:1420px;
-  width:200px;
+  width:240px;
   height:100px;
 }
 #delay_broadband_p2p_div{
   position:absolute;
   top:180px;
   left:1420px;
-  width:200px;
+  width:240px;
   height:100px;
 }
 #delay_wifi_p2p_div{
   position:absolute;
   top:210px;
   left:1420px;
-  width:200px;
+  width:210px;
   height:100px;
 }
 #delay_lte_p2p_div{
