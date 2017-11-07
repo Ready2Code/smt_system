@@ -21,6 +21,14 @@ from potal.models import UserInfo
 from potal.models import get_userinfo_settings
 def test(request):
       return render(request, 'test.html')
+
+
+def edit_file(request):
+    path = ''
+    if request.GET.has_key('path'):
+        path = request.GET['path']
+    return render(request, 'test.html', {'path':path})
+      
 def check_username(username):
     userinfo=get_userinfo_settings()
     for userlist in userinfo:

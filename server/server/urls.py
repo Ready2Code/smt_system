@@ -36,6 +36,7 @@ urlpatterns = [
     url(r'^$',                       potal_views.start_page ,                   name='startpage'),
 	url(r'^config_program/$',potal_views.config_program,   name='config_program'),
 	url(r'^test/$',potal_views.test,   name='test'),
+	url(r'^edit_file/$',potal_views.edit_file,   name='test'),
 	url(r'^current_program/$',potal_views.current_program,   name='current_program'),
 
     url(r'^ws/$',                    state_monitor_views.connect_websocket,    name='connect_websocket '),
