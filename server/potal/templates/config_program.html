@@ -30,7 +30,7 @@
 			   <td> 向下</td>
 			   <td> 向上</td>
 			   <td>删除</td>
-			   <td></td>
+			   <td>查看文件</td>
 		   <hr/>
 			 <table id='content_list' border="1" > 
 			   <td>名字 </td>
@@ -263,6 +263,7 @@
 				 newtr = newtr + "<td ><button type='button'  path="+path+""+"  programmename='"+name+" '"+"  class='process_resource_down'>"+"向下"+"</button></td>"
 				 newtr = newtr + "<td ><button type='button'  path="+path+""+"  programmename='"+name+" '"+"  class='process_resource_up'>"+"向上"+"</button></td>"
 				 newtr = newtr + "<td ><button type='button'  path="+path+""+"  programmename='"+name+" '"+"  class='process_resource_delete'>"+"删除"+"</button></td>"
+				 newtr = newtr + "<td ><button type='button'  path="+path+""+"  programmename='"+name+" '"+"  class='process_resource_edit'>"+"查看"+"</button></td>"
 			    $("#programme_list").append(newtr)
 
 		       $("button.process_resource_programme").unbind('click').bind('click',function(){
@@ -328,6 +329,11 @@
 				 $("#content_list").hide()
 			     $("#broadcast_info_list").hide()                      
 			  })
+		       $("button.process_resource_edit").unbind('click').bind('click',function(){
+				   var path= $(this).attr('path')
+                   window.location.href="/edit_file/?path="+path
+			  })
+
 					   
 			}
             function get_broadcast_max_bandwidth(){

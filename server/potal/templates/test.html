@@ -49,6 +49,7 @@
 				 }					   
 			    });
 			}
+
 /*****************************for test******************************/
 
 			$(document).ready(function(){
@@ -62,6 +63,12 @@
 				   data=$("#displayfile").val()
 				   set_config_file(data,path)
 			   })
+			   path = "{{path}}"
+			   if(path.length > 0){
+			       $("#filepath").val(path)
+			       console.log(path)
+			       get_config_file_test(path)
+			   }
 
 		   });
          </script>
