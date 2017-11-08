@@ -728,20 +728,7 @@ $(function() {
                     g_programmer = obj.programmer;
                 }
                 else if (typeof(obj.streaming_delay) != 'undefined') {
-                  var delaytime= parseInt(obj.streaming_delay/1000);
-                 if(server_delay==0){               
                    server_delay= parseFloat(obj.streaming_delay)/1000;
-                   console.log("obj.streaming_delay port000====",server_delay,"delaytime===",delaytime,"diff===");
-                 }
-                 else{
-                  var diff=parseInt(server_delay)-delaytime;
-                  diff=diff/1000; 
-                   console.log("diff===",diff,"server_delay=",server_delay);
-                  if(diff<0.5){
-                   server_delay= parseFloat(obj.streaming_delay)/1000;
-                    
-                  } 
-                 }             
                 }
                 else {
                     return;
