@@ -144,7 +144,7 @@ def first_signal(dest):
         counter = counter - 1
         time.sleep(0.01)
     
-def convert_signal(json_file, resource_broadcast_ip, resource_broadband_ip,avlogext='',static_resource_host='', dir_name='/'):
+def convert_signal(json_data, resource_broadcast_ip, resource_broadband_ip,avlogext='',static_resource_host='', dir_name='/'):
 #def convert_signal(json_file, resource_broadcast_ip, resource_broadband_ip,static_resource_host,avlogext=''):
     global resource_num
     global sequence_number
@@ -156,7 +156,7 @@ def convert_signal(json_file, resource_broadcast_ip, resource_broadband_ip,avlog
 #        functions.kill_process_by_name(ffmpeg_list[i]["cmd"])
 #    del ffmpeg_list[:]
 
-    json_data = json.loads(json_file)
+    #json_data = json.loads(json_file)
     sequence_number += json_data['programmer']['sequence']
     json_data['programmer']['sequence'] = sequence_number
     json_data['programmer']['begin'] = update_delta_time(json_data['programmer']['begin'], endtime)
@@ -451,7 +451,7 @@ def start_smt_system(programs_file=CONFIG_FILE_NAME,
             if play_order_type == PlayOrderType.singleloop:
                 json_data['programmer']['end'] = "d23:59:59"
             
-            convert = convert_signal(program_data, resource_broadcast_ip, resource_broadband_ip, avlogext_ip+':'+str(avlogext_port),static_resource_host,dir_name)
+            convert = convert_signal(json_data, resource_broadcast_ip, resource_broadband_ip, avlogext_ip+':'+str(avlogext_port),static_resource_host,dir_name)
             packet = convert
             #print convert
 

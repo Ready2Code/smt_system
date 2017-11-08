@@ -301,6 +301,7 @@ def UDP_recv(port, channel_id, name):
     global channels_info
     last_sequence = sequence
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    print 'binding sigalling port=%d' % port
     s.bind(('', port))
     print bcolors.OKBLUE + "{2} id [{0}] is listened on port {1}".format(channel_id, port, name.encode('utf-8').strip()) + bcolors.ENDC
 
