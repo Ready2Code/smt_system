@@ -7,6 +7,7 @@ from websocketserver import WebSocket
 from state_monitor.models import get_monitor_settings
 from potal.models import get_userinfo_settings 
 from potal.models import UserInfo
+import json
 def check_username(username):
    userinfo=get_userinfo_settings() 
    for userlist in userinfo:
@@ -36,5 +37,10 @@ def connect_websocket(request):
     print "websocket"
     return HttpResponse('OK', content_type='applicatoin/json')
 
+def websocket_connection_num(request):
+    num =  websocketserver.get_connectonlist_length()
+    ret={}
+    ret["websocket_connection_num"]=num
+    return HttpResponse(json.dumps(ret), content_type='applicatoin/json')
 
 

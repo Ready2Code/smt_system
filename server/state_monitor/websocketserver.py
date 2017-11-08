@@ -14,6 +14,7 @@ import json
 connectionlist = {}
 g_code_length = 0
 g_header_length = 0
+g_is_info_server_running = False
 
 
 def hex2dec(string_num):
@@ -26,7 +27,7 @@ def get_datalength(msg):
     global g_code_length
     global g_header_length    
     
-    print (len(msg))
+    #print (msg)
     g_code_length = ord(msg[1]) & 127
     received_length = 0;
     if g_code_length == 126:
@@ -69,15 +70,25 @@ def parse_data(msg):
         i += 1
 
 
-    print (u"总长度是：%d" % int(g_code_length))    
+    #print (u"总长度是：%d" % int(g_code_length))    
     return raw_str  
 
-
+def remove_timeout_connection():
+    global connectionlist
+    
+    keys = connectionlist.keys()
+    for key in keys:
+        heartbeat = connectionlist[key][2]
+        if time.time() - heartbeat > 5:
+            deleteconnection_by_key(key)
+            
 def sendMessage(message):
     global connectionlist
     
     message_utf_8 = message.encode('utf-8')
-    for connection in connectionlist.values():
+    remove_timeout_connection()
+            
+    for [connection, addr, heartbeat] in connectionlist.values():
         back_str = []
         back_str.append('\x81')
         data_length = len(message_utf_8)
@@ -115,11 +126,25 @@ def sendMessage(message):
                 pass
                 #print e
 
-
-def deleteconnection(item):
+def deleteconnection_by_key(key):
     global connectionlist
-    del connectionlist['connection'+item]
+    print "del connection "+key
+    connection = connectionlist[key][0]
+    connection.close()
+    del connectionlist[key]
 
+
+
+def setconnectionheartbeat(item):
+    key = 'connection'+item
+    if connectionlist.has_key(key):
+        connectionlist[key][2] = time.time()
+    
+def deleteconnection(item):
+    deleteconnection_by_key('connection'+item)
+
+def is_connectioning(item):
+    return connectionlist.has_key('connection'+item)
 
 class WebSocket(threading.Thread):#继承Thread
 
@@ -178,9 +203,11 @@ class WebSocket(threading.Thread):#继承Thread
 
 
             else:
-                return
+                #return
                 global g_code_length
                 global g_header_length
+                if not is_connectioning(str(self.index)):
+                    break
                 mm=self.conn.recv(128)
                 if len(mm) <= 0:
                     continue
@@ -197,14 +224,15 @@ class WebSocket(threading.Thread):#继承Thread
                     if msg_unicode=='quit':
                         print (u'Socket%s Logout!' % (self.index))
                         nowTime = time.strftime('%H:%M:%S',time.localtime(time.time()))
-                        sendMessage(u'%s %s say: %s' % (nowTime, self.remote, self.name+' Logout'))                      
+                        #sendMessage(u'%s %s say: %s' % (nowTime, self.remote, self.name+' Logout'))                      
                         deleteconnection(str(self.index))
-                        self.conn.close()
+                        #self.conn.close()
                         break #退出线程
                     else:
                         #print (u'Socket%s Got msg:%s from %s!' % (self.index, msg_unicode, self.remote))
-                        nowTime = time.strftime(u'%H:%M:%S',time.localtime(time.time()))
+                        #nowTime = time.strftime(u'%H:%M:%S',time.localtime(time.time()))
                         #sendMessage(u'%s %s say: %s' % (nowTime, self.remote, msg_unicode))  
+                        setconnectionheartbeat(str(self.index))
                     #重置buffer和bufferlength
                     self.buffer_utf8 = ""
                     self.buffer = ""
@@ -237,7 +265,7 @@ class WebSocketServer(object):
             username=address[0]     
             newSocket = WebSocket(connection,i,username,address)
             newSocket.start() #开始线程,执行run函数
-            connectionlist['connection'+str(i)]=connection
+            connectionlist['connection'+str(i)]= [connection,address,time.time()]
             i = i + 1
 
 def run_websocket(addr, port):
@@ -289,8 +317,20 @@ def info_collector(host, port):
 
 
 def start_info_server(info_collector_ip, info_collector_port, info_websocket_ip, info_websocket_port ):
-    thread.start_new_thread(info_collector, (info_collector_ip, info_collector_port))
-    thread.start_new_thread(run_websocket, (info_websocket_ip, info_websocket_port ))
+    global g_is_info_server_running
+    if not g_is_info_server_running:
+       g_is_info_server_running = True
+       thread.start_new_thread(info_collector, (info_collector_ip, info_collector_port))
+       thread.start_new_thread(run_websocket, (info_websocket_ip, info_websocket_port ))
+
+def stop_info_server():
+    global g_is_info_server_running
+    g_is_info_server_running = False
+    
+def get_connectonlist_length():
+    global connectionlist
+    remove_timeout_connection()
+    return len(connectionlist)
 
 if __name__ == "__main__":
     start_info_server("", 7777, "127.0.0.1", 7778)
