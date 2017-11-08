@@ -1,8 +1,10 @@
 bitrateCharts = new Array();
 delayCharts = new Array();
 packetLostCharts = new Array();
-json_obj=0
+json_obj=0;
 bitrate_notchange_times=0
+server_delay=0;
+server_delay_port=0
 var broadcast_bitrate=0
 var broadband_bitrate=0
 var interval = 100;
@@ -208,23 +210,23 @@ function drawbitrateCharts() {
          type= filename.split(':');
 	     if(type[2]=='1'){
 		   chartArray=thechartArray[1]
-                   var thepoint1 = chartArray.series[i].sList.last;
-                   vpoint = thepoint1.data[1];
+                   //var thepoint1 = chartArray.series[i].sList.last;
+                  // vpoint = thepoint1.data[1];
                   // console.log("vpoint net 22222 ##############===",vpoint);
                   // document.getElementById('bitrate_server1').value=vpoint.toPrecision(4)+"Mb/s";
 	     }else{
 		   chartArray=thechartArray[0]
-                 var thepoint1 = chartArray.series[i].sList.last;
-                 var thepoint2 = thepoint1.pre;
-                 vpoint = thepoint1.data[1];
-                 vpoint2 = thepoint2.data[1];
-                 var bitrate_tb=vpoint2-vpoint;
-                 if(bitrate_tb==0){
-                    bitrate_notchange_times++;
-                    if(bitrate_notchange_times>5){
-                      bitrate_notchange_times=0;
-                    } 
-                  }
+                // var thepoint1 = chartArray.series[i].sList.last;
+                 //var thepoint2 = thepoint1.pre;
+                // vpoint = thepoint1.data[1];
+                // vpoint2 = thepoint2.data[1];
+                // var bitrate_tb=vpoint2-vpoint;
+                 //if(bitrate_tb==0){
+                  //  bitrate_notchange_times++;
+                  //  if(bitrate_notchange_times>5){
+                  //    bitrate_notchange_times=0;
+                  //  } 
+                 // }
            
 	     }
 	   chartArray.yAxis[0].options.tickInterval=2;
@@ -278,6 +280,7 @@ function drawbitrateCharts() {
                      broadcast_bitrate=broadcast_bitrate+vpoint;
                      if(i==length){
                         document.getElementById('bitrate_server').value=broadcast_bitrate.toPrecision(4)+"Mb/s";
+                        document.getElementById('delay_server').value=server_delay.toPrecision(6)+"ms";;
                         broadcast_bitrate=0;
                       }
                   }
@@ -333,15 +336,15 @@ function drawSimpleChart(chartArrays, frontFilter, postFilter) {
                        var type= g_programmer.resources[j].type;
                        var g_port=url.split(':');
                        if(port[3]==g_port[2]){
-                          var total_delay= chartArrays[x].series[i].value; 
+                          var total_delay= chartArrays[x].series[i].value+server_delay; 
                           document.getElementById('delay_broadcast').value=chartArrays[x].series[i].value.toPrecision(5)+"ms"; 
-                          document.getElementById('delay_broadcast_p2p').value=chartArrays[x].series[i].value.toPrecision(5)+"ms"; 
+                          document.getElementById('delay_broadcast_p2p').value=total_delay.toPrecision(5)+"ms"; 
                           break;  
                        }
                        if(port[3]==g_port[3]){
                           var  delaytime=chartArrays[x].series[i].value*1000;
                           var  decodetime=0;
-                          var  server_delaytime=0 
+                          var  server_delaytime=server_delay; 
                           var total_delay= delaytime+decodetime+server_delaytime; 
                           document.getElementById('delay_broadband').value=delaytime.toPrecision(5)+"ms";  
                           document.getElementById('delay_broadband_p2p').value=delaytime.toPrecision(5)+"ms";  
@@ -704,7 +707,24 @@ $(function() {
                     }
                 }
                 else if (typeof(obj.programmer) != 'undefined') {
-                    g_programmer = obj.programmer
+                 //   console.log("obj.streaming_delay====",obj.programmer);
+                    g_programmer = obj.programmer;
+                }
+                else if (typeof(obj.streaming_delay) != 'undefined') {
+                  var delaytime= parseInt(obj.streaming_delay/1000);
+                 if(server_delay==0){               
+                   server_delay= parseFloat(obj.streaming_delay)/1000;
+                   console.log("obj.streaming_delay port000====",server_delay,"delaytime===",delaytime,"diff===");
+                 }
+                 else{
+                  var diff=parseInt(server_delay)-delaytime;
+                  diff=diff/1000; 
+                   console.log("diff===",diff,"server_delay=",server_delay);
+                  if(diff<0.5){
+                   server_delay= parseFloat(obj.streaming_delay)/1000;
+                    
+                  } 
+                 }             
                 }
                 else {
                     return;
