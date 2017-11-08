@@ -51,6 +51,8 @@
              <input type="submit" value="start Info Server" />
         </form>
         <p/>
+        <button type="button" id="websocket_connection_num" >Connection Number(?)</button>
+        <p/>
         <a href='show_status'> Show Status </a>
         <hr/>
         <a href='config_program/'>config_programmers </a>
@@ -90,6 +92,10 @@
 				$("#stop").click(function(){
 			    	$.get("/stop_server/",function(ret){}) 	
 				})
+				$("#websocket_connection_num").click(function(){
+			    	$.get("/websocket_connection_num/",function(ret){$("#websocket_connection_num").text('Connection Number('+ret.websocket_connection_num+')');}) 	
+				})
+				
             })
             </script>
             

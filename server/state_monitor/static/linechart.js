@@ -9,6 +9,23 @@ var interval = 100;
 var packet_lost_log = new SinglyLinkedList();
 var g_programmer = null
 
+
+var heartCheck = {
+    timeout: 1000,//1s
+    timeoutObj: null,
+    reset: function(){
+        clearInterval(this.timeoutObj);
+        this.start();
+    },
+    start: function(ws){
+        if(null == this.timeoutObj) {
+	        this.timeoutObj = setInterval(function(){
+	            ws.send("HeartBeat");
+	        }, this.timeout)
+        }
+    }
+}
+
 function setLineChart(tag, color, charttype) {
     Highcharts.setOptions({
         global: {
@@ -614,7 +631,7 @@ $(function() {
         try {
             socket = new ReconnectingWebSocket(host);
             socket.onopen = function(msg) {
-                //log('Connected');
+                heartCheck.start(socket);
             };
             socket.onmessage = function(msg) {
 
