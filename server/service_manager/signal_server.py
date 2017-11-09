@@ -453,6 +453,9 @@ def start_smt_system(programs_file=CONFIG_FILE_NAME,
             
             convert = convert_signal(json_data, resource_broadcast_ip, resource_broadband_ip, avlogext_ip+':'+str(avlogext_port),static_resource_host,dir_name)
             packet = convert
+
+            program_num += 1
+            program_num = program_num % 10
             #print convert
 
             #if play_order_type is singleloop, set endtime to long time later
@@ -473,8 +476,6 @@ def start_smt_system(programs_file=CONFIG_FILE_NAME,
             if play_order_type == PlayOrderType.singleloop and i != 0:
                return               
             
-            program_num += 1
-            program_num = program_num % 10
 
             
 
