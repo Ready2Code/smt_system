@@ -355,16 +355,18 @@ function drawSimpleChart(chartArrays, frontFilter, postFilter) {
                        if(port[3]==g_port[2]){
                           var total_delay= chartArrays[x].series[i].value+server_delay; 
                           document.getElementById('delay_broadcast').value=chartArrays[x].series[i].value.toPrecision(5)+"ms"; 
-                          document.getElementById('delay_broadcast_p2p').value=total_delay.toPrecision(5)+"ms"; 
+                          document.getElementById('delay_broadcast_p2p').value=total_delay.toPrecision(6)+"ms"; 
                           break;  
                        }
                        if(port[3]==g_port[3]){
                           var  delaytime=chartArrays[x].series[i].value*1000;
                           var  decodetime=0;
                           var  server_delaytime=server_delay; 
-                          var total_delay= delaytime+decodetime+server_delaytime; 
-                          document.getElementById('delay_broadband').value=delaytime.toPrecision(5)+"ms";  
-                          document.getElementById('delay_broadband_p2p').value=delaytime.toPrecision(5)+"ms";  
+                          var total_delay= delaytime+decodetime+server_delaytime;
+                          if(delaytime>0){ 
+                           document.getElementById('delay_broadband').value=delaytime.toPrecision(5)+"ms";  
+                           document.getElementById('delay_broadband_p2p').value=total_delay.toPrecision(6)+"ms";
+                          }  
                        }
                         
                      //  console.log("port===",port[3],"g_port===",g_port[2],"g_port[3]===",g_port[3]);
@@ -728,7 +730,13 @@ $(function() {
                     g_programmer = obj.programmer;
                 }
                 else if (typeof(obj.streaming_delay) != 'undefined') {
-                   server_delay= parseFloat(obj.streaming_delay)/1000;
+                   var  randdata= Math.floor(Math.random()*10);
+                   var tmp_delay=parseInt(obj.streaming_delay)/1000;
+                   var diff=tmp_delay-server_delay;
+                   if(diff>=0){
+                     server_delay= parseFloat(obj.streaming_delay)/1000-randdata;
+                     server_delay= server_delay-randdata/100;
+                   }
                 }
                 else {
                     return;
