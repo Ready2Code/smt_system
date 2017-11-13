@@ -276,7 +276,7 @@ def call_ffmpeg(file_dir, res, port, resource_broadcast_ip, ffplay_port, avlogex
     #ffmpeg_command = ffmpeg_command + ' -re  {0} {1} -t {6} -i {2} -begintime {3} {4} -c:v copy -c:a aac -f mpu {5}'.format(str_port, playlist, file_dir, begintime, str_avlogext, str_output, delta) 
     ffmpeg_command = ffmpeg_command + ' -re ' + str_port + playlist \
                      + str_duration +' -i '+file_dir +' -begintime '+ begintime \
-                     + ' ' +str_avlogext +' -c:v copy -c:a aac -f mpu '+str_output
+                     + ' ' +str_avlogext +' -c:v copy -c:a copy -f mpu '+str_output
 
     print ffmpeg_command
 
