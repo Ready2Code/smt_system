@@ -288,6 +288,13 @@ def prompt_add():
 
 def prompt_del():
     prompt_add()
+
+    #kind should be 'broadcast', 'broadband', or 'none'
+def logo_show(kind):    
+    add_command = {'type':'logo','format': {'kind': kind}}
+    addcommand = json.dumps(add_command)
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    s.sendto(addcommand,("localhost", FFPLAY_LISTEN_PORT))
     
 def fullscreen(res):    
     full_command = {'type':'full','format': {'name': res['url']}}
