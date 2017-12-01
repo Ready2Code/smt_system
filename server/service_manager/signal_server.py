@@ -489,7 +489,6 @@ def update_signal(url,resource_broadcast_ip, resource_broadband_ip):
     program_data = url_load(url)
     json_data=json.loads(program_data)
     if json_data['programmer']['sequence'] <= sequence_number: 
-        print "nothing to update file <" , url , "> return \n"
         return
     print "update file <" , url , "> successful \n"
     sequence_number = json_data['programmer']['sequence']
