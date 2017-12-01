@@ -83,9 +83,13 @@ class SignalTimerThread(Thread):
         Thread.__init__(self)
         self.stopped = event
         self.dests = [dest]
+        self.program_url = ''
 
     def add_dest(self, dest):
         self.dests.append(dest)
+        
+    def update_url(self,file):
+        self.program_url = file
 
     def run(self):
         global signal_timer_thread_flag
@@ -96,6 +100,8 @@ class SignalTimerThread(Thread):
 
         while not self.stopped.wait(BROADCASE_TIME_INTERVAL):
             if signal_timer_thread_flag==1:
+                if self.program_url != '':
+                    update_signal(self.program_url, BROADCAST_SERVER_IP, BROADBAND_SERVER_IP)
                 for dest in self.dests:
                     delay_broadcast(s, packet, dest)
             else:
@@ -227,7 +233,6 @@ def convert_signal(json_data, resource_broadcast_ip, resource_broadband_ip,avlog
             t.daemon = True
             t.start()
             time.sleep(0.1)
-
     return json_data
 
 def get_begin_time_string(begin_time, zone_offset='default'):
@@ -454,6 +459,7 @@ def start_smt_system(programs_file=CONFIG_FILE_NAME,
             convert = convert_signal(json_data, resource_broadcast_ip, resource_broadband_ip, avlogext_ip+':'+str(avlogext_port),static_resource_host,dir_name)
             packet = convert
 
+            thread.update_url(url)
             program_num += 1
             program_num = program_num % 10
             #print convert
@@ -472,13 +478,40 @@ def start_smt_system(programs_file=CONFIG_FILE_NAME,
             time.sleep((endtime - datetime.now()).seconds)
 
             if play_order_type == PlayOrderType.onebyone and i == programmers[len(programmers)-1]:
-               return
+                return
             if play_order_type == PlayOrderType.singleloop and i != 0:
-               return               
-            
+                return               
 
-            
+def update_signal(url,resource_broadcast_ip, resource_broadband_ip):
+    global packet
+    global sequence_number
 
+    program_data = url_load(url)
+    json_data=json.loads(program_data)
+    if json_data['programmer']['sequence'] <= sequence_number: 
+        print "nothing to update file <" , url , "> return \n"
+        return
+    print "update file <" , url , "> successful \n"
+    sequence_number = json_data['programmer']['sequence']
+    packet['programmer']['sequence'] = sequence_number
+    resources = json_data['programmer']['resources']
+    for res in resources:
+        for item in packet['programmer']['resources']:
+            if item['id'] != res['id']: continue
+            if item['sequence'] >= res['sequence']: break
+            item['sequence'] = res['sequence']
+            if item['type'] == 'broadcast' and res['type'] == 'broadband':
+                ffplay_port = item['url'].split(':')[-1]
+                ffmpeg_port = ffplay_port[:1] + '1' + ffplay_port[2:]
+                item['url'] = 'smt://{0}:{1}@:{2}'.format(resource_broadband_ip, ffmpeg_port,ffplay_port)
+                item['type'] = 'broadband'
+            elif item['type'] == 'broadband' and res['type'] == 'broadcast':
+                    ffplay_port = item['url'].split(':')[-1]
+                    item['url'] = 'smt://{0}:{1}'.format(resource_broadcast_ip, ffplay_port)
+                    item['type'] = 'broadcast'    
+    print packet
+            
+            
 def get_current_programme():
     return packet
 

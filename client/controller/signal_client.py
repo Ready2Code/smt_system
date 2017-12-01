@@ -289,9 +289,8 @@ def prompt_add():
 def prompt_del():
     prompt_add()
 
-    #kind should be 'broadcast', 'broadband', or 'none'
-def logo_show(kind):    
-    add_command = {'type':'logo','format': {'kind': kind}}
+def logo_show(res):    
+    add_command = {'type':'logo','format': {'name':res['url'],'logo': res['type']}}
     addcommand = json.dumps(add_command)
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     s.sendto(addcommand,("localhost", FFPLAY_LISTEN_PORT))
