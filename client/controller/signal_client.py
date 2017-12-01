@@ -149,6 +149,7 @@ def call_ffplay(res):
     str_port=''
     #str_quick='-fflags nobuffer  -analyzeduration 100 -probesize 50 -framedrop '
     str_quick=' -analyzeduration 100 -probesize 50 -framedrop '
+    str_type = ' -type ' + res_type
         
     if platform.system() == "Windows":
         ffplay_command = RELATIVE_PATH + 'ffplay.exe' + ' '
@@ -167,7 +168,7 @@ def call_ffplay(res):
         #-sync smt 
         if ('bk' in res.keys()):
             str_bk = '-bk '+ res['bk'] + ' '
-        ffplay_command =(ffplay_command + str_sync + str_avlogext + res['url'] + ' ' + str_port + str_bk + str_quick)
+        ffplay_command =(ffplay_command + str_sync + str_avlogext + res['url'] + ' ' + str_port + str_bk + str_quick + str_type)
  
     print ffplay_command
     window_stack_clean()
@@ -229,9 +230,10 @@ def add_ffplay(res, full = DEFAULT):
     server_ip = ''
     name = ''
     (server_ip, name) = get_ip_and_name_from_url(url)
-    add_command = {'type':'add', 'server': '', 'format': {'name': '','fullscreen':'','posx':'','posy':'','width':'','height':'','kind':'video'}}
+    add_command = {'type':'add', 'server': '', 'format': {'name': '', 'type':'','fullscreen':'','posx':'','posy':'','width':'','height':'','kind':'video'}}
     add_command['server'] = server_ip
     add_command['format']['name'] = name
+    add_command['format']['type'] = res['type']
     if full == 'full': 
         add_command['format']['fullscreen'] = 1
         add_command['format']['kind'] = 'all'
@@ -289,8 +291,8 @@ def prompt_add():
 def prompt_del():
     prompt_add()
 
-def logo_show(res):    
-    add_command = {'type':'logo','format': {'name':res['url'],'logo': res['type']}}
+def type_update(res):    
+    add_command = {'type':'type','format': {'name':res['url'],'type': res['type']}}
     addcommand = json.dumps(add_command)
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     s.sendto(addcommand,("localhost", FFPLAY_LISTEN_PORT))
@@ -336,6 +338,8 @@ def UDP_recv(port, channel_id, name):
             print bcolors.WARNING + "\n{1} id [{0}] have an updated signaling ...".format(channel_id, name.encode('utf-8').strip()) + bcolors.ENDC
             if 'related' in json_data['programmer'].keys(): 
                 related = json_data['programmer']['related']
+            for res in json_data['programmer']['resources']:
+                type_update(res)            
                 # if related == 'true' and pffplay is not None:
                 #    t = Thread(target=prompt_add)
                     #   t.start()
