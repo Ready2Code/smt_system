@@ -16,6 +16,7 @@ from subprocess import call,Popen,PIPE,STDOUT
 from itertools import cycle
 from utils import functions
 import urllib, urlparse
+import traceback
 
 # This is a throwaway variable to deal with a python bug
 throwaway = datetime.strptime('20110101','%Y%m%d')
@@ -210,11 +211,14 @@ def convert_signal(json_data, resource_broadcast_ip, resource_broadband_ip,avlog
             if not os.path.isabs(res['poster']):
                 res['poster'] = os.path.normpath(dir_name+'/' + res['poster'])
             (path, name) = os.path.split(res['poster'])
-            shutil.copy(res['poster'], POSTER_PATH + name)
+            try:
+                shutil.copy(res['poster'], POSTER_PATH + name)
+            except:
+                print "copy error", res['poster'], ' ', POSTER_PATH + name
             res['poster'] = 'http://' + static_resource_host + '/static/' + name
             
         #print str(res['begin'])
-
+        res['ffmpeg_port'] = ffmpeg_port
         t = Thread(target=call_ffmpeg, args=(localfile, res, ffmpeg_port, resource_broadcast_ip, ffplay_port, avlogext))
         t.daemon = True
         t.start()
@@ -482,14 +486,54 @@ def start_smt_system(programs_file=CONFIG_FILE_NAME,
             if play_order_type == PlayOrderType.singleloop and i != 0:
                 return               
 
+def notify_bitrate_change(bitrate_str, dest):
+    global s
+    print "notify (", dest,") bitrate_change, new bitrate = ", bitrate_str
+    try:
+        bitrate_str = bitrate_str.replace(" ", "").lower()
+        multiplier = 1
+
+        if bitrate_str[-1] == 'k':
+            multiplier = 1024
+        elif bitrate_str[-1] == 'm':
+            multiplier = 1024 * 1024
+        elif bitrate_str[-1] == 'g':
+            multiplier = 1024 * 1024 * 1024
+        if multiplier == 1:
+            bitrate = int(bitrate_str)   
+        else:
+            bitrate = int(bitrate_str[:-1]) 
+        bitrate = bitrate * multiplier
+
+        cmd = {}
+        cmd["type"] = "set"
+        cmd["input_bandwidth"] = bitrate
+        s.sendto(json.dumps(cmd), dest)
+    except Exception, e:
+        print traceback.format_exc()
+    
+def check_bitrate(json_data,resource_broadcast_ip, resource_broadband_ip):
+    resources = json_data['programmer']['resources']
+    for res in resources:
+        for item in packet['programmer']['resources']:
+            if item['id'] != res['id']: continue
+            if item['bitrate'] != res['bitrate']:
+                item['bitrate'] = res['bitrate']
+                notify_bitrate_change(item['bitrate'], (resource_broadband_ip,int(item['ffmpeg_port'])))
+
+
 def update_signal(url,resource_broadcast_ip, resource_broadband_ip):
     global packet
     global sequence_number
 
-    program_data = url_load(url)
-    json_data=json.loads(program_data)
+    try:
+        program_data = url_load(url)
+        json_data=json.loads(program_data)
+    except Exception, e:
+        print traceback.format_exc()
     if json_data['programmer']['sequence'] <= sequence_number: 
         return
+    check_bitrate(json_data, resource_broadcast_ip, resource_broadband_ip)
     print "update file <" , url , "> successful \n"
     sequence_number = json_data['programmer']['sequence']
     packet['programmer']['sequence'] = sequence_number
@@ -507,7 +551,7 @@ def update_signal(url,resource_broadcast_ip, resource_broadband_ip):
             elif item['type'] == 'broadband' and res['type'] == 'broadcast':
                     ffplay_port = item['url'].split(':')[-1]
                     item['url'] = 'smt://{0}:{1}'.format(resource_broadcast_ip, ffplay_port)
-                    item['type'] = 'broadcast'    
+                    item['type'] = 'broadcast'   
     print packet
             
             
