@@ -88,6 +88,8 @@ function get_program_list_data() {
         for(var i=0; i< resources.length; i++) {
             newtr = newtr + "<tr class='programme_info'> "
         console.log(resources[i].poster)
+        console.log("added======",resources[i].added)
+		if(resources[i].added == 'true'){
         newtr = newtr + "<td > <a href='#'><img src=" + resources[i].poster + " alt=" + resources[i].name +" </td>"
         newtr = newtr + "<td > <button resource_id='" + resources[i].id + "' " 
         + "channel_id='" + ret.channel_id + "' "
@@ -103,8 +105,9 @@ function get_program_list_data() {
             newtr = newtr + "<td > <button ad_url='" + resources[i].adurl + "' " 
         + "class='process_resource_ad'>"+resources[i].adname+"</button> </td>"
         }*/
-    newtr = newtr + "</tr>"
-        }
+        newtr = newtr + "</tr>"
+		}
+       }
     $("#programmeinfo").append(newtr);
     $("#programmeinfo").trigger('create');
     set_programme_process_response()
