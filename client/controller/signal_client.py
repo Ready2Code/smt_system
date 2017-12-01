@@ -308,6 +308,7 @@ def UDP_recv(port, channel_id, name):
     global related
     global channels_info
     last_sequence = sequence
+    last_id = ""
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     print 'binding sigalling port=%d' % port
     s.bind(('', port))
@@ -329,8 +330,10 @@ def UDP_recv(port, channel_id, name):
 
         if(is_continue_play and
            continue_play_channel == channel_id and
-           json_data['programmer']['sequence'] > sequence):
+           json_data['programmer']['sequence'] > sequence and
+           json_data['programmer']['id'] != last_id ):
             sequence = json_data['programmer']['sequence']
+            last_id = json_data['programmer']['id']
             play_json(json_data)
 
         if json_data['programmer']['sequence'] > last_sequence:
