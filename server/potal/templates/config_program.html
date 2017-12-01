@@ -26,23 +26,28 @@
 			 <table id='programme_list' border="1" > 
 			   <td><button type="button" id="addBt">添加节目</button> </td>
 			   <td>名称</td>
-			   <td> 参数</td>
+			   <td> 资源</td>
 			   <td> 向下</td>
 			   <td> 向上</td>
 			   <td>删除</td>
 			   <td>查看文件</td>
 		   <hr/>
+		   <hr style="border:none"/>
+			 <table id='addresource_list' border="1" > 
+			   <td>资源名称</td>
 			 <table id='content_list' border="1" > 
+			   <td><button type="button" id="addresourceBt">添加资源</button> </td>
 			   <td>名字 </td>
 			   <td>码率 </td>
 			   <td> 网络</td>
 			   <td> 路径</td>
 			   <td> 布局</td>
-			   <td> 提交</td>
-			   <td> 关闭</td>
+			   <td> 删除</td>
+			   <td><button type="button" id="submitBt"> 提交</button> </td>
+			   <td><button type="button" id="closeBt">关闭</button> </td>
 		   <hr style="border:none"/>
 			 <table id='addprogramme_list' border="1" > 
-			   <td>名称</td>
+			   <td>节目名称</td>
 		   <hr/>
 			 <table id='broadcast_info_list' border="0" >
 			  <tr>
@@ -221,6 +226,66 @@
 				 }					   
 			    });	
 			}
+		    function set_resource_added_delete(path,resource_name,added){
+			   $.ajax({
+				 type:"GET",
+				 dataType:"json",
+				 url:"/config_program/get_config_file/",
+				 data:{path:path},
+				 async:false,
+				 success:function(data){
+			       var jsonObj=JSON.parse(data)
+                   resource=jsonObj.programmer.resources			   
+				   for(var i=0;i<resource.length;i++){
+				    if(resource[i].name==resource_name){
+					  resource[i].added=added
+					  break
+					}
+				   
+				   }
+			       var json_data=JSON.stringify(jsonObj).replace(/\\n/g,"\\n").replace(/\\r/g,"\\n")
+				   if(added=='true'){
+				     get_content_list(jsonObj)
+				   }
+			       set_config_file(json_data,path)
+				 }					   
+			    });	
+			}
+		    function set_resource_info(path){
+			   $.ajax({
+				 type:"GET",
+				 dataType:"json",
+				 url:"/config_program/get_config_file/",
+				 data:{path:path},
+				 async:false,
+				 success:function(data){
+			       var jsonObj=JSON.parse(data)
+				   var programmer=jsonObj.programmer
+                   resource=jsonObj.programmer.resources			   
+				   for(var i=0;i<resource.length;i++){
+                     var tb_content_list=document.getElementById('content_list')
+			         for(j=1;j<tb_content_list.rows.length;j++){
+					    var name=tb_content_list.rows[j].cells[1].innerHTML
+				       if(resource[i].name==name){
+				    	 var bitrate=tb_content_list.rows[j].cells[2].childNodes[0].value
+			             var type=tb_content_list.rows[j].cells[3].childNodes[0].value
+					     var url=tb_content_list.rows[j].cells[4].childNodes[0].value
+						 resource[i].url=url
+						 resource[i].bitrate=bitrate
+						 if(resource[i].type != type){
+						   programmer.sequence=programmer.sequence+1
+						   resource[i].type=type
+						   resource[i].sequence=resource[i].sequence+1
+						 }
+						 break
+						}
+               	      }  
+				   }
+			       var json_data=JSON.stringify(jsonObj).replace(/\\n/g,"\\n").replace(/\\r/g,"\\n")
+			       set_config_file(json_data,path)
+				 }					   
+			    });	
+			}
             
 		    function set_programme_process_response() {
                 $("#play_order_type").unbind('change').bind('change', function() {
@@ -231,7 +296,6 @@
 		        $("button.process_resource").unbind('click').bind('click',function(){
 		              var name=$(this).attr('programmename')
 		              var path=$(this).attr('path')
-		              console.log(path)
                       get_programme_list(name,path)
 					  var data = set_programmes_file()
 					  add_programmes(data,name,path)
@@ -259,7 +323,7 @@
 			     newtr = newtr + "<tr class='programme_list'> "
 				 newtr = newtr + "<td ></td>"
 				 newtr = newtr + "<td ><button type='button' programmename='"+name+" '"+"  class='process_resource_programme'>"+name+"</button></td>"
-				 newtr = newtr + "<td ><button type='button'  path="+path+""+"  programmename='"+name+" '"+"  class='process_resource_info'>"+"参数"+"</button></td>"
+				 newtr = newtr + "<td ><button type='button'  path="+path+""+"  programmename='"+name+" '"+"  class='process_resource_info'>"+"资源"+"</button></td>"
 				 newtr = newtr + "<td ><button type='button'  path="+path+""+"  programmename='"+name+" '"+"  class='process_resource_down'>"+"向下"+"</button></td>"
 				 newtr = newtr + "<td ><button type='button'  path="+path+""+"  programmename='"+name+" '"+"  class='process_resource_up'>"+"向上"+"</button></td>"
 				 newtr = newtr + "<td ><button type='button'  path="+path+""+"  programmename='"+name+" '"+"  class='process_resource_delete'>"+"删除"+"</button></td>"
@@ -273,6 +337,7 @@
 
 		       $("button.process_resource_info").unbind('click').bind('click',function(){
 			        $("#content_list").show()
+				    $("#addresource_list").hide()
 				    path= $(this).attr('path')
 				    path=path.split("file://")
 				    path=path.join('')
@@ -367,39 +432,59 @@
 			    return value
 			}
             function on_network_type_change() {
-                mlist =  $(".content_list") 
-                sum_bitrate = 0
-                for(i = 0; i < mlist.length; i ++ ) {
-                    //console.log(mlist[i])
-                    if('broadcast' == $(mlist[i]).find("td select")[0].value) {
-                        //sum_bitrate += $(mlist[i]).find("td.bitrate_value")[0].value
-                        mbitrate = $(mlist[i]).find(".bitrate_value")[0].value
-                        value = get_bitrate_from_string(mbitrate)
-                        if(!isNaN(value)) {
-                           sum_bitrate += value
-                        } 
-                    }
-                }
-                $("#broadcast_used_bandwidth")[0].innerHTML = String(sum_bitrate)+"M"
-                total_bitrate = get_bitrate_from_string($("#broadcast_total_bandwidth")[0].innerHTML)
-                $("#broadcast_free_bandwidth")[0].innerHTML = String(total_bitrate - sum_bitrate)+"M"
-                on_bandwidth_change($("#broadcast_free_bandwidth")[0].innerHTML)
+                  var tb_content_list=document.getElementById('content_list')
+                  var sum_bitrate = 0
+			      for(j=1;j<tb_content_list.rows.length;j++){
+				   var bitrate=tb_content_list.rows[j].cells[2].childNodes[0].value
+
+			       var type=tb_content_list.rows[j].cells[3].childNodes[0].value
+				   if(type=='broadcast'){
+                     var value = get_bitrate_from_string(bitrate)
+                     if(!isNaN(value)) {
+                        sum_bitrate += value
+                      } 
+					}
+               	 }  
+                 $("#broadcast_used_bandwidth")[0].innerHTML = String(sum_bitrate)+"M"
+                 total_bitrate = get_bitrate_from_string($("#broadcast_total_bandwidth")[0].innerHTML)
+                 $("#broadcast_free_bandwidth")[0].innerHTML = String(total_bitrate - sum_bitrate)+"M"
+                 on_bandwidth_change($("#broadcast_free_bandwidth")[0].innerHTML)
             }
             function get_content_list(jsonObj){
                resource=jsonObj.programmer.resources			   
-               console.log(jsonObj.play_order_type)
                $("tr.content_list").remove()
+               $("tr.addresource_list").remove()
                $("tr.broadcast_info_list").remove()
-			   console.log("get content list file!!")
 			   var newtr = ""
+			   var newtr2 = ""
+			   var newtrbitrate=""
 			   var used_bitrate=0
+			   var close_bt=1
 			   for(var i=0; i< resource.length; i++) {
-			     newtr = newtr + "<tr class='content_list'> "
+				if(resource[i].added=='false'){
+			     newtr2 = newtr2 + "<tr class='addresource_list'> "
+			     newtr2 = newtr2 + "<td ><button type='button'  resourcename='"+resource[i].name+"'"+"  class='process_add_resource'>"+resource[i].name+"</button></td>"
+				}
+				else if(resource[i].added=='true'){
+				 newtr = newtr + "<tr class='content_list'> "
+				 newtr = newtr + "<td ></td>"
 				 newtr = newtr + "<td >"+resource[i].name+"</td>"
-				 newtr = newtr + "<td ><input type='text' id='bitrate"+i+"' class='bitrate_value' value="+resource[i].bitrate+"></td>"
+				 var bitrate=''
+				 for(var j=-1;j<resource[i].vbr.length;j++){
+				   if(j==-1){
+				      bitrate=resource[i].bitrate
+				   }
+				   else{
+				      bitrate=resource[i].vbr[j]
+					  if(bitrate==resource[i].bitrate)
+						  continue
+				   }
+				    newtrbitrate = newtrbitrate + "<option value='" +bitrate + "'>"+bitrate+"</option>"
+				 }
+				 newtr=newtr + "<td ><select id='select"+i+"' onchange='on_network_type_change()'>"+ newtrbitrate +"</select></td>"
+				 newtrbitrate=""
 			     if(resource[i].type=='broadcast'){
 				   used_bitrate +=get_bitrate(resource[i].bitrate)
-				   console.log(used_bitrate)
 				   newtr = newtr + "<td ><select id='select"+i+"' onchange='on_network_type_change()'>"+"<option value='"+resource[i].type+"'>广播</option>"+"<option value='broadband'>宽带</option>"+"</select></td>"
 			     }else{
 				   newtr = newtr + "<td ><select id='select"+i+"' onchange='on_network_type_change()'>"+"<option value='"+resource[i].type+"'>宽带</option>"+"<option value='broadcast'>广播</option>"+"</select></td>"
@@ -407,10 +492,15 @@
 			     }
 				 newtr = newtr + "<td ><input type='text' id='text"+i+"' value="+resource[i].url+"></td>"
 				 newtr = newtr + "<td ><button type='button' id='layout"+i+"'  posx='"+resource[i].layout.posx+"'  posy='"+resource[i].layout.posy+"'  width='"+resource[i].layout.width+"'   height='"+resource[i].layout.height+"'"+" class='process_resource_layout'>布局</button></td>"
-				 newtr = newtr + "<td ><button type='button' number='"+i+"' bitrate_id='bitrate"+i+"'  text_id='text"+i+"' layout_id='layout"+i+"' select_id='select"+i+"'  path="+resource[i].url+""+" name='"+resource[i].name+" '"+"  posx='"+resource[i].layout.posx+"'"+"  posy='"+resource[i].layout.posy+"'"+"  width='"+resource[i].layout.width+"'"+"  height='"+resource[i].layout.height+"'"+" class='process_resource_submit'>提交</button></td>"
-		      }
-			  newtr=newtr+"<td rowspan='2'><button type='button' id='close'>关闭</button></td>"
+			//	 newtr = newtr + "<td ><button type='button' number='"+i+"' bitrate_id='bitrate"+i+"'  text_id='text"+i+"' layout_id='layout"+i+"' select_id='select"+i+"'  path="+resource[i].url+""+" name='"+resource[i].name+" '"+"  posx='"+resource[i].layout.posx+"'"+"  posy='"+resource[i].layout.posy+"'"+"  width='"+resource[i].layout.width+"'"+"  height='"+resource[i].layout.height+"'"+" class='process_resource_submit'>提交</button></td>"
+				 newtr = newtr + "<td ><button type='button'  resourcename='"+resource[i].name+"'"+"  class='process_delete_resource'>"+"删除"+"</button></td>"
+				if(close_bt=='1'){
+			       //newtr=newtr+"<td rowspan='2'><button type='button' id='close'>关闭</button></td>"
+				 }
+		       }
+			  }
 			  $("#content_list").append(newtr)
+			  $("#addresource_list").append(newtr2)
               
               var tb=document.getElementById('broadcast_info_list')
 			  var total_bandwidth=get_bitrate(tb.rows[0].cells[1].innerHTML)
@@ -433,10 +523,10 @@
 				   var height= $(this).attr('height')
 			       var newtr = ""
 			       newtr = newtr + "<tr class='layout_list'> "
-				   newtr = newtr + "<td ><input type='text' id='input_posx'   father_id="+$(this).attr('id')+"  value="+posx+"></td>"
-				   newtr = newtr + "<td ><input type='text' id='input_posy'   father_id="+$(this).attr('id')+"  value="+posy+"></td>"
-				   newtr = newtr + "<td ><input type='text' id='input_width'  father_id="+$(this).attr('id')+"  value="+width+"></td>"
-				   newtr = newtr + "<td ><input type='text' id='input_height' father_id="+$(this).attr('id')+"  value="+height+"></td>"
+				   newtr = newtr + "<td ><input type='text' id='input_posx'   father_id="+$(this).attr('id')+"  value="+posx+" readonly></td>"
+				   newtr = newtr + "<td ><input type='text' id='input_posy'   father_id="+$(this).attr('id')+"  value="+posy+" readonly></td>"
+				   newtr = newtr + "<td ><input type='text' id='input_width'  father_id="+$(this).attr('id')+"  value="+width+" readonly></td>"
+				   newtr = newtr + "<td ><input type='text' id='input_height' father_id="+$(this).attr('id')+"  value="+height+" readonly></td>"
 			       $("#addprogramme_list").after($("#layout_list").append(newtr))
 				   $("#layout_list").show()
 		    	})
@@ -487,12 +577,44 @@
 				   set_global_info_value(type_val,url_val,new_posx,new_posy,new_width,new_height,new_number,bitrate_val)
 		           set_programme_info(path)                    
 			   })
+		       $("button.process_delete_resource").unbind('click').bind('click',function(){
+
+			     var $tr=$(this).parents("tr")
+				 var currentIndex=$tr.index()
+			     document.all.content_list.deleteRow(currentIndex)
+				 var added='false'
+				 var resource_name=$(this).attr('resourcename')
+			     set_resource_added_delete(path,resource_name,added)
+				 /*var data = set_programmes_file()
+				 del_programmes(data, currentIndex-1,path)
+				 $("#layout_list").hide()
+				 $("#content_list").hide()
+			     $("#broadcast_info_list").hide()*/                      
+			  })
+		      $("button.process_add_resource").unbind('click').bind('click',function(){
+					  var resource_name=$(this).attr('resourcename')
+					  var added='true'
+					  set_resource_added_delete(path,resource_name,added)
+			  })
 			}
             clean_addprogramme_list=false
             function get_addprogramme_list(jsonObj,current_path){
               if(clean_addprogramme_list){
 			      $("tr.addprogramme_list").remove()
                   clean_addprogramme_list=false
+			  }
+               var addprogramme_obj=jsonObj.programmer			   
+			   var newtr = ""
+			   newtr = newtr + "<tr class='addprogramme_list'> "
+			   newtr = newtr + "<td ><button type='button'  path="+current_path+"  programmename='"+addprogramme_obj.name+" '"+"  class='process_resource'>"+addprogramme_obj.name+"</button></td>"
+			   $("#addprogramme_list").append(newtr)
+			   set_programme_process_response()
+			}
+            clean_addresource_list=false
+            function get_addresource_list(jsonObj,current_path){
+              if(clean_addresource_list){
+			      $("tr.addresource_list").remove()
+                  clean_addresource_list=false
 			  }
                var addprogramme_obj=jsonObj.programmer			   
 			   var newtr = ""
@@ -581,7 +703,18 @@
 			   $("#addBt").click(function(){ 
 			     get_file_list("")
 				 $("#addprogramme_list").show()
-				   
+			   })
+			   $("#addresourceBt").click(function(){
+				   get_programme_info(path)
+				   $("#addresource_list").show()
+			   })
+			  $('#closeBt').click(function(){
+				   $("#layout_list").hide()
+				   $("#content_list").hide()
+			       $("#broadcast_info_list").hide()                      
+			   })
+			  $('#submitBt').click(function(){
+				  set_resource_info(path)
 			   })
                get_broadcast_max_bandwidth()
 			   var data=set_programmes_file()
@@ -589,6 +722,7 @@
 			   set_programme_process_response()
 			   $("#layout_list").hide()
 			   $("#addprogramme_list").hide()
+			   $("#addresource_list").hide()
 			   $("#content_list").hide()
 			   $("#broadcast_info_list").hide()
 			   $("#start").click(function(){
