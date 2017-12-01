@@ -235,11 +235,13 @@
 				 async:false,
 				 success:function(data){
 			       var jsonObj=JSON.parse(data)
+				   var programmer=jsonObj.programmer			   
                    resource=jsonObj.programmer.resources			   
 				   for(var i=0;i<resource.length;i++){
 				    if(resource[i].name==resource_name){
-					  if(typeof(resource[i].added) !='undefined')
 					   resource[i].added=added
+					   resource[i].sequence +=1
+					   programmer.sequence +=1
 					   break
 					  }
 					}
@@ -270,12 +272,12 @@
 				    	 var bitrate=tb_content_list.rows[j].cells[2].childNodes[0].value
 			             var type=tb_content_list.rows[j].cells[3].childNodes[0].value
 					     var url=tb_content_list.rows[j].cells[4].childNodes[0].value
-						 resource[i].url=url
-						 resource[i].bitrate=bitrate
-						 if(resource[i].type != type){
+						 if((resource[i].type != type || resource[i].url !=url) || resource[i].bitrate != bitrate){
 						   programmer.sequence=programmer.sequence+1
 						   resource[i].type=type
+						   resource[i].url=url
 						   resource[i].sequence=resource[i].sequence+1
+						   resource[i].bitrate=bitrate
 						 }
 						 break
 						}
