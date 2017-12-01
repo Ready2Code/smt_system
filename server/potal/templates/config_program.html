@@ -238,11 +238,11 @@
                    resource=jsonObj.programmer.resources			   
 				   for(var i=0;i<resource.length;i++){
 				    if(resource[i].name==resource_name){
-					  resource[i].added=added
-					  break
+					  if(typeof(resource[i].added) !='undefined')
+					   resource[i].added=added
+					   break
+					  }
 					}
-				   
-				   }
 			       var json_data=JSON.stringify(jsonObj).replace(/\\n/g,"\\n").replace(/\\r/g,"\\n")
 				   if(added=='true'){
 				     get_content_list(jsonObj)
@@ -480,6 +480,46 @@
 						  continue
 				   }
 				    newtrbitrate = newtrbitrate + "<option value='" +bitrate + "'>"+bitrate+"</option>"
+				 }
+				 newtr=newtr + "<td ><select id='select"+i+"' onchange='on_network_type_change()'>"+ newtrbitrate +"</select></td>"
+				 newtrbitrate=""
+			     if(resource[i].type=='broadcast'){
+				   used_bitrate +=get_bitrate(resource[i].bitrate)
+				   newtr = newtr + "<td ><select id='select"+i+"' onchange='on_network_type_change()'>"+"<option value='"+resource[i].type+"'>广播</option>"+"<option value='broadband'>宽带</option>"+"</select></td>"
+			     }else{
+				   newtr = newtr + "<td ><select id='select"+i+"' onchange='on_network_type_change()'>"+"<option value='"+resource[i].type+"'>宽带</option>"+"<option value='broadcast'>广播</option>"+"</select></td>"
+			   
+			     }
+				 newtr = newtr + "<td ><input type='text' id='text"+i+"' value="+resource[i].url+"></td>"
+				 newtr = newtr + "<td ><button type='button' id='layout"+i+"'  posx='"+resource[i].layout.posx+"'  posy='"+resource[i].layout.posy+"'  width='"+resource[i].layout.width+"'   height='"+resource[i].layout.height+"'"+" class='process_resource_layout'>布局</button></td>"
+			//	 newtr = newtr + "<td ><button type='button' number='"+i+"' bitrate_id='bitrate"+i+"'  text_id='text"+i+"' layout_id='layout"+i+"' select_id='select"+i+"'  path="+resource[i].url+""+" name='"+resource[i].name+" '"+"  posx='"+resource[i].layout.posx+"'"+"  posy='"+resource[i].layout.posy+"'"+"  width='"+resource[i].layout.width+"'"+"  height='"+resource[i].layout.height+"'"+" class='process_resource_submit'>提交</button></td>"
+				 newtr = newtr + "<td ><button type='button'  resourcename='"+resource[i].name+"'"+"  class='process_delete_resource'>"+"删除"+"</button></td>"
+				if(close_bt=='1'){
+			       //newtr=newtr+"<td rowspan='2'><button type='button' id='close'>关闭</button></td>"
+				 }
+		       }
+				else if( typeof(resource[i].added)=="undefined"){
+				console.log("added3========",resource[i].added)
+				 newtr = newtr + "<tr class='content_list'> "
+				 newtr = newtr + "<td ></td>"
+				 newtr = newtr + "<td >"+resource[i].name+"</td>"
+				 var bitrate=''
+				 if(typeof(resource[i].vbr) !='undefined'){
+				  for(var j=-1;j<resource[i].vbr.length;j++){
+				   if(j==-1){
+				      bitrate=resource[i].bitrate
+				   }
+				   else{
+				      bitrate=resource[i].vbr[j]
+					  if(bitrate==resource[i].bitrate)
+						  continue
+				   }
+				    newtrbitrate = newtrbitrate + "<option value='" +bitrate + "'>"+bitrate+"</option>"
+				  }
+				 }
+				 else{
+				   bitrate=resource[i].bitrate
+				   newtrbitrate = newtrbitrate + "<option value='" +bitrate + "'>"+bitrate+"</option>"
 				 }
 				 newtr=newtr + "<td ><select id='select"+i+"' onchange='on_network_type_change()'>"+ newtrbitrate +"</select></td>"
 				 newtrbitrate=""
