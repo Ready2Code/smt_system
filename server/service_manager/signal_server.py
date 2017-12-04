@@ -533,8 +533,8 @@ def update_signal(url,resource_broadcast_ip, resource_broadband_ip):
         json_data=json.loads(program_data)
     except Exception, e:
         print traceback.format_exc()
-    if json_data['programmer']['sequence'] <= sequence_number: 
-        return
+    if json_data['programmer']['sequence'] <= sequence_number:
+		return
     check_bitrate(json_data, resource_broadcast_ip, resource_broadband_ip)
     print "update file <" , url , "> successful \n"
     sequence_number = json_data['programmer']['sequence']
@@ -545,7 +545,7 @@ def update_signal(url,resource_broadcast_ip, resource_broadband_ip):
             if item['id'] != res['id']: continue
             if item['sequence'] >= res['sequence']: break
             item['sequence'] = res['sequence']
-            item['add'] = res['add']
+            item['added'] = res['added']
             if item['type'] == 'broadcast' and res['type'] == 'broadband':
                 ffplay_port = item['url'].split(':')[-1]
                 ffmpeg_port = ffplay_port[:1] + '1' + ffplay_port[2:]
