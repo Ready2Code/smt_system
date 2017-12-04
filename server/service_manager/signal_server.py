@@ -545,6 +545,7 @@ def update_signal(url,resource_broadcast_ip, resource_broadband_ip):
             if item['id'] != res['id']: continue
             if item['sequence'] >= res['sequence']: break
             item['sequence'] = res['sequence']
+            item['add'] = res['add']
             if item['type'] == 'broadcast' and res['type'] == 'broadband':
                 ffplay_port = item['url'].split(':')[-1]
                 ffmpeg_port = ffplay_port[:1] + '1' + ffplay_port[2:]
