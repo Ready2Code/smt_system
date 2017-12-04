@@ -168,6 +168,7 @@ def convert_signal(json_data, resource_broadcast_ip, resource_broadband_ip,avlog
     json_data['programmer']['sequence'] = sequence_number
     json_data['programmer']['begin'] = update_delta_time(json_data['programmer']['begin'], endtime)
     json_data['programmer']['end'] = update_delta_time(json_data['programmer']['end'], endtime)
+    json_data['programmer']['id'] += '@' + json_data['programmer']['begin'].strftime("%Y%m%d%H%M%S")
 
     resources = json_data['programmer']['resources']
     for res in resources:
@@ -462,6 +463,7 @@ def start_smt_system(programs_file=CONFIG_FILE_NAME,
             
             convert = convert_signal(json_data, resource_broadcast_ip, resource_broadband_ip, avlogext_ip+':'+str(avlogext_port),static_resource_host,dir_name)
             packet = convert
+            print packet
 
             thread.update_url(url)
             program_num += 1
