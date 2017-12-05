@@ -359,12 +359,12 @@ function drawSimpleChart(chartArrays, frontFilter, postFilter) {
                           break;  
                        }
                        if(port[3]==g_port[3]){
-                          var  delaytime=chartArrays[x].series[i].value*1000;
+                          var  delaytime=chartArrays[x].series[i].value;
                           var  decodetime=0;
                           var  server_delaytime=server_delay; 
                           var total_delay= delaytime+decodetime+server_delaytime;
                           if(delaytime>0){ 
-                           document.getElementById('delay_broadband').value=delaytime.toPrecision(5)+"ms";  
+                           document.getElementById('delay_broadband').value=delaytime.toPrecision(3)+"ms";  
                            document.getElementById('delay_broadband_p2p').value=total_delay.toPrecision(6)+"ms";
                           }  
                        }
