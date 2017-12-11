@@ -261,6 +261,7 @@ def call_ffmpeg(file_dir, res, port, resource_broadcast_ip, ffplay_port, avlogex
     str_avlogext = ''
     str_output = ''
     str_port = ''
+    str_bitrate = ''
     if('playlist' in res.keys()): playlist = '-f concat'
     if platform.system() == "Windows":
         ffmpeg_command = SETTING_RELATIVE_PATH + 'ffmpeg.exe'
@@ -269,6 +270,10 @@ def call_ffmpeg(file_dir, res, port, resource_broadcast_ip, ffplay_port, avlogex
 
     if(len(avlogext) != 0):
         str_avlogext = '-avlogext ' + avlogext + ' -deviceinfo ' + res['id']
+
+    if res.has_key("bitrate"):
+        bitrate = get_bitrate_from_str(res["bitrate"])
+        str_bitrate = " -input_bandwidth %f" % bitrate
 
     if(res_type == 'broadband' or resource_broadcast_ip == ''):
         str_port ='-port %s' % port
@@ -284,7 +289,7 @@ def call_ffmpeg(file_dir, res, port, resource_broadcast_ip, ffplay_port, avlogex
         str_duration = ' -t %s' % delta
 
     #ffmpeg_command = ffmpeg_command + ' -re  {0} {1} -t {6} -i {2} -begintime {3} {4} -c:v copy -c:a aac -f mpu {5}'.format(str_port, playlist, file_dir, begintime, str_avlogext, str_output, delta) 
-    ffmpeg_command = ffmpeg_command + ' -re ' + str_port + playlist \
+    ffmpeg_command = ffmpeg_command + ' -re ' + str_port + playlist + str_bitrate\
                      + str_duration +' -i '+file_dir +' -begintime '+ begintime \
                      + ' ' +str_avlogext +' -c:v copy -c:a copy -f mpu '+str_output
 
@@ -488,13 +493,11 @@ def start_smt_system(programs_file=CONFIG_FILE_NAME,
             if play_order_type == PlayOrderType.singleloop and i != 0:
                 return               
 
-def notify_bitrate_change(bitrate_str, dest):
-    global s
-    print "notify (", dest,") bitrate_change, new bitrate = ", bitrate_str
+def get_bitrate_from_str(bitrate_str):
+    bitrate = 0
     try:
         bitrate_str = bitrate_str.replace(" ", "").lower()
         multiplier = 1
-
         if bitrate_str[-1] == 'k':
             multiplier = 1024
         elif bitrate_str[-1] == 'm':
@@ -505,8 +508,16 @@ def notify_bitrate_change(bitrate_str, dest):
             bitrate = float(bitrate_str)   
         else:
             bitrate = float(bitrate_str[:-1]) 
-        bitrate = bitrate * multiplier
-
+        bitrate = bitrate * multiplier 
+    except Exception, e:
+        print traceback.format_exc()
+    return bitrate
+        
+def notify_bitrate_change(bitrate_str, dest):
+    global s
+    print "notify (", dest,") bitrate_change, new bitrate = ", bitrate_str
+    try:
+        bitrate = get_bitrate_from_str(bitrate_str)
         cmd = {}
         cmd["type"] = "set"
         cmd["input_bandwidth"] = bitrate
