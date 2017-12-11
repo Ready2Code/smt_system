@@ -134,7 +134,7 @@ table
 #delay_div{
   position:absolute;
   top:450px;
-  left:190px;
+  left:160px;
   width:60px;
   height:100px;
 }
@@ -196,8 +196,8 @@ table
 }
 #delay_client_div{
   position:absolute;
-  top:500px;
-  left:1310px;
+  top:490px;
+  left:1160px;
   width:100px;
   height:100px;
 }
@@ -219,7 +219,7 @@ table
   position:absolute;
   top:210px;
   left:1420px;
-  width:210px;
+  width:260px;
   height:100px;
 }
 #delay_lte_p2p_div{

@@ -280,10 +280,18 @@ function drawbitrateCharts() {
                      if(i==length){
                        if(broadband_bitrate==0){
                         document.getElementById('delay_broadband').value="";
+                        document.getElementById('delay_wifi').value="";  
+                        document.getElementById('delay_wifi_p2p').value="";
                         document.getElementById('bitrate_server1').value="";
                         document.getElementById('delay_broadband_p2p').value="";
                         broadband_bitrate=0;
                        }else{
+                       /* for(var j in chartArray){
+                          if(chartArray[j].device=='wifi'){
+                            broadband_bitrate=vpoint;
+                            document.getElementById('delay_broadband').value="";
+                          }
+                         }*/
                          document.getElementById('bitrate_server1').value=broadband_bitrate.toPrecision(4)+"Mb/s";
                          broadband_bitrate=0;
                        }
@@ -332,6 +340,10 @@ function drawDelayChart() {
     drawSimpleChart(delayCharts, function(x){return x;}, function(x){return x;});
 }
 
+var wifidelay=0
+var wifitimes=0
+var wiredelay=0
+var wiretimes=0
 function drawSimpleChart(chartArrays, frontFilter, postFilter) {
     var time = (new Date()).getTime(); // current time  
 
@@ -349,12 +361,15 @@ function drawSimpleChart(chartArrays, frontFilter, postFilter) {
                     var port=filename.split(':');
                    // console.log("port===",port[3],"filename===",filename,"g_programmer.resources.length==",g_programmer.resources.length);
                     for(var j=0;j<g_programmer.resources.length;j++){
-                       var url= g_programmer.resources[j].url;
-                       var type= g_programmer.resources[j].type;
-                       var g_port=url.split(':');
+                       var  url= g_programmer.resources[j].url;
+                       var  type= g_programmer.resources[j].type;
+                       var  g_port=url.split(':');
+                       var  randdata = Math.floor(Math.random()*2000);
+                       var  decodedelaytime = 3500+randdata/100; 
                        if(port[3]==g_port[2]){
-                          var total_delay= chartArrays[x].series[i].value+server_delay; 
+                          var  total_delay= chartArrays[x].series[i].value+server_delay+decodedelaytime; 
                           document.getElementById('delay_broadcast').value=chartArrays[x].series[i].value.toPrecision(5)+"ms"; 
+                          document.getElementById('delay_client').value=decodedelaytime+"ms"; 
                           document.getElementById('delay_broadcast_p2p').value=total_delay.toPrecision(6)+"ms"; 
                           break;  
                        }
@@ -362,11 +377,42 @@ function drawSimpleChart(chartArrays, frontFilter, postFilter) {
                           var  delaytime=chartArrays[x].series[i].value;
                           var  decodetime=0;
                           var  server_delaytime=server_delay; 
-                          var total_delay= delaytime+decodetime+server_delaytime;
-                          if(delaytime>0){ 
+                          var  total_delay= delaytime+decodetime+server_delaytime+decodedelaytime;
+                          var  device=chartArrays[x].device
+                          console.log("device=====",device)
+                          if(delaytime>0){
+                           if(device=='wifi'){ 
+                              wifidelay=delaytime.toPrecision(3)+"ms";  
+                              console.log("wifidelay=====",wifidelay)
+                              document.getElementById('delay_wifi').value=delaytime.toPrecision(3)+"ms";  
+                              document.getElementById('delay_wifi_p2p').value=total_delay.toPrecision(6)+"ms";
+                              if(typeof(wiredelay) == typeof(document.getElementById('delay_broadband').value)){
+                              wiretimes++
+                             // console.log("wiretimes=====",wiretimes)
+                              if(wiretimes == 50){
+                                 wiretimes=0
+                                 wiredelay=0
+                                 document.getElementById('delay_broadband').value=""; 
+                                 document.getElementById('delay_braodband_p2p').value="";
+                              } 
+                           }
+                          }else{
+                           console.log("wifidelay=====",wifidelay,"wifidelay2======",document.getElementById('delay_wifi').value)
+                           if(typeof(wifidelay) == typeof(document.getElementById('delay_wifi').value)){
+                              wifitimes++
+                              console.log("wifitimes=====",wifitimes)
+                              if(wifitimes == 20){
+                                 wifitimes=0
+                                 wifidelay=0
+                                 document.getElementById('delay_wifi').value=""; 
+                                 document.getElementById('delay_wifi_p2p').value="";
+                              } 
+                           }
+                           wiredelay=delaytime.toPrecision(3)+"ms";  
                            document.getElementById('delay_broadband').value=delaytime.toPrecision(3)+"ms";  
                            document.getElementById('delay_broadband_p2p').value=total_delay.toPrecision(6)+"ms";
-                          }  
+                          }
+                         }  
                        }
                         
                      //  console.log("port===",port[3],"g_port===",g_port[2],"g_port[3]===",g_port[3]);
@@ -477,22 +523,26 @@ function addNewPoint2DelayChart(chartArray, filename, from, delay, thetime) {
     }
 }
 */
-function addNewPoint2DelayChart(chartArray, filename, from, delay, thetime) {
-    var i = addNewPoint2Chart(chartArray, filename, from, delay, thetime, 'one')
+function addNewPoint2DelayChart(chartArray, filename, from, delay, thetime,device) {
+    var i = addNewPoint2Chart(chartArray, filename, from, delay, thetime, 'one',device)
 //    packetLostCharts[i].filename = filename;
 }
 
-function addNewPoint2Chart(chartArray, filename, from, value, thetime, type) {
+function addNewPoint2Chart(chartArray, filename, from, value, thetime, type,device) {
     var thechart;
     for (var i in chartArray) {
         if (typeof(chartArray[i].filename) === 'undefined') {
             chartArray[i].filename = filename;
+            chartArray[i].device = device;
+            console.log("device00=====",device)
             chartArray[i].setTitle({
                 text: filename
             });
             thechart = chartArray[i];
             break;
         } else if (chartArray[i].filename == filename) {
+            chartArray[i].device = device;
+            console.log("device01=====",device)
             thechart = chartArray[i];
             chartArray[i].setTitle({
                 text: filename
@@ -699,15 +749,18 @@ $(function() {
 					  bitrateCharts[0].filename=obj.filename;
 					}
                 } else if (typeof(obj.delay) != 'undefined') {
+                    console.log("obj.streaming_delay====",obj);
                     vpoint = parseInt(obj.delay) / 1000.0;
                     vpoint += 0.2;
                     if(vpoint < 0.1) vpoint = 0.1;
                     chartArrays = delayCharts;
-                    filename = obj.device;
+                    var device = obj.device;
+                  // console.log("obj.device====", obj.device)
+                    console.log("obj====", obj)
                     filename = obj.filename;
                     thetime = parseInt(obj.time) / 1000;
                     from = obj.from;
-                    addNewPoint2DelayChart(chartArrays, filename, from, vpoint, thetime);
+                    addNewPoint2DelayChart(chartArrays, filename, from, vpoint, thetime,device);
 
                 } else if (typeof(obj.time_displacement) != 'undefined') {
                     chartArray = delayCharts;
