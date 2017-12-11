@@ -502,9 +502,9 @@ def notify_bitrate_change(bitrate_str, dest):
         elif bitrate_str[-1] == 'g':
             multiplier = 1024 * 1024 * 1024
         if multiplier == 1:
-            bitrate = int(bitrate_str)   
+            bitrate = float(bitrate_str)   
         else:
-            bitrate = int(bitrate_str[:-1]) 
+            bitrate = float(bitrate_str[:-1]) 
         bitrate = bitrate * multiplier
 
         cmd = {}
