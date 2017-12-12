@@ -21,9 +21,9 @@ var heartCheck = {
     },
     start: function(ws){
         if(null == this.timeoutObj) {
-	        this.timeoutObj = setInterval(function(){
-	            ws.send("HeartBeat");
-	        }, this.timeout)
+            this.timeoutObj = setInterval(function(){
+                ws.send("HeartBeat");
+            }, this.timeout)
         }
     }
 }
@@ -43,7 +43,7 @@ function setLineChart(tag, color, charttype) {
                     if('packet_lost' == charttype) {
                         return 'column';
                         }
-					else if('bitrate' == charttype) {
+                    else if('bitrate' == charttype) {
                         return 'column';
                         }
                     else {
@@ -218,21 +218,21 @@ function getdata(obj) {
 function drawbitrateCharts() {
     var time = (new Date()).getTime(); // current time  
     var thechartArray = bitrateCharts;
-	var chartArra;
+    var chartArra;
   
-	for(var i in thechartArray){
-	  
-	  if(typeof(thechartArray[i].filename) !='undefined' ){
+    for(var i in thechartArray){
+      
+      if(typeof(thechartArray[i].filename) !='undefined' ){
          filename= thechartArray[i].filename;
          type= filename.split(':');
-	     if(type[2]=='1'){
-		   chartArray=thechartArray[1]
+         if(type[2]=='1'){
+           chartArray=thechartArray[1]
                    //var thepoint1 = chartArray.series[i].sList.last;
                   // vpoint = thepoint1.data[1];
                   // console.log("vpoint net 22222 ##############===",vpoint);
                   // document.getElementById('bitrate_server1').value=vpoint.toPrecision(4)+"Mb/s";
-	     }else{
-		   chartArray=thechartArray[0]
+         }else{
+           chartArray=thechartArray[0]
                 // var thepoint1 = chartArray.series[i].sList.last;
                  //var thepoint2 = thepoint1.pre;
                 // vpoint = thepoint1.data[1];
@@ -245,10 +245,10 @@ function drawbitrateCharts() {
                   //  } 
                  // }
            
-	     }
-	   chartArray.yAxis[0].options.tickInterval=2;
-	   chartArray.yAxis[0].options.min=0;
-	   chartArray.yAxis[0].options.max=30;
+         }
+       chartArray.yAxis[0].options.tickInterval=2;
+       chartArray.yAxis[0].options.min=0;
+       chartArray.yAxis[0].options.max=30;
        for (var i in chartArray.series) {
         var timecount = 0;
         var numbercount = 0.00000000001;
@@ -269,9 +269,9 @@ function drawbitrateCharts() {
           //  chartArray.series[i].hide();
         }
 
-		var data=[];
-	    if(type[2]=='1'){
-		  data.push([ chartArray.series[i].name,timecount / (numbercount)]);		  
+        var data=[];
+        if(type[2]=='1'){
+          data.push([ chartArray.series[i].name,timecount / (numbercount)]);          
                   chartArray.series[i].setData(data);
                   var vpoint=timecount/numbercount;
                   var length=chartArray.series.length-1;
@@ -297,7 +297,7 @@ function drawbitrateCharts() {
                        }
                      }
                   }
-		}else{
+        }else{
                   chartArray.series[i].setData([ chartArray.series[i].name, timecount / (numbercount)]);
                   var vpoint=timecount/numbercount;
                   var length=chartArray.series.length-1;
@@ -309,7 +309,7 @@ function drawbitrateCharts() {
                         broadcast_bitrate=0;
                       }
                   }
-		}     
+        }     
 
       }
     }
@@ -622,12 +622,12 @@ function display(obj){
    if(type[2]=='1'){
      if(vpoint>0){
         document.getElementById('bitrate_server1').value=vpoint.toPrecision(4)+"Mb/s";
-	  }
+      }
    }
    else{
      if(vpoint>0){
         document.getElementById('bitrate_server').value=vpoint.toPrecision(4)+"Mb/s";
-	 } 
+     } 
    }
  }
  else if (typeof(obj.delay) != 'undefined') {
@@ -693,7 +693,7 @@ $(function() {
                 //console.log(msg.data);
                 var charArray;
                 data = msg.data;
-				
+                data = data.replace(/\u0000|\u0001|\u0002|\u0003|\u0004|\u0005|\u0006|\u0007|\u0008|\u0009|\u000a|\u000b|\u000c|\u000d|\u000e|\u000f|\u0010|\u0011|\u0012|\u0013|\u0014|\u0015|\u0016|\u0017|\u0018|\u0019|\u001a|\u001b|\u001c|\u001d|\u001e|\u001f/g,"");
                 end = data.lastIndexOf('}')
                 if(end < 0) return
                 var obj = JSON.parse(data.substring(0, end+1));
@@ -736,18 +736,18 @@ $(function() {
                 } else if (typeof(obj.bitrate) != 'undefined') {
                     vpoint = parseFloat(obj.bitrate);
                     filename = obj.device;
-					nettype=obj.filename;
+                    nettype=obj.filename;
                     type= nettype.split(':');
                     thetime = parseInt(obj.time) / 1000;
                     if(type[2]=='1'){
                    //   thetime = parseInt(obj.time) / 1000;
                       addNewPoint2BitrateChart(bitrateCharts[1], filename, vpoint, thetime);
-				      bitrateCharts[1].filename=obj.filename;
-					}else{
+                      bitrateCharts[1].filename=obj.filename;
+                    }else{
                      // thetime = parseInt(obj.time) / 1000;
                       addNewPoint2BitrateChart(bitrateCharts[0], filename, vpoint, thetime);
-					  bitrateCharts[0].filename=obj.filename;
-					}
+                      bitrateCharts[0].filename=obj.filename;
+                    }
                 } else if (typeof(obj.delay) != 'undefined') {
                     console.log("obj.streaming_delay====",obj);
                     vpoint = parseInt(obj.delay) / 1000.0;
@@ -774,7 +774,7 @@ $(function() {
                         showdiv("tab1","block")
                         showdiv("tab2","none")
                     } else if(obj.program == '2') {
-                    	  showdiv("tab1","none")
+                          showdiv("tab1","none")
                         showdiv("tab2","block")
                     }
                 }
