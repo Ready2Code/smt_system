@@ -80,35 +80,31 @@ var getFnName = function(callee){
 function get_program_list_data() {
     console.log(getFnName(arguments.callee))
     $.get("/currentprogramme/", function(ret){
-     $("tr.programme_info").remove()
-     resources = ret.programmer.resources
-     set_resources(resources)
-     console.log(ret.programmer)
-     var newtr = ""
-     for(var i=0; i< resources.length; i++) {
-      newtr = newtr + "<tr class='programme_info'> "
-	  if(resources[i].added == 'true'|| typeof(resources[i].added) == 'undefined'){
-		if(resources[i].info !='embeded_ad'){
-          newtr = newtr + "<td > <a href='#'><img src=" + resources[i].poster + " alt=" + resources[i].name +" </td>"
-          newtr = newtr + "<td > <button resource_id='" + resources[i].id + "' " 
-          + "channel_id='" + ret.channel_id + "' "
-          + "resource_url='" + resources[i].url + "' "
-	 	  + "resource_adurl='" + resources[i].adurl +"'"
-          + "command='play' " 
-          + "class='ui-btn process_resource'>打开</button> </td>"
-          newtr = newtr + "<td > <button resource_id='" + resources[i].id + "' " 
-          + "channel_id='" + ret.channel_id + "' "
-          + "command='stop' " 
-          + "class='ui-btn process_resource_close'>关闭</button> </td>"
-		}
-	    else{
-         if(resources[i].adurl!=""&&resources[i].adname!=""){
-			console.log("resources[i].begin====",resources[i].begin)
-            newtr = newtr + "<td > <a href='#'><img src=" + resources[i].poster + " alt=" + resources[i].name +" </td>"
+        $("tr.programme_info").remove()
+        resources = ret.programmer.resources
+        set_resources(resources)
+        console.log(ret.programmer)
+        var newtr = ""
+        for(var i=0; i< resources.length; i++) {
+            newtr = newtr + "<tr class='programme_info'> "
+        console.log(resources[i].poster)
+        console.log("added======",resources[i].added)
+		if(resources[i].added == 'true'){
+        newtr = newtr + "<td > <a href='#'><img src=" + resources[i].poster + " alt=" + resources[i].name +" </td>"
+        newtr = newtr + "<td > <button resource_id='" + resources[i].id + "' " 
+        + "channel_id='" + ret.channel_id + "' "
+        + "resource_url='" + resources[i].url + "' "
+		+ "resource_adurl='" + resources[i].adurl +"'"
+        + "command='play' " 
+        + "class='ui-btn process_resource'>打开</button> </td>"
+        newtr = newtr + "<td > <button resource_id='" + resources[i].id + "' " 
+        + "channel_id='" + ret.channel_id + "' "
+        + "command='stop' " 
+        + "class='ui-btn process_resource_close'>关闭</button> </td>"
+       /* if(resources[i].adurl!=null&&resources[i].adname!=null){
             newtr = newtr + "<td > <button ad_url='" + resources[i].adurl + "' " 
-            + "class='process_resource_ad'>"+resources[i].adname+"</button> </td>"
-          }
-		}
+        + "class='process_resource_ad'>"+resources[i].adname+"</button> </td>"
+        }*/
         newtr = newtr + "</tr>"
 		}
        }
