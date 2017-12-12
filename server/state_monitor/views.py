@@ -19,9 +19,12 @@ def show_status(request):
   ret=check_username(name)
   if (ret):
     monitor_settings = get_monitor_settings()   
-    return render(request, 'index.html', {'monitor_settings':monitor_settings})
+    if request.GET.has_key('version') and request.GET['version'] == 'fe85884':
+        return render(request, 'index-fe85884.html', {'monitor_settings':monitor_settings}) 
+    else:
+        return render(request, 'index.html', {'monitor_settings':monitor_settings})
   else:
-    url='/show_status'
+    url=request.get_full_path()
     return render(request,'login.html',{'url':url})
 def start_state_monitor(request):
     print 'start info server'
