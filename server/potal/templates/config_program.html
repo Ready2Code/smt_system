@@ -462,7 +462,13 @@
 			   var newtrbitrate=""
 			   var used_bitrate=0
 			   var close_bt=1
+			   var disable=""
 			   for(var i=0; i< resource.length; i++) {
+				if(i==0){
+				   disable="disabled"
+				}else{
+				   disable=""
+				}
 				if(resource[i].added=='false'){
 			     newtr2 = newtr2 + "<tr class='addresource_list'> "
 			     newtr2 = newtr2 + "<td ><button type='button'  resourcename='"+resource[i].name+"'"+"  class='process_add_resource'>"+resource[i].name+"</button></td>"
@@ -483,19 +489,19 @@
 				   }
 				    newtrbitrate = newtrbitrate + "<option value='" +bitrate + "'>"+bitrate+"</option>"
 				 }
-				 newtr=newtr + "<td ><select id='select"+i+"' onchange='on_network_type_change()'>"+ newtrbitrate +"</select></td>"
+				 newtr=newtr + "<td ><select id='select"+i+"' "+disable+"  onchange=''>"+ newtrbitrate +"</select></td>"
 				 newtrbitrate=""
 			     if(resource[i].type=='broadcast'){
 				   used_bitrate +=get_bitrate(resource[i].bitrate)
-				   newtr = newtr + "<td ><select id='select"+i+"' onchange='on_network_type_change()'>"+"<option value='"+resource[i].type+"'>广播</option>"+"<option value='broadband'>宽带</option>"+"</select></td>"
+				   newtr = newtr + "<td ><select id='select"+i+"' "+disable+"  onchange=''>"+"<option value='"+resource[i].type+"'>广播</option>"+"<option value='broadband'>宽带</option>"+"</select></td>"
 			     }else{
-				   newtr = newtr + "<td ><select id='select"+i+"' onchange='on_network_type_change()'>"+"<option value='"+resource[i].type+"'>宽带</option>"+"<option value='broadcast'>广播</option>"+"</select></td>"
+				   newtr = newtr + "<td ><select id='select"+i+"' onchange=''>"+"<option value='"+resource[i].type+"'>宽带</option>"+"<option value='broadcast'>广播</option>"+"</select></td>"
 			   
 			     }
 				 newtr = newtr + "<td ><input type='text' id='text"+i+"' value="+resource[i].url+"></td>"
-				 newtr = newtr + "<td ><button type='button' id='layout"+i+"'  posx='"+resource[i].layout.posx+"'  posy='"+resource[i].layout.posy+"'  width='"+resource[i].layout.width+"'   height='"+resource[i].layout.height+"'"+" class='process_resource_layout'>布局</button></td>"
+				 newtr = newtr + "<td ><button type='button' id='layout"+i+"' "+disable+" posx='"+resource[i].layout.posx+"'  posy='"+resource[i].layout.posy+"'  width='"+resource[i].layout.width+"'   height='"+resource[i].layout.height+"'"+" class='process_resource_layout'>布局</button></td>"
 			//	 newtr = newtr + "<td ><button type='button' number='"+i+"' bitrate_id='bitrate"+i+"'  text_id='text"+i+"' layout_id='layout"+i+"' select_id='select"+i+"'  path="+resource[i].url+""+" name='"+resource[i].name+" '"+"  posx='"+resource[i].layout.posx+"'"+"  posy='"+resource[i].layout.posy+"'"+"  width='"+resource[i].layout.width+"'"+"  height='"+resource[i].layout.height+"'"+" class='process_resource_submit'>提交</button></td>"
-				 newtr = newtr + "<td ><button type='button'  resourcename='"+resource[i].name+"'"+"  class='process_delete_resource'>"+"删除"+"</button></td>"
+				 newtr = newtr + "<td ><button type='button' "+disable+" "+" resourcename='"+resource[i].name+"'"+"  class='process_delete_resource'>"+"删除"+"</button></td>"
 				if(close_bt=='1'){
 			       //newtr=newtr+"<td rowspan='2'><button type='button' id='close'>关闭</button></td>"
 				 }
@@ -523,13 +529,13 @@
 				   bitrate=resource[i].bitrate
 				   newtrbitrate = newtrbitrate + "<option value='" +bitrate + "'>"+bitrate+"</option>"
 				 }
-				 newtr=newtr + "<td ><select id='select"+i+"' onchange='on_network_type_change()'>"+ newtrbitrate +"</select></td>"
+				 newtr=newtr + "<td ><select id='select"+i+"' onchange=''>"+ newtrbitrate +"</select></td>"
 				 newtrbitrate=""
 			     if(resource[i].type=='broadcast'){
 				   used_bitrate +=get_bitrate(resource[i].bitrate)
-				   newtr = newtr + "<td ><select id='select"+i+"' onchange='on_network_type_change()'>"+"<option value='"+resource[i].type+"'>广播</option>"+"<option value='broadband'>宽带</option>"+"</select></td>"
+				   newtr = newtr + "<td ><select id='select"+i+"' onchange=''>"+"<option value='"+resource[i].type+"'>广播</option>"+"<option value='broadband'>宽带</option>"+"</select></td>"
 			     }else{
-				   newtr = newtr + "<td ><select id='select"+i+"' onchange='on_network_type_change()'>"+"<option value='"+resource[i].type+"'>宽带</option>"+"<option value='broadcast'>广播</option>"+"</select></td>"
+				   newtr = newtr + "<td ><select id='select"+i+"' onchange=''>"+"<option value='"+resource[i].type+"'>宽带</option>"+"<option value='broadcast'>广播</option>"+"</select></td>"
 			   
 			     }
 				 newtr = newtr + "<td ><input type='text' id='text"+i+"' value="+resource[i].url+"></td>"
@@ -757,6 +763,7 @@
 			   })
 			  $('#submitBt').click(function(){
 				  set_resource_info(path)
+				  on_network_type_change()
 			   })
                get_broadcast_max_bandwidth()
 			   var data=set_programmes_file()
