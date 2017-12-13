@@ -77,6 +77,10 @@ def get_screen_resolution():
 # window ={'id': xxxxx, 'type': 'fullscreen' or 'normal'
 def window_stack_push(wid, url, wtype='normal'):
     global window_stack_list
+    for i in range(len(window_stack_list)-1,-1,-1):
+        if window_stack_list[i]['id'] == wid:
+            print "push fail" + wid + "already exists"
+            return
     if wtype == 'fullscreen':
         for i in range(len(window_stack_list)-1,-1,-1):
             if window_stack_list[i]['type'] == 'fullscreen':
