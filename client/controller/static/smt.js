@@ -19,7 +19,7 @@ function get_related(){
 
 function set_programme_process_response() {
     $("button.process_resource").click(process_resource_open);
-    $("#tv-fullscreen").click(function(){
+    $("#tv-fullscreen").unbind('click').bind('click',function(){
         console.log("big screen button click")		   
         var	full_id=1
         $.get("/" + $(this).attr('command') +"/"+$(this).attr('channel_id')+"/"+$(this).attr('resource_id')+"/"+full_id+"/",function(ret){
@@ -32,7 +32,7 @@ function set_programme_process_response() {
           history.go(1-history.length)
 		}
     });
-    $("#tv-smallscreen").click(function(){
+    $("#tv-smallscreen").unbind('click').bind('click',function(){
         console.log("small screen button click")		   
         $.get("/" + $(this).attr('command') +"/"+$(this).attr('channel_id')+"/"+$(this).attr('resource_id')+"/",function(ret){
         })
@@ -43,12 +43,12 @@ function set_programme_process_response() {
           history.go(1-history.length)
 		}
     })
-    $("#pad").click(function(){
+    $("#pad").unbind('click').bind('click',function(){
         console.log("pad  button click")		   
         $("#device_window").popup("close")
         window.open($(this).attr('resource_url'))			     
     })
-   $("button.process_resource_ad").click(function(){
+   $("button.process_resource_ad").unbind('click').bind('click',function(){
 	 window.open( $(this).attr('ad_url'))		
    })
  $("button.process_resource_close").unbind('click').bind('click',function(){
