@@ -85,10 +85,12 @@ function get_program_list_data() {
         set_resources(resources)
         console.log(ret.programmer)
         var newtr = ""
+		var row=0
         for(var i=0; i< resources.length; i++) {
             newtr = newtr + "<tr class='programme_info'> "
         console.log(resources[i].poster)
         console.log("added======",resources[i].added)
+       if(resources[i].info!='embeded_ad'){
 		if(resources[i].added == 'true'){
         newtr = newtr + "<td > <a href='#'><img src=" + resources[i].poster + " alt=" + resources[i].name +" </td>"
         newtr = newtr + "<td > <button resource_id='" + resources[i].id + "' " 
@@ -107,7 +109,43 @@ function get_program_list_data() {
         }*/
         newtr = newtr + "</tr>"
 		}
-       }
+	   }else{
+		 if(i>0){
+		  // console.log("begintime=======",resources[i].begin)
+		   var begintime=resources[i].begin
+		   arr=begintime.split(":")
+		   var min= parseInt(arr[1])*60
+		   var second= parseInt(arr[2])
+		   //console.log("minute====",min)
+		  // console.log("second====",second)
+		   var displaytime=min+second
+           var myDate = new Date()
+		   var cur_min = myDate.getMinutes()*60
+		   var cur_second = myDate.getSeconds()
+		   var cur_time= cur_min+cur_second
+		   var diff=cur_time-displaytime
+		   console.log("diff====",diff)
+		   if(diff<2 && diff >-2){
+		  	row++
+            newtr = newtr + "<td > <a href='#'><img src=" + resources[i].poster + " alt=" + resources[i].name +" </td>"
+            newtr = newtr + "<td > <button ad_url='" + resources[i].adurl + "' " 
+                          + "class='process_resource_ad'>"+resources[i].adname+"</button> </td>"
+			tabnewtr=newtr
+			name= resources[i].name
+		   }
+		   else if(diff>=2){
+			if(row<3 ){
+		  	 row++
+             newtr = newtr + "<td > <a href='#'><img src=" + resources[i].poster + " alt=" + resources[i].name +" </td>"
+             newtr = newtr + "<td > <button ad_url='" + resources[i].adurl + "' " 
+                           + "class='process_resource_ad'>"+resources[i].adname+"</button> </td>"
+			}
+		      
+		   }
+           newtr = newtr + "</tr>"
+		 }
+	   }
+     }
     $("#programmeinfo").append(newtr);
     $("#programmeinfo").trigger('create');
     set_programme_process_response()
