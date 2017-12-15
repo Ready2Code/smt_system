@@ -2,6 +2,7 @@
 # Minghao LI 2017-2-20
 import json
 import time
+import re
 import socket 
 import sys
 import urllib2
@@ -307,6 +308,39 @@ def fullscreen(res):
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     s.sendto(fullcommand,("localhost", FFPLAY_LISTEN_PORT))
 
+def get_time_second(time):
+    timearr= re.split(":",time)  
+    minute=int(timearr[1])*60
+    second=float(timearr[2])
+    cur_time=minute+second
+    return cur_time
+
+def control_embeded_ad__reddot_display(json_data):
+   global related
+   if json_data['programmer']['sequence']  > 0:
+     for res in json_data['programmer']['resources']:
+       if res['info'] == 'embeded_ad':
+          begin_time=res['begin']
+          end_time=res['end']
+          now_time = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time()))
+          nowtime= get_time_second(now_time)
+          ad_begintime= get_time_second(begin_time)
+          ad_endtime= get_time_second(end_time)
+          diff=nowtime - ad_begintime
+          diff2=nowtime - ad_endtime
+#       print "name ===================================\n",res['name']
+#         print "begintime ===================================\n",begin_time
+#         print "endtime ===================================\n", end_time
+#         print "now_time===================================\n" ,nowtime
+#         print "diff===================================\n" ,diff
+#         print "diff2===================================\n" ,diff2
+          if diff > -2 and diff < 1:
+             related='true'
+             prompt_add()
+          if diff2 > 0 and related=='true':
+             related='false'
+             prompt_del()
+
 def UDP_recv(port, channel_id, name):
     global sequence
     global related
@@ -321,6 +355,7 @@ def UDP_recv(port, channel_id, name):
     while 1:
         data, address = s.recvfrom(4096)
         json_data = json.loads(data)
+        control_embeded_ad__reddot_display(json_data)
         if is_gateway == 1 and json_data['programmer']['sequence'] > 0:
             for res in json_data['programmer']['resources']:
                 if(res['type'] == 'broadcast'):
