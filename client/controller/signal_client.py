@@ -317,8 +317,12 @@ def get_time_second(time):
 
 def control_embeded_ad__reddot_display(json_data):
    global related
+   count=0
    if json_data['programmer']['sequence']  > 0:
      for res in json_data['programmer']['resources']:
+       if count==0:
+          count=count+1
+          continue
        if res['info'] == 'embeded_ad':
           begin_time=res['begin']
           end_time=res['end']
