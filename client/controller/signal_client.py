@@ -368,7 +368,8 @@ def UDP_recv(port, channel_id, name):
 
         if json_data['programmer']['sequence']  == 0:
             clear_all()
-            print "*********** restart **************"
+            progress = (100 * json_data['counter']) if json_data.has_key('counter') else 0
+            print "*********** restart   %.1f%%  **************" % progress
             continue
 
         if(is_continue_play and

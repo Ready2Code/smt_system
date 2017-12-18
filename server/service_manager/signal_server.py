@@ -151,15 +151,22 @@ def update_delta_time(tt, now):
     return tt 
 
 def first_signal(dest):
-    string  = '{"programmer": {"sequence": 0}}'
-    counter = 300
+    cmd = {}
+    cmd["programmer"] = {}
+    cmd["programmer"]["sequence"] = 0
+
+    string2  = 2000*' '
+    counter = 22000
+    sumsum = counter
 
     if ext_callbacks.has_key('before_ffmpeg'):
         ext_callbacks['before_ffmpeg']('broadcast', dest[0]+':'+str(dest[1]))
     while counter > 0:
-        s.sendto(string, dest)
+        cmd["counter"] = 1.0 * (sumsum- counter)/sumsum
+        string1 = json.dumps(cmd)
+        s.sendto(string1 + string2, dest)
         counter = counter - 1
-        time.sleep(0.01)
+        time.sleep(0.0001)
     
 def convert_signal(json_data, resource_broadcast_ip, resource_broadband_ip,avlogext='',static_resource_host='', dir_name='/'):
 #def convert_signal(json_file, resource_broadcast_ip, resource_broadband_ip,static_resource_host,avlogext=''):
