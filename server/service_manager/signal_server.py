@@ -304,7 +304,10 @@ def call_ffmpeg(file_dir, res, port, resource_broadcast_ip, ffplay_port, avlogex
         str_output = 'smt://%s:%s' % (BROADBAND_SERVER_IP, 1)
     elif(res_type == 'broadcast'):
         str_port ='-port %s' % port
-        str_output = 'smt://%s:%s' % (resource_broadcast_ip, ffplay_port)
+	if res['added'] == 'true':
+	    str_output = 'smt://%s:%s' % (resource_broadcast_ip, ffplay_port)
+	else:
+	    str_output = 'smt://%s:%s' % (BROADBAND_SERVER_IP, 1)
         
     str_duration = ''
     if play_order_type == PlayOrderType.singleloop:
@@ -567,8 +570,17 @@ def check_bitrate(json_data,resource_broadcast_ip, resource_broadband_ip):
                 item['bitrate'] = res['bitrate']
                 notify_bitrate_change(item['bitrate'], (resource_broadband_ip,int(item['ffmpeg_port'])))
 
+
 def update_signalling_from_external():
     pass
+
+def update_ffmpeg_stream(orig, current, ffmpeg_port):
+    global s
+    command = "mod " + orig + " " + current
+    print command
+    s.sendto(command,("localhost", int(ffmpeg_port)))    
+    
+
 
 def update_signal(url,resource_broadcast_ip, resource_broadband_ip):
     global packet
@@ -580,7 +592,7 @@ def update_signal(url,resource_broadcast_ip, resource_broadband_ip):
     except Exception, e:
         print traceback.format_exc()
     if json_data['programmer']['sequence'] <= sequence_number:
-		return
+	return
     check_bitrate(json_data, resource_broadcast_ip, resource_broadband_ip)
     print "update file <" , url , "> successful \n"
     sequence_number = json_data['programmer']['sequence']
@@ -591,16 +603,34 @@ def update_signal(url,resource_broadcast_ip, resource_broadband_ip):
             if item['id'] != res['id']: continue
             if item['sequence'] >= res['sequence']: break
             item['sequence'] = res['sequence']
-            item['added'] = res['added']
+            
             if item['type'] == 'broadcast' and res['type'] == 'broadband':
                 ffplay_port = item['url'].split(':')[-1]
                 ffmpeg_port = ffplay_port[:1] + '1' + ffplay_port[2:]
+		if item['added'] == 'true':
+		    orig_url = item['url']
+		    current_url = 'smt://%s:%s' % (BROADBAND_SERVER_IP, 1)
+		    update_ffmpeg_stream(orig_url, current_url, ffmpeg_port )
                 item['url'] = 'smt://{0}:{1}@:{2}'.format(resource_broadband_ip, ffmpeg_port,ffplay_port)
                 item['type'] = 'broadband'
             elif item['type'] == 'broadband' and res['type'] == 'broadcast':
                     ffplay_port = item['url'].split(':')[-1]
                     item['url'] = 'smt://{0}:{1}'.format(resource_broadcast_ip, ffplay_port)
-                    item['type'] = 'broadcast'   
+                    item['type'] = 'broadcast' 
+		    if res['added'] == 'true':
+			orig_url = 'smt://%s:%s' % (BROADBAND_SERVER_IP, 1) 
+			current_url = item['url']
+			update_ffmpeg_stream(orig_url, current_url, item['ffmpeg_port'] )
+	    elif item['type'] == 'broadcast' and res['type'] == 'broadcast':
+		if item['added'] == 'true' and res['added'] == 'false':
+		    orig_url = item['url']
+		    current_url = 'smt://%s:%s' % (BROADBAND_SERVER_IP, 1)
+		    update_ffmpeg_stream(orig_url, current_url, item['ffmpeg_port'] )	
+		elif item['added'] == 'false' and res['added'] == 'true':
+		    orig_url = 'smt://%s:%s' % (BROADBAND_SERVER_IP, 1) 
+		    current_url = item['url']
+		    update_ffmpeg_stream(orig_url, current_url, item['ffmpeg_port'] )		    
+	    item['added'] = res['added']
     print packet
             
             
