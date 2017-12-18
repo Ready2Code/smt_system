@@ -6,6 +6,7 @@ from django.http import HttpResponse
 
 from signal_server import start_smt_system
 from signal_server import stop_all
+from signal_server import update_signalling_from_external
 import threading
 from service_manager.models import ServiceSettings
 from service_manager.models import get_service_settings
@@ -65,7 +66,8 @@ def start_programs(request):
                                                                  monitor_settings.info_collector_ip,
                                                                  monitor_settings.info_collector_port,
                                                                  request.get_host(),
-                                                                 callbacks))
+                                                                 callbacks,
+                                                                 service_settings.signal_format))
     t.setDaemon(True)
     t.start()
     #start_smt_system()
@@ -93,3 +95,7 @@ def stop_server(request):
      print "stop_server"
      stop_all()
   return HttpResponse(u"ok", content_type='application/json')
+
+def update_signalling(request):
+    update_signalling_from_external()
+    return HttpResponse(u"ok", content_type='application/json')

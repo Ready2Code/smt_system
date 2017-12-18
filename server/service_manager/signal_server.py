@@ -17,6 +17,7 @@ from itertools import cycle
 from utils import functions
 import urllib, urlparse
 import traceback
+from utils import signal_format_converter
 
 # This is a throwaway variable to deal with a python bug
 throwaway = datetime.strptime('20110101','%Y%m%d')
@@ -96,6 +97,15 @@ class SignalTimerThread(Thread):
         global signal_timer_thread_flag
         global ext_callbacks
 
+        for dest in self.dests:
+            if dest['format'] == 'smtp_message':
+                dest['current_address'] = ('127.0.0.1', dest['destination_address'][1])
+                call_ffmpeg_for_send_signalling(dest['current_address'], dest['destination_address'])
+            else:
+                dest['current_address'] = dest['destination_address']
+
+
+        print "dests=",self.dests
         if ext_callbacks.has_key('before_ffmpeg'):
             ext_callbacks['before_ffmpeg']('broadcast', self.dests[0][0]+':'+str(self.dests[0][1]))
 
@@ -249,6 +259,20 @@ def get_begin_time_string(begin_time, zone_offset='default'):
     begin_time_with_zone_offset = begin_time + zone_offset
     begin_time_utc_string = begin_time_with_zone_offset.strftime("%Y-%m-%dT%H:%M:%S.%f")
     return begin_time_utc_string
+
+def call_ffmpeg_for_send_signalling(input_address, output_address ):
+    global ffmpeg_list
+    ffmpeg_command = ""
+    if platform.system() == "Windows":
+        ffmpeg_command = SETTING_RELATIVE_PATH + 'ffmpeg.exe'
+    if platform.system() == "Linux":
+        ffmpeg_command = SETTING_RELATIVE_PATH + 'ffmpeg'
+    ffmpeg_command = ffmpeg_command + " -i smt://signalling:message.json@" + input_address[0] + ":" + str(input_address[1])
+    ffmpeg_command = ffmpeg_command + " -f mpu smt://" + output_address[0] + ":" + str(output_address[1])
+    print "ffmpeg_command=",ffmpeg_command
+    ffmpeg_list.append({"cmd":ffmpeg_command, "end":datetime.now() + timedelta(days=999)})
+    os.system(ffmpeg_command)
+  
     
 def call_ffmpeg(file_dir, res, port, resource_broadcast_ip, ffplay_port, avlogext=''):
     global play_order_type
@@ -342,8 +366,15 @@ def delay_broadcast(s, packet, des):
     cur = datetime.now()
     if ( cur > packet['programmer']['begin'] - timedelta(milliseconds=(aheadtime+cachetime)) and cur < packet['programmer']['end'] - timedelta(milliseconds=(aheadtime+cachetime))):
         #print 'Dest:',des,' Duration:', packet['programmer']['begin'], '~', packet['programmer']['end'],' Now:', datetime.now(), 'SIGNAL sending ', packet['programmer']['name']
-        sp = json.dumps(packet, cls=DateTimeEncoder)#.encode('utf8')
-        s.sendto(sp, des)
+        sp = ''
+        if des['format'] == 'program.json':
+            sp = json.dumps(packet, cls=DateTimeEncoder)#.encode('utf8')
+        elif des['format'] == 'message.json' or des['format'] == 'smtp_message':
+            message_json = signal_format_converter.program_to_PA_message(packet["programmer"])
+            sp = json.dumps(message_json, cls=DateTimeEncoder)
+        else:
+            return
+        s.sendto(sp, des['current_address'])
         #print sp
         no_signal_print_couter = 0
     else:
@@ -397,7 +428,8 @@ def start_smt_system(programs_file=CONFIG_FILE_NAME,
                      avlogext_ip           = AVLOGEXT_IP,
                      avlogext_port         = AVLOGEXT_PORT,
                      static_resource_host  = '',
-                     callbacks = {}):
+                     callbacks = {},
+                     signal_format='program.json'):
     global program_num
     global resource_num
     global packet
@@ -433,8 +465,9 @@ def start_smt_system(programs_file=CONFIG_FILE_NAME,
 
     first_signal(signal_destination)
     stopFlag = Event()
-    thread = SignalTimerThread(stopFlag, signal_destination)
-    thread.add_dest((avlogext_ip, avlogext_port))
+    thread = SignalTimerThread(stopFlag, {'format':signal_format, 'destination_address':signal_destination})
+    thread.add_dest({'format':'program.json','destination_address':(avlogext_ip, avlogext_port)})
+    #thread.set_signal_format(signal_format)
     thread.setDaemon(True)
     thread.start()
     t = Thread(target=command_timer)
@@ -534,6 +567,8 @@ def check_bitrate(json_data,resource_broadcast_ip, resource_broadband_ip):
                 item['bitrate'] = res['bitrate']
                 notify_bitrate_change(item['bitrate'], (resource_broadband_ip,int(item['ffmpeg_port'])))
 
+def update_signalling_from_external():
+    pass
 
 def update_signal(url,resource_broadcast_ip, resource_broadband_ip):
     global packet

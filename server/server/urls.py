@@ -55,5 +55,6 @@ urlpatterns = [
     url(r'^ts_adapter/',               include('ts_adapter.urls')),
 	url(r'^config_program/get_broadcast_max_bandwidth/$',potal_views.get_broadcast_max_bandwidth,   name='get_broadcast_max_bandwidth'),
     url(r'^current_program/get_current_programme/$',          potal_views.get_current_programme,       name='get_current_programme'),
+    url(r'^update_signalling/$', service_manager_views.update_signalling,       name='update_signalling'),
 ]
 

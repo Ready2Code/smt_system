@@ -110,6 +110,7 @@ def modify_service_settings(request):
     service_settings.resource_file_path      = request.GET['resource_file_path']
     service_settings.auto_ts_adapter_destaddr      = request.GET['auto_ts_adapter_destaddr']
     service_settings.broadcast_max_bandwidth      = request.GET['broadcast_max_bandwidth']
+    service_settings.signal_format      = request.GET['signal_format']    
     service_settings.save()
     set_aheadtime_cachetime(service_settings,1)
 
