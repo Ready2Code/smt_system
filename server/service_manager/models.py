@@ -15,6 +15,7 @@ class ServiceSettings(models.Model):
     auto_ts_adapter_destaddr = models.CharField(max_length=30)
     aheadtime      = models.IntegerField()
     cachetime      = models.IntegerField()
+    signal_format  = models.CharField(max_length=30)
 
 def get_service_settings():
     all_settings =  ServiceSettings.objects.all()
@@ -30,7 +31,8 @@ def get_service_settings():
                                                                          resource_broadband_ip='127.0.0.1',
                                                                          auto_ts_adapter_destaddr = '',
 																		 aheadtime=2000,
-																		 cachetime=6000)
+																		 cachetime=6000,
+																		 signal_format="program.josn")
     else:
         service_settings = all_settings[0]
     return service_settings 

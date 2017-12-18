@@ -9,6 +9,11 @@
         <a href='/ts_adapter/?mode=ip2ts'>Ts Adapter</a>
         <hr/>
         <form id='serviceSettings' action='set_settings' method='get'>
+             Signal fromat:
+             <label><input name="signal_format" type="radio" value="program.json" />program.json</label> 
+             <label><input name="signal_format" type="radio" value="message.json" />message.json</label> 
+             <label><input name="signal_format" type="radio" value="smtp_message" />smtp message</label> 
+             <p/>
              Signal Dest IP: <input type="text" name="signal_destip" value="{{service_settings.signal_destip}}"/>
              <p/>
              Signal Port: <input type="text"  name="signal_port" value="{{service_settings.signal_port}}"/>
@@ -95,6 +100,12 @@
 				$("#websocket_connection_num").click(function(){
 			    	$.get("/websocket_connection_num/",function(ret){$("#websocket_connection_num").text('Connection Number('+ret.websocket_connection_num+')');}) 	
 				})
+				inputs = $("input[name='signal_format']")
+				for(i=0; i< inputs.length; i++) {
+				    if(inputs[i].value == "{{service_settings.signal_format}}") {
+                        inputs[i].checked = true
+				    }
+				}
 				
             })
             </script>
