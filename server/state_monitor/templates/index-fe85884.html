@@ -1,0 +1,134 @@
+<!doctype html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"> 
+    <script type="text/javascript" src="{{STATIC_URL}}reconnecting-websocket/reconnecting-websocket.js"></script>
+    <script type="text/javascript" src="{{STATIC_URL}}Jquery/jquery-1.9.1.min.js"></script>
+    <script type="text/javascript" src="{{STATIC_URL}}singlylinkedlist.js"></script>
+    <script type="text/javascript" src="{{STATIC_URL}}Highcharts/js/highcharts.js"></script>
+    <script type="text/javascript" src="{{STATIC_URL}}Highcharts/js/modules/exporting.js"></script>
+    <script type="text/javascript">  
+        websocket_destination = 'ws://{{monitor_settings.info_websocket_ip}}:{{monitor_settings.info_websocket_port}}'
+    </script> 
+    <script type="text/javascript" src="{{STATIC_URL}}linechart-fe85884.js"></script> 
+    <script type="text/javascript" src="{{STATIC_URL}}strings.js"></script> 
+    <script type="text/javascript" src="{{STATIC_URL}}lang.js"></script>     
+    <link rel="stylesheet" type="text/css" href="{{STATIC_URL}}style.css">
+</head>  
+<body >  
+      	 <div id='test' >
+      	 <div id='test2'></div>
+      	 </div>
+    <div class="div">
+
+      <div class = "left">
+         <div class = "left-top" lang >server rate</div>
+         <div  class = "left-main1"></div>
+         <div  class = "left-main2"></div>         
+         <div id="tab2">
+<table >
+        <tr>
+            <th style="width: 160px;" lang >server</th>
+            <th style="width: 160px;" lang >network type</th>
+            <th style="width: 160px;" lang >video resolution</th>
+            <th style="width: 160px;" lang >Average Bitrate</th>
+            <th style="width: 160px;" lang >View</th>
+        </tr>
+        <tr class = "line1">
+            <td lang>server1</td>
+            <td lang>broadcast</td>
+            <td>4K(3840*2160)</td>
+            <td>15Mbps</td>
+            <td id="use1" lang>Panorama</td>
+        </tr>
+        <tr class = "line2">
+            <td lang>server2</td>
+            <td lang>broadband</td>
+            <td>720P(1280*720)</td>
+            <td>2.5Mbps</td>
+            <td id="use2" lang>Cello</td>
+        </tr>
+        <tr class = "line3">
+            <td lang>server3</td>
+            <td lang>broadband</td>
+            <td>720P(1280*720)</td>
+            <td>2.5Mbps</td>
+            <td id="use3" lang>Piano</td>
+        </tr>
+        <tr class = "line4">
+            <td lang>server4</td>
+            <td lang>broadband</td>
+            <td>720P(1280*720)</td>
+            <td>2.5Mbps</td>
+            <td id="use4" lang>Violin</td>
+        </tr>       
+</table>         
+         </div>
+         
+         <div id="tab1">
+<table >
+        <tr>
+            <th style="width: 160px;" lang>server</th>
+            <th style="width: 160px;" lang>network type</th>
+            <th style="width: 160px;" lang>video resolution</th>
+            <th style="width: 160px;" lang>Average Bitrate</th>
+            <th style="width: 160px;" lang>View</th>
+        </tr>
+        <tr class = "line1">
+            <td lang>server1</td>
+            <td lang>broadcast</td>
+            <td>1080p(1920*1080)</td>
+            <td>10Mbps</td>
+            <td lang>Default Program</td>
+        </tr>
+        <tr class = "line2">
+            <td lang>server2</td>
+            <td lang>broadband</td>
+            <td>1080p(1920*1080)</td>
+            <td>10Mbps</td>
+            <td lang>Optional ad 1</td>
+        </tr>
+        <tr class = "line3">
+            <td lang>server3</td>
+            <td lang>broadband</td>
+            <td>1080p(1920*1080)</td>
+            <td>10Mbps</td>
+            <td id="use3" lang>Optional ad 2</td>
+        </tr>
+        <tr class = "line4">
+            <td lang>server4</td>
+            <td lang>broadband</td>
+            <td>1080p(1920*1080)</td>
+            <td>10Mbps</td>
+            <td id="use4" lang>Optional ad 3</td>
+        </tr>       
+</table>         
+         </div>         
+         
+         
+      </div>
+      <div class = "center">
+         <div class = "center-top" lang>Network Delay</div>
+         <div class = "center-main1"></div>
+         <div class = "center-main2"></div>
+         <div class = "center-main3"></div>
+      </div>
+      <div class = "right">
+         <div class = "right-top" lang>Packet Lost</div>
+         <div class = "right-main1">
+         </div>
+         <!-- <div id="msg"/> -->
+         <div class = "right-main2"></div>
+         <div class = "right-main3"></div>
+      </div>
+
+	<div>
+		<div>		<a href="#" id="enBtn">English</a> </div>
+    <div>   <a href="#" id="zhBtn">简体中文</a> </div>
+		
+	</div>
+	  <div class="sys">
+    	<img  width="80%" src="{{STATIC_URL}}sys.png" alt="SMT" title="SMT" />
+    </div>
+</body> 
+</html>  
