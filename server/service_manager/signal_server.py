@@ -106,8 +106,11 @@ class SignalTimerThread(Thread):
 
 
         print "dests=",self.dests
+
+        #process MMTtool
         if ext_callbacks.has_key('before_ffmpeg'):
-            ext_callbacks['before_ffmpeg']('broadcast', self.dests[0][0]+':'+str(self.dests[0][1]))
+            ext_callbacks['before_ffmpeg']('broadcast', self.dests[0]['destination_address'][0]+':'+str(self.dests[0]['destination_address'][1]))
+
 
         while not self.stopped.wait(BROADCASE_TIME_INTERVAL):
             if signal_timer_thread_flag==1:
@@ -119,7 +122,7 @@ class SignalTimerThread(Thread):
                 break
 
         if ext_callbacks.has_key('after_ffmpeg'):
-            ext_callbacks['after_ffmpeg']('broadcast', self.dests[0][0]+':'+str(self.dests[0][1]))
+            ext_callbacks['after_ffmpeg']('broadcast', self.dests[0]['destination_address'][0]+':'+str(self.dests[0]['destination_address'][1]))
             #ext_callbacks['after_ffmpeg'](res_type, str_output)
 
 
@@ -155,8 +158,8 @@ def first_signal(dest):
     cmd["programmer"] = {}
     cmd["programmer"]["sequence"] = 0
 
-    string2  = 2000*' '
-    counter = 22000
+    string2  = 500*' '
+    counter = 80
     sumsum = counter
 
     if ext_callbacks.has_key('before_ffmpeg'):
@@ -165,8 +168,10 @@ def first_signal(dest):
         cmd["counter"] = 1.0 * (sumsum- counter)/sumsum
         string1 = json.dumps(cmd)
         s.sendto(string1 + string2, dest)
+        print 100 * "\b",
+        print "##### restart %.1f%% ######" % (cmd["counter"] * 100 ),
         counter = counter - 1
-        time.sleep(0.0001)
+        time.sleep(0.1)
     
 def convert_signal(json_data, resource_broadcast_ip, resource_broadband_ip,avlogext='',static_resource_host='', dir_name='/'):
 #def convert_signal(json_file, resource_broadcast_ip, resource_broadband_ip,static_resource_host,avlogext=''):

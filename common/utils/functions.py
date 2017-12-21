@@ -7,6 +7,7 @@ import re
 import urllib
 
 def find_process_by_name(name):
+    print "find process by name=",name
     name = name.replace('-',' ')
     name_list = name.split()
     cmd='ps aux | grep %s'%'| grep '.join(name_list) 

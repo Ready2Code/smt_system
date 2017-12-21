@@ -19,6 +19,7 @@ def find_process_by_name(name):
     return txt
 
 def kill_process_by_name(name):
+    print "kill process, name=",name
     txt = find_process_by_name(name)
     regex=re.compile(r'\w+\s+(\d+)\s+.*')
     ids=regex.findall(txt)
@@ -87,5 +88,5 @@ def find_ts_adapter(srcaddr):
     txt = ''
     if dll_list.has_key(srcaddr):
         txt = find_process_by_name(dll_list[srcaddr])
-        return txt
+    return txt
 
