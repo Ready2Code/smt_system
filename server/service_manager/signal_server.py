@@ -81,11 +81,12 @@ ext_callbacks ={}
 signal_destination = ('127.0.0.1',9999)
 
 class SignalTimerThread(Thread):
-    def __init__(self, event, dest):
+    def __init__(self, event, dest, broadband_ip):
         Thread.__init__(self)
         self.stopped = event
         self.dests = [dest]
         self.program_url = ''
+	self.broadband_ip = broadband_ip
 
     def add_dest(self, dest):
         self.dests.append(dest)
@@ -115,7 +116,7 @@ class SignalTimerThread(Thread):
         while not self.stopped.wait(BROADCASE_TIME_INTERVAL):
             if signal_timer_thread_flag==1:
                 if self.program_url != '':
-                    update_signal(self.program_url, BROADCAST_SERVER_IP, BROADBAND_SERVER_IP)
+                    update_signal(self.program_url, BROADCAST_SERVER_IP, self.broadband_ip)
                 for dest in self.dests:
                     delay_broadcast(s, packet, dest)
             else:
@@ -480,7 +481,7 @@ def start_smt_system(programs_file=CONFIG_FILE_NAME,
 
     first_signal(signal_destination)
     stopFlag = Event()
-    thread = SignalTimerThread(stopFlag, {'format':signal_format, 'destination_address':signal_destination})
+    thread = SignalTimerThread(stopFlag, {'format':signal_format, 'destination_address':signal_destination}, resource_broadband_ip)
     thread.add_dest({'format':'program.json','destination_address':(avlogext_ip, avlogext_port)})
     #thread.set_signal_format(signal_format)
     thread.setDaemon(True)
