@@ -736,18 +736,19 @@ $(function() {
                 } else if (typeof(obj.bitrate) != 'undefined') {
                     vpoint = parseFloat(obj.bitrate);
                     filename = obj.device;
-                    nettype=obj.filename;
+					//nettype=obj.filename;
+					nettype=obj.sendto;
                     type= nettype.split(':');
                     thetime = parseInt(obj.time) / 1000;
-                    if(type[2]=='1'){
+                    if(type[0]=='smt://127.0.0.1'){
                    //   thetime = parseInt(obj.time) / 1000;
-                      addNewPoint2BitrateChart(bitrateCharts[1], filename, vpoint, thetime);
-                      bitrateCharts[1].filename=obj.filename;
-                    }else{
-                     // thetime = parseInt(obj.time) / 1000;
                       addNewPoint2BitrateChart(bitrateCharts[0], filename, vpoint, thetime);
-                      bitrateCharts[0].filename=obj.filename;
-                    }
+					  bitrateCharts[0].filename=obj.filename;
+					}else{
+                     // thetime = parseInt(obj.time) / 1000;
+                      addNewPoint2BitrateChart(bitrateCharts[1], filename, vpoint, thetime);
+				      bitrateCharts[1].filename=obj.filename;
+					}
                 } else if (typeof(obj.delay) != 'undefined') {
                     console.log("obj.streaming_delay====",obj);
                     vpoint = parseInt(obj.delay) / 1000.0;
