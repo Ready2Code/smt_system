@@ -736,11 +736,13 @@ $(function() {
                 } else if (typeof(obj.bitrate) != 'undefined') {
                     vpoint = parseFloat(obj.bitrate);
                     filename = obj.device;
-					//nettype=obj.filename;
-					nettype=obj.sendto;
+		    //nettype=obj.filename;
+		    nettype=obj.sendto;
+                    console.log("obj.sendto====",nettype);
                     type= nettype.split(':');
+                    console.log("type====",type[1]);
                     thetime = parseInt(obj.time) / 1000;
-                    if(type[0]=='smt://127.0.0.1'){
+                    if(type[1]=='//127.0.0.1'){
                    //   thetime = parseInt(obj.time) / 1000;
                       addNewPoint2BitrateChart(bitrateCharts[0], filename, vpoint, thetime);
 					  bitrateCharts[0].filename=obj.filename;
