@@ -225,14 +225,14 @@ function drawbitrateCharts() {
       if(typeof(thechartArray[i].filename) !='undefined' ){
          filename= thechartArray[i].filename;
          type= filename.split(':');
-         if(type[2]=='1'){
-           chartArray=thechartArray[1]
+         if(type[1]=='//127.0.0.1'){
+           chartArray=thechartArray[0]
                    //var thepoint1 = chartArray.series[i].sList.last;
                   // vpoint = thepoint1.data[1];
                   // console.log("vpoint net 22222 ##############===",vpoint);
                   // document.getElementById('bitrate_server1').value=vpoint.toPrecision(4)+"Mb/s";
          }else{
-           chartArray=thechartArray[0]
+           chartArray=thechartArray[1]
                 // var thepoint1 = chartArray.series[i].sList.last;
                  //var thepoint2 = thepoint1.pre;
                 // vpoint = thepoint1.data[1];
@@ -270,7 +270,7 @@ function drawbitrateCharts() {
         }
 
         var data=[];
-        if(type[2]=='1'){
+        if(type[1] !='//127.0.0.1'){
           data.push([ chartArray.series[i].name,timecount / (numbercount)]);          
                   chartArray.series[i].setData(data);
                   var vpoint=timecount/numbercount;
@@ -739,27 +739,31 @@ $(function() {
 		    //nettype=obj.filename;
 		    nettype=obj.sendto;
                     console.log("obj.sendto====",nettype);
+                    console.log("obj====",obj);
                     type= nettype.split(':');
                     console.log("type====",type[1]);
                     thetime = parseInt(obj.time) / 1000;
                     if(type[1]=='//127.0.0.1'){
                    //   thetime = parseInt(obj.time) / 1000;
                       addNewPoint2BitrateChart(bitrateCharts[0], filename, vpoint, thetime);
-					  bitrateCharts[0].filename=obj.filename;
+					  //bitrateCharts[0].filename=obj.filename;
+					  bitrateCharts[0].filename=obj.sendto;
 					}else{
                      // thetime = parseInt(obj.time) / 1000;
+                      console.log("obj.bitrate====",obj.bitrate);
                       addNewPoint2BitrateChart(bitrateCharts[1], filename, vpoint, thetime);
-				      bitrateCharts[1].filename=obj.filename;
+				      //bitrateCharts[1].filename=obj.filename;
+				      bitrateCharts[1].filename=obj.sendto;
 					}
                 } else if (typeof(obj.delay) != 'undefined') {
-                    console.log("obj.streaming_delay====",obj);
+                  //  console.log("obj.streaming_delay====",obj);
                     vpoint = parseInt(obj.delay) / 1000.0;
                     vpoint += 0.2;
                     if(vpoint < 0.1) vpoint = 0.1;
                     chartArrays = delayCharts;
                     var device = obj.device;
                   // console.log("obj.device====", obj.device)
-                    console.log("obj====", obj)
+                  //  console.log("obj====", obj)
                     filename = obj.filename;
                     thetime = parseInt(obj.time) / 1000;
                     from = obj.from;
