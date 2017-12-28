@@ -46,6 +46,7 @@ g_info_collector_dest = ''
 g_device_name = ''
 g_sync='smt'
 window_stack_list = []
+last_res = {}
 
 class bcolors:
     HEADER = '\033[95m'
@@ -349,6 +350,7 @@ def UDP_recv(port, channel_id, name):
     global sequence
     global related
     global channels_info
+    global last_res
     last_sequence = sequence
     last_id = ""
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -386,7 +388,18 @@ def UDP_recv(port, channel_id, name):
             if 'related' in json_data['programmer'].keys(): 
                 related = json_data['programmer']['related']
             for res in json_data['programmer']['resources']:
-                type_update(res)            
+                 if len(last_res) == 0:
+                     break
+                 if res['type'] == "broadcast":
+                     for ll in last_res:
+                         if res['id'] == ll['id'] and ll['type'] == "broadband":
+                             res_copy = res.copy()
+                             res_copy['url'] = ll['url']
+                             type_update(res_copy)
+                             break
+                 else: type_update(res)
+                
+            last_res = json_data['programmer']['resources']
                 # if related == 'true' and pffplay is not None:
                 #    t = Thread(target=prompt_add)
                     #   t.start()
