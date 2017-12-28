@@ -297,8 +297,8 @@ def prompt_add():
 def prompt_del():
     prompt_add()
 
-def type_update(res):    
-    add_command = {'type':'type','format': {'name':res['url'],'type': res['type']}}
+def type_update(res, orig):    
+    add_command = {'type':'type','format': {'orig': orig,'name':res['url'],'type': res['type']}}
     addcommand = json.dumps(add_command)
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     s.sendto(addcommand,("localhost", FFPLAY_LISTEN_PORT))
@@ -393,13 +393,15 @@ def UDP_recv(port, channel_id, name):
                  if res['type'] == "broadcast":
                      for ll in last_res:
                          if res['id'] == ll['id'] and ll['type'] == "broadband":
-                             res_copy = res.copy()
-                             res_copy['url'] = ll['url']
-                             type_update(res_copy)
+                             type_update(res, ll['url'])
                              break
-                 else: type_update(res)
+                 else: 
+                     for ll in last_res:
+                         if res['id'] == ll['id'] and ll['type'] == 'broadcast':
+                             type_update(res, ll['url'])
+                             break
                 
-            last_res = json_data['programmer']['resources']
+        last_res = json_data['programmer']['resources']
                 # if related == 'true' and pffplay is not None:
                 #    t = Thread(target=prompt_add)
                     #   t.start()
