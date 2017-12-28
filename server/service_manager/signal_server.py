@@ -297,6 +297,7 @@ def call_ffmpeg(file_dir, res, port, resource_broadcast_ip, ffplay_port, avlogex
     playlist = ''
     str_avlogext = ''
     str_output = ''
+    mmttool_output = ''
     str_port = ''
     str_bitrate = ''
     if('playlist' in res.keys()): playlist = '-f concat'
@@ -321,7 +322,7 @@ def call_ffmpeg(file_dir, res, port, resource_broadcast_ip, ffplay_port, avlogex
 	    str_output = 'smt://%s:%s' % (resource_broadcast_ip, ffplay_port)
 	else:
 	    str_output = 'smt://%s:%s' % (BROADBAND_SERVER_IP, 1)
-        
+    mmttool_output = 'smt://%s:%s' % (resource_broadcast_ip, ffplay_port)    
     str_duration = ''
     if play_order_type == PlayOrderType.singleloop:
         str_duration = ' -stream_loop -1'
@@ -338,7 +339,7 @@ def call_ffmpeg(file_dir, res, port, resource_broadcast_ip, ffplay_port, avlogex
     ffmpeg_list.append({"cmd":ffmpeg_command, "end":res['end']})
 
     if ext_callbacks.has_key('before_ffmpeg'):
-        ext_callbacks['before_ffmpeg'](res_type, str_output)
+        ext_callbacks['before_ffmpeg'](res_type, mmttool_output)
 
     try:
         os.system(ffmpeg_command)
@@ -346,7 +347,7 @@ def call_ffmpeg(file_dir, res, port, resource_broadcast_ip, ffplay_port, avlogex
         print "error ---------------------------------------" 
 
     if ext_callbacks.has_key('after_ffmpeg'):
-        ext_callbacks['after_ffmpeg'](res_type, str_output)
+        ext_callbacks['after_ffmpeg'](res_type, mmttool_output)
 
 def stop_all():
     global signal_timer_thread_flag
@@ -620,12 +621,12 @@ def update_signal(url,resource_broadcast_ip, resource_broadband_ip):
             if item['type'] == 'broadcast' and res['type'] == 'broadband':
                 ffplay_port = item['url'].split(':')[-1]
                 ffmpeg_port = ffplay_port[:1] + '1' + ffplay_port[2:]
+		item['url'] = 'smt://{0}:{1}@:{2}'.format(resource_broadband_ip, ffmpeg_port,ffplay_port)
+		item['type'] = 'broadband'		
 		if item['added'] == 'true':
-		    orig_url = item['url']
-		    current_url = 'smt://%s:%s' % (BROADBAND_SERVER_IP, 1)
+		    current_url = item['url']
+		    orig_url = 'smt://%s:%s' % (BROADBAND_SERVER_IP, 1)
 		    update_ffmpeg_stream(orig_url, current_url, ffmpeg_port )
-                item['url'] = 'smt://{0}:{1}@:{2}'.format(resource_broadband_ip, ffmpeg_port,ffplay_port)
-                item['type'] = 'broadband'
             elif item['type'] == 'broadband' and res['type'] == 'broadcast':
                     ffplay_port = item['url'].split(':')[-1]
                     item['url'] = 'smt://{0}:{1}'.format(resource_broadcast_ip, ffplay_port)

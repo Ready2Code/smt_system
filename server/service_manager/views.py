@@ -20,8 +20,6 @@ start_flag=1
 stop_flag=0
 
 def call_ts_adapter_before_ffmepg(res_type, src_addr):
-    if res_type == 'broadband':
-        return 
     service_settings = get_service_settings()   
     request = HttpRequest()
     request.GET ={}
@@ -37,8 +35,6 @@ def call_ts_adapter_before_ffmepg(res_type, src_addr):
     ts_adapter_views.start(request)
 
 def call_ts_adapter_after_ffmepg(res_type, src_addr):
-    if res_type == 'broadband':
-        return 
     service_settings = get_service_settings()   
     request = HttpRequest()
     request.GET ={}
