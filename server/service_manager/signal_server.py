@@ -621,12 +621,12 @@ def update_signal(url,resource_broadcast_ip, resource_broadband_ip):
             if item['type'] == 'broadcast' and res['type'] == 'broadband':
                 ffplay_port = item['url'].split(':')[-1]
                 ffmpeg_port = ffplay_port[:1] + '1' + ffplay_port[2:]
+		if item['added'] == 'true':
+		    orig_url = item['url']
+		    current_url = 'smt://%s:%s' % (BROADBAND_SERVER_IP, 1)
+		    update_ffmpeg_stream(orig_url, current_url, ffmpeg_port )
 		item['url'] = 'smt://{0}:{1}@:{2}'.format(resource_broadband_ip, ffmpeg_port,ffplay_port)
 		item['type'] = 'broadband'		
-		if item['added'] == 'true':
-		    current_url = item['url']
-		    orig_url = 'smt://%s:%s' % (BROADBAND_SERVER_IP, 1)
-		    update_ffmpeg_stream(orig_url, current_url, ffmpeg_port )
             elif item['type'] == 'broadband' and res['type'] == 'broadcast':
                     ffplay_port = item['url'].split(':')[-1]
                     item['url'] = 'smt://{0}:{1}'.format(resource_broadcast_ip, ffplay_port)
