@@ -111,7 +111,7 @@ def window_stack_check_type(wid):
         if wid == window_stack_list[i]['id']:
             return window_stack_list[i]['type']
     return
-      
+
 def window_stack_fullscreen_type(wid):
     global window_stack_list
     for i in range(len(window_stack_list)-1,-1,-1):
@@ -120,8 +120,8 @@ def window_stack_fullscreen_type(wid):
             else: window_stack_list[i]['type'] = 'fullscreen'
         else:
             if(window_stack_list[i]['type'] == 'fullscreen'):  window_stack_list[i]['type'] = 'normal'
-    
-     
+
+
 def cal_screen_value(val, is_width = True):
     if isinstance(val, int):
         return val
@@ -156,7 +156,7 @@ def call_ffplay(res):
     #str_quick='-fflags nobuffer  -analyzeduration 100 -probesize 50 -framedrop '
     str_quick=' -analyzeduration 100 -probesize 50 -framedrop '
     str_type = ' -type ' + res_type
-        
+
     if platform.system() == "Windows":
         ffplay_command = RELATIVE_PATH + 'ffplay.exe' + ' '
     if platform.system() == "Linux":
@@ -175,7 +175,7 @@ def call_ffplay(res):
         if ('bk' in res.keys()):
             str_bk = '-bk '+ res['bk'] + ' '
         ffplay_command =(ffplay_command + str_sync + str_avlogext + res['url'] + ' ' + str_port + str_bk + str_quick + str_type)
- 
+
     print ffplay_command
     window_stack_clean()
     window_stack_push(res['id'],res['url'],'fullscreen')
@@ -194,7 +194,7 @@ def call_ffplay(res):
     curr_time_with_timezone = datetime.now()
     curr_time = time_remove_timezone(curr_time_with_timezone)
     delta = endtime - curr_time 
-    
+
     cur_ffplay_id = ffplay_pid
     time.sleep(delta.seconds)
     print delta.seconds, "passed  resource [", res['name'], "] is closed"
@@ -220,7 +220,7 @@ def get_ip_and_name_from_url(url):
         name = url
     return (server_ip, name)
 
- 
+
 def add_ffplay(res, full = DEFAULT):
     #print res
     global related
@@ -259,7 +259,7 @@ def add_ffplay(res, full = DEFAULT):
 
     if(related == 'true'):
         time.sleep(2)
-        prompt_add()
+            prompt_add()
     delta = endtime - curr_time
     # add 1 more second 
     cur_ffplay_id = ffplay_pid
@@ -302,7 +302,7 @@ def type_update(res, orig):
     addcommand = json.dumps(add_command)
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     s.sendto(addcommand,("localhost", FFPLAY_LISTEN_PORT))
-    
+
 def fullscreen(res):    
     full_command = {'type':'full','format': {'name': res['url']}}
     fullcommand = json.dumps(full_command)
@@ -317,34 +317,34 @@ def get_time_second(time):
     return cur_time
 
 def control_embeded_ad__reddot_display(json_data):
-   global related
-   count=0
-   if json_data['programmer']['sequence']  > 0:
-     for res in json_data['programmer']['resources']:
-       if count==0:
-          count=count+1
-          continue
-       if res['info'] == 'embeded_ad':
-          begin_time=res['begin']
-          end_time=res['end']
-          now_time = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time()))
-          nowtime= get_time_second(now_time)
-          ad_begintime= get_time_second(begin_time)
-          ad_endtime= get_time_second(end_time)
-          diff=nowtime - ad_begintime
-          diff2=nowtime - ad_endtime
+    global related
+    count=0
+    if json_data['programmer']['sequence']  > 0:
+        for res in json_data['programmer']['resources']:
+            if count==0:
+                count=count+1
+                continue
+            if res['info'] == 'embeded_ad':
+                begin_time=res['begin']
+                end_time=res['end']
+                now_time = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time()))
+                nowtime= get_time_second(now_time)
+                ad_begintime= get_time_second(begin_time)
+                ad_endtime= get_time_second(end_time)
+                diff=nowtime - ad_begintime
+                diff2=nowtime - ad_endtime
 #       print "name ===================================\n",res['name']
 #         print "begintime ===================================\n",begin_time
 #         print "endtime ===================================\n", end_time
 #         print "now_time===================================\n" ,nowtime
 #         print "diff===================================\n" ,diff
 #         print "diff2===================================\n" ,diff2
-          if diff > -2 and diff < 1:
-             related='true'
-             prompt_add()
-          if diff2 > 0 and related=='true':
-             related='false'
-             prompt_del()
+                if diff > -2 and diff < 1:
+                    related='true'
+                    prompt_add()
+                if diff2 > 0 and related=='true':
+                    related='false'
+                    prompt_del()
 
 def UDP_recv(port, channel_id, name):
     global sequence
@@ -388,19 +388,19 @@ def UDP_recv(port, channel_id, name):
             if 'related' in json_data['programmer'].keys(): 
                 related = json_data['programmer']['related']
             for res in json_data['programmer']['resources']:
-                 if len(last_res) == 0:
-                     break
-                 if res['type'] == "broadcast":
-                     for ll in last_res:
-                         if res['id'] == ll['id'] and ll['type'] == "broadband":
-                             type_update(res, ll['url'])
-                             break
-                 else: 
-                     for ll in last_res:
-                         if res['id'] == ll['id'] and ll['type'] == 'broadcast':
-                             type_update(res, ll['url'])
-                             break
-                
+                if len(last_res) == 0:
+                    break
+                if res['type'] == "broadcast":
+                    for ll in last_res:
+                        if res['id'] == ll['id'] and ll['type'] == "broadband":
+                            type_update(res, ll['url'])
+                            break
+                else: 
+                    for ll in last_res:
+                        if res['id'] == ll['id'] and ll['type'] == 'broadcast':
+                            type_update(res, ll['url'])
+                            break
+
         last_res = json_data['programmer']['resources']
                 # if related == 'true' and pffplay is not None:
                 #    t = Thread(target=prompt_add)
@@ -572,7 +572,7 @@ def play_programmer(val = DEFAULT, full = DEFAULT):
                 exception = vals[0] + ':' + res['exception']
             else:
                 exception = ''
-          
+
             if pffplay is not None:
                 if(window_stack_check_type(res['id']) == 'normal' and full == 'full'):
                     fullscreen(res)
