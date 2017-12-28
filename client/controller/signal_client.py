@@ -259,9 +259,9 @@ def add_ffplay(res, full = DEFAULT):
 
     if(related == 'true'):
         time.sleep(2)
-            prompt_add()
+        prompt_add()
     delta = endtime - curr_time
-    # add 1 more second 
+        # add 1 more second 
     cur_ffplay_id = ffplay_pid
     time.sleep(delta.seconds)
     print delta.seconds, "passed  resource [", res['name'], "] is closed"
