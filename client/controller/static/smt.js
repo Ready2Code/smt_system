@@ -115,7 +115,7 @@ function get_program_list_data() {
 		   var begintime=resources[i].begin
 		   arr=begintime.split(":")
 		   var min= parseInt(arr[1])*60
-		   var second= parseInt(arr[2])
+		   var second= parseFloat(arr[2])
 		   //console.log("minute====",min)
 		  // console.log("second====",second)
 		   var displaytime=min+second
@@ -129,7 +129,7 @@ function get_program_list_data() {
 		  	row++
             newtr = newtr + "<td > <a href='#'><img src=" + resources[i].poster + " alt=" + resources[i].name +" </td>"
             newtr = newtr + "<td > <button ad_url='" + resources[i].adurl + "' " 
-                          + "class='process_resource_ad'>"+resources[i].adname+"</button> </td>"
+                          + "class='process_resource_ad'>购买</button> </td>"
 			tabnewtr=newtr
 			name= resources[i].name
 		   }
@@ -138,7 +138,7 @@ function get_program_list_data() {
 		  	 row++
              newtr = newtr + "<td > <a href='#'><img src=" + resources[i].poster + " alt=" + resources[i].name +" </td>"
              newtr = newtr + "<td > <button ad_url='" + resources[i].adurl + "' " 
-                           + "class='process_resource_ad'>"+resources[i].adname+"</button> </td>"
+                           + "class='process_resource_ad'>购买</button> </td>"
 			}
 		      
 		   }

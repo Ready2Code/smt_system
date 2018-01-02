@@ -144,7 +144,10 @@ def url_load(url):
     return data.read()
 
 def cal_delta_time(tt):
-    t = datetime.strptime(tt,'d%H:%M:%S')
+    if "." in tt:
+      t = datetime.strptime(tt,'d%H:%M:%S.%f')
+    else:
+      t = datetime.strptime(tt,'d%H:%M:%S')
     delta = timedelta(hours=t.hour,minutes=t.minute,seconds=t.second)
     delta += timedelta(milliseconds=(aheadtime+cachetime))
     return delta
@@ -174,6 +177,26 @@ def first_signal(dest):
         counter = counter - 1
         time.sleep(0.1)
     
+def add_embeded_ad_info(program_data,dir_path):
+    external_url=program_data['programmer']['external_resources']
+    resources=program_data['programmer']['resources']
+    if(external_url != ''):
+      (ad_path, name) = os.path.split(external_url)
+      external_url='file://'+dir_path+'/'+name
+      ad_data= url_load(external_url)
+      ad_json=json.loads(ad_data)
+      
+      for i in range(len(ad_json['resource'])):
+#         ad_url=program_data['programmer']['external_resources']
+#         ad_path = os.path.dirname(functions.url2pathname(ad_url))
+#          adurl =ad_path+'/'+ad_json['resource'][i]['ad_image']
+          adurl =ad_json['resource'][i]['ad_image']
+          begin ='d0'+ad_json['resource'][i]['begin']
+          end   ='d0'+ad_json['resource'][i]['end']
+          poster =ad_path+'/'+ad_json['resource'][i]['poster_image']
+          id="cloth-"+str(i)
+          resources.append({"adurl":adurl,"begin":begin,"end":end,"info":"embeded_ad","poster":poster,"adname":"goumai","type":"broadband","id":id })
+    return program_data
 def convert_signal(json_data, resource_broadcast_ip, resource_broadband_ip,avlogext='',static_resource_host='', dir_name='/'):
 #def convert_signal(json_file, resource_broadcast_ip, resource_broadband_ip,static_resource_host,avlogext=''):
     global resource_num
@@ -211,7 +234,7 @@ def convert_signal(json_data, resource_broadcast_ip, resource_broadband_ip,avlog
             #    bkfile = bkfile.replace('./', FILE_RELATIVE_PATH)  
         if(localfile == ''): print 'error url or playlist has to been assigned' 
         localfile = localfile.replace('?' , '-' + res['type'] )
-        if not os.path.isabs(localfile):
+        if localfile != '' and not os.path.isabs(localfile):
             localfile = os.path.normpath(dir_name+'/'+localfile)
         #if localfile.encode('ascii', 'ignore').startswith('./'):
         #    localfile = localfile.replace('./', FILE_RELATIVE_PATH)
@@ -241,14 +264,29 @@ def convert_signal(json_data, resource_broadcast_ip, resource_broadband_ip,avlog
                 print "copy error", res['poster'], ' ', POSTER_PATH + name
             res['poster'] = 'http://' + static_resource_host + '/static/' + name
             
+        if 'adurl' in res.keys():
+            if not os.path.isabs(res['adurl']):
+# ad_url=json_data['programmer']['external_resources']
+#                ad_path = os.path.dirname(functions.url2pathname(ad_url))
+#                res['adurl'] = os.path.normpath(ad_path+'/' + res['adurl'])
+                 res['adurl'] = os.path.normpath(dir_name+'/' + res['adurl'])
+            (path, name) = os.path.split(res['adurl'])
+            print "name===================="+ name
+            print "adurl0===================="+ res['adurl']
+            try:
+                shutil.copy(res['adurl'], POSTER_PATH + name)
+            except:
+                print "copy error", res['adurl'], ' ', POSTER_PATH + name
+            res['adurl'] = 'http://' + static_resource_host + '/static/' + name
         #print str(res['begin'])
         res['ffmpeg_port'] = ffmpeg_port
-        t = Thread(target=call_ffmpeg, args=(localfile, res, ffmpeg_port, resource_broadcast_ip, ffplay_port, avlogext))
-        t.daemon = True
-        t.start()
-        resource_num += 1
-        resource_num = resource_num % 10
-        time.sleep(0.1)
+        if localfile != '':
+            t = Thread(target=call_ffmpeg, args=(localfile, res, ffmpeg_port, resource_broadcast_ip, ffplay_port, avlogext))
+            t.daemon = True
+            t.start()
+            resource_num += 1
+            resource_num = resource_num % 10
+            time.sleep(0.1)
 
         if ('bk' in res.keys()):
             res_bk = res.copy()
