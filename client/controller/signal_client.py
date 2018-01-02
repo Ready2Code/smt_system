@@ -523,10 +523,10 @@ def show_channels():
 
 def show_channel(channel_id = DEFAULT):
     global channels_info
-    ret = object()
+    ret = {}
     if channel_id is DEFAULT:
         print bcolors.FAIL + "missing operand: need channel_id" + bcolors.ENDC
-        return
+        return ret 
     if channel_id not in channels_info.keys():
         print bcolors.FAIL + "unknown channel_id" + bcolors.ENDC
     else:
