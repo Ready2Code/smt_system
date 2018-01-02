@@ -553,7 +553,9 @@ def start_smt_system(programs_file=CONFIG_FILE_NAME,
             
             if play_order_type == PlayOrderType.singleloop:
                 json_data['programmer']['end'] = "d23:59:59"
-            
+            if ('external_resources' in json_data['programmer'].keys()): 
+              json_data = add_embeded_ad_info(json_data,dir_name)
+#print "jsondata:======\n" + json.dumps(json_data)
             convert = convert_signal(json_data, resource_broadcast_ip, resource_broadband_ip, avlogext_ip+':'+str(avlogext_port),static_resource_host,dir_name)
             packet = convert
             print packet
