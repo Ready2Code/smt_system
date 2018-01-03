@@ -61,7 +61,7 @@ class PlayOrderType:
             return PlayOrderType.onebyone  
         else:
             return PlayOrderType.unknown
-            
+
 play_order_type = PlayOrderType.onebyone
 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 packet = ''
@@ -86,11 +86,11 @@ class SignalTimerThread(Thread):
         self.stopped = event
         self.dests = [dest]
         self.program_url = ''
-	self.broadband_ip = broadband_ip
+        self.broadband_ip = broadband_ip
 
     def add_dest(self, dest):
         self.dests.append(dest)
-        
+
     def update_url(self,file):
         self.program_url = file
 
@@ -145,9 +145,9 @@ def url_load(url):
 
 def cal_delta_time(tt):
     if "." in tt:
-      t = datetime.strptime(tt,'d%H:%M:%S.%f')
+        t = datetime.strptime(tt,'d%H:%M:%S.%f')
     else:
-      t = datetime.strptime(tt,'d%H:%M:%S')
+        t = datetime.strptime(tt,'d%H:%M:%S')
     delta = timedelta(hours=t.hour,minutes=t.minute,seconds=t.second)
     delta += timedelta(milliseconds=(aheadtime+cachetime))
     return delta
@@ -176,26 +176,26 @@ def first_signal(dest):
         print "##### restart %.1f%% ######" % (cmd["counter"] * 100 ),
         counter = counter - 1
         time.sleep(0.1)
-    
+
 def add_embeded_ad_info(program_data,dir_path):
     external_url=program_data['programmer']['external_resources']
     resources=program_data['programmer']['resources']
     if(external_url != ''):
-      (ad_path, name) = os.path.split(external_url)
-      external_url='file://'+dir_path+'/'+name
-      ad_data= url_load(external_url)
-      ad_json=json.loads(ad_data)
-      
-      for i in range(len(ad_json['resource'])):
+        (ad_path, name) = os.path.split(external_url)
+        external_url='file://'+dir_path+'/'+name
+        ad_data= url_load(external_url)
+        ad_json=json.loads(ad_data)
+
+        for i in range(len(ad_json['resource'])):
 #         ad_url=program_data['programmer']['external_resources']
 #         ad_path = os.path.dirname(functions.url2pathname(ad_url))
 #          adurl =ad_path+'/'+ad_json['resource'][i]['ad_image']
-          adurl =ad_json['resource'][i]['ad_image']
-          begin ='d0'+ad_json['resource'][i]['begin']
-          end   ='d0'+ad_json['resource'][i]['end']
-          poster =ad_path+'/'+ad_json['resource'][i]['poster_image']
-          id="cloth-"+str(i)
-          resources.append({"adurl":adurl,"begin":begin,"end":end,"info":"embeded_ad","poster":poster,"adname":"goumai","type":"broadband","id":id })
+            adurl =ad_json['resource'][i]['ad_image']
+            begin ='d0'+ad_json['resource'][i]['begin']
+            end   ='d0'+ad_json['resource'][i]['end']
+            poster =ad_path+'/'+ad_json['resource'][i]['poster_image']
+            id="cloth-"+str(i)
+            resources.append({"adurl":adurl,"begin":begin,"end":end,"info":"embeded_ad","poster":poster,"adname":"goumai","type":"broadband","id":id })
     return program_data
 def convert_signal(json_data, resource_broadcast_ip, resource_broadband_ip,avlogext='',static_resource_host='', dir_name='/'):
 #def convert_signal(json_file, resource_broadcast_ip, resource_broadband_ip,static_resource_host,avlogext=''):
@@ -204,7 +204,7 @@ def convert_signal(json_data, resource_broadcast_ip, resource_broadband_ip,avlog
     global packet
     global ffmpeg_list
     global play_order_type 
-    
+
 #    for i in range(len(ffmpeg_list)):
 #        functions.kill_process_by_name(ffmpeg_list[i]["cmd"])
 #    del ffmpeg_list[:]
@@ -263,13 +263,13 @@ def convert_signal(json_data, resource_broadcast_ip, resource_broadband_ip,avlog
             except:
                 print "copy error", res['poster'], ' ', POSTER_PATH + name
             res['poster'] = 'http://' + static_resource_host + '/static/' + name
-            
+
         if 'adurl' in res.keys():
             if not os.path.isabs(res['adurl']):
 # ad_url=json_data['programmer']['external_resources']
 #                ad_path = os.path.dirname(functions.url2pathname(ad_url))
 #                res['adurl'] = os.path.normpath(ad_path+'/' + res['adurl'])
-                 res['adurl'] = os.path.normpath(dir_name+'/' + res['adurl'])
+                res['adurl'] = os.path.normpath(dir_name+'/' + res['adurl'])
             (path, name) = os.path.split(res['adurl'])
             print "name===================="+ name
             print "adurl0===================="+ res['adurl']
@@ -323,8 +323,8 @@ def call_ffmpeg_for_send_signalling(input_address, output_address ):
     print "ffmpeg_command=",ffmpeg_command
     ffmpeg_list.append({"cmd":ffmpeg_command, "end":datetime.now() + timedelta(days=999)})
     os.system(ffmpeg_command)
-  
-    
+
+
 def call_ffmpeg(file_dir, res, port, resource_broadcast_ip, ffplay_port, avlogext=''):
     global play_order_type
     time.sleep(aheadtime/1000)
@@ -356,10 +356,10 @@ def call_ffmpeg(file_dir, res, port, resource_broadcast_ip, ffplay_port, avlogex
         str_output = 'smt://%s:%s' % (BROADBAND_SERVER_IP, 1)
     elif(res_type == 'broadcast'):
         str_port ='-port %s' % port
-	if res['added'] == 'true':
-	    str_output = 'smt://%s:%s' % (resource_broadcast_ip, ffplay_port)
-	else:
-	    str_output = 'smt://%s:%s' % (BROADBAND_SERVER_IP, 1)
+        if res['added'] == 'true':
+            str_output = 'smt://%s:%s' % (resource_broadcast_ip, ffplay_port)
+        else:
+            str_output = 'smt://%s:%s' % (BROADBAND_SERVER_IP, 1)
     mmttool_output = 'smt://%s:%s' % (resource_broadcast_ip, ffplay_port)    
     str_duration = ''
     if play_order_type == PlayOrderType.singleloop:
@@ -550,11 +550,11 @@ def start_smt_system(programs_file=CONFIG_FILE_NAME,
 
             dir_name = os.path.dirname(functions.url2pathname(url))
             resource_num = 1
-            
+
             if play_order_type == PlayOrderType.singleloop:
                 json_data['programmer']['end'] = "d23:59:59"
             if ('external_resources' in json_data['programmer'].keys()): 
-              json_data = add_embeded_ad_info(json_data,dir_name)
+                json_data = add_embeded_ad_info(json_data,dir_name)
 #print "jsondata:======\n" + json.dumps(json_data)
             convert = convert_signal(json_data, resource_broadcast_ip, resource_broadband_ip, avlogext_ip+':'+str(avlogext_port),static_resource_host,dir_name)
             packet = convert
@@ -602,7 +602,7 @@ def get_bitrate_from_str(bitrate_str):
     except Exception, e:
         print traceback.format_exc()
     return bitrate
-        
+
 def notify_bitrate_change(bitrate_str, dest):
     global s
     print "notify (", dest,") bitrate_change, new bitrate = ", bitrate_str
@@ -614,7 +614,7 @@ def notify_bitrate_change(bitrate_str, dest):
         s.sendto(json.dumps(cmd), dest)
     except Exception, e:
         print traceback.format_exc()
-    
+
 def check_bitrate(json_data,resource_broadcast_ip, resource_broadband_ip):
     resources = json_data['programmer']['resources']
     for res in resources:
@@ -633,7 +633,7 @@ def update_ffmpeg_stream(orig, current, ffmpeg_port):
     command = "mod " + orig + " " + current
     print command
     s.sendto(command,("localhost", int(ffmpeg_port)))    
-    
+
 
 
 def update_signal(url,resource_broadcast_ip, resource_broadband_ip):
@@ -646,7 +646,7 @@ def update_signal(url,resource_broadcast_ip, resource_broadband_ip):
     except Exception, e:
         print traceback.format_exc()
     if json_data['programmer']['sequence'] <= sequence_number:
-	return
+        return
     check_bitrate(json_data, resource_broadcast_ip, resource_broadband_ip)
     print "update file <" , url , "> successful \n"
     sequence_number = json_data['programmer']['sequence']
@@ -657,37 +657,37 @@ def update_signal(url,resource_broadcast_ip, resource_broadband_ip):
             if item['id'] != res['id']: continue
             if item['sequence'] >= res['sequence']: break
             item['sequence'] = res['sequence']
-            
+
             if item['type'] == 'broadcast' and res['type'] == 'broadband':
                 ffplay_port = item['url'].split(':')[-1]
                 ffmpeg_port = ffplay_port[:1] + '1' + ffplay_port[2:]
-		if item['added'] == 'true':
-		    orig_url = item['url']
-		    current_url = 'smt://%s:%s' % (BROADBAND_SERVER_IP, 1)
-		    update_ffmpeg_stream(orig_url, current_url, ffmpeg_port )
-		item['url'] = 'smt://{0}:{1}@:{2}'.format(resource_broadband_ip, ffmpeg_port,ffplay_port)
-		item['type'] = 'broadband'		
+                if item['added'] == 'true':
+                    orig_url = item['url']
+                    current_url = 'smt://%s:%s' % (BROADBAND_SERVER_IP, 1)
+                    update_ffmpeg_stream(orig_url, current_url, ffmpeg_port )
+                item['url'] = 'smt://{0}:{1}@:{2}'.format(resource_broadband_ip, ffmpeg_port,ffplay_port)
+                item['type'] = 'broadband'		
             elif item['type'] == 'broadband' and res['type'] == 'broadcast':
-                    ffplay_port = item['url'].split(':')[-1]
-                    item['url'] = 'smt://{0}:{1}'.format(resource_broadcast_ip, ffplay_port)
-                    item['type'] = 'broadcast' 
-		    if res['added'] == 'true':
-			orig_url = 'smt://%s:%s' % (BROADBAND_SERVER_IP, 1) 
-			current_url = item['url']
-			update_ffmpeg_stream(orig_url, current_url, item['ffmpeg_port'] )
-	    elif item['type'] == 'broadcast' and res['type'] == 'broadcast':
-		if item['added'] == 'true' and res['added'] == 'false':
-		    orig_url = item['url']
-		    current_url = 'smt://%s:%s' % (BROADBAND_SERVER_IP, 1)
-		    update_ffmpeg_stream(orig_url, current_url, item['ffmpeg_port'] )	
-		elif item['added'] == 'false' and res['added'] == 'true':
-		    orig_url = 'smt://%s:%s' % (BROADBAND_SERVER_IP, 1) 
-		    current_url = item['url']
-		    update_ffmpeg_stream(orig_url, current_url, item['ffmpeg_port'] )		    
-	    item['added'] = res['added']
+                ffplay_port = item['url'].split(':')[-1]
+                item['url'] = 'smt://{0}:{1}'.format(resource_broadcast_ip, ffplay_port)
+                item['type'] = 'broadcast' 
+                if res['added'] == 'true':
+                    orig_url = 'smt://%s:%s' % (BROADBAND_SERVER_IP, 1) 
+                    current_url = item['url']
+                    update_ffmpeg_stream(orig_url, current_url, item['ffmpeg_port'] )
+            elif item['type'] == 'broadcast' and res['type'] == 'broadcast':
+                if item['added'] == 'true' and res['added'] == 'false':
+                    orig_url = item['url']
+                    current_url = 'smt://%s:%s' % (BROADBAND_SERVER_IP, 1)
+                    update_ffmpeg_stream(orig_url, current_url, item['ffmpeg_port'] )	
+                elif item['added'] == 'false' and res['added'] == 'true':
+                    orig_url = 'smt://%s:%s' % (BROADBAND_SERVER_IP, 1) 
+                    current_url = item['url']
+                    update_ffmpeg_stream(orig_url, current_url, item['ffmpeg_port'] )		    
+            item['added'] = res['added']
     print packet
-            
-            
+
+
 def get_current_programme():
     return packet
 
