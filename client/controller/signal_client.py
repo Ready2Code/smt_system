@@ -14,6 +14,8 @@ from datetime import datetime, timedelta
 from threading import Timer, Thread, Event
 from subprocess import call,Popen,PIPE,STDOUT
 from utils import functions
+from utils import smt_proto 
+from utils import signal_format_converter 
 
 
 FNULL = open(os.devnull, 'w')
@@ -47,7 +49,9 @@ g_device_name = ''
 g_sync='smt'
 window_stack_list = []
 last_res = {}
-
+signal_thread = None
+smtproto = smt_proto.SmtProto()
+program_json_data = {}
 class bcolors:
     HEADER = '\033[95m'
     OKBLUE = '\033[94m'
@@ -197,7 +201,10 @@ def call_ffplay(res):
 
     cur_ffplay_id = ffplay_pid
     time.sleep(delta.seconds)
-    print delta.seconds, "passed  resource [", res['name'], "] is closed"
+    if res.has_key('name'):
+        print delta.seconds, "passed  resource [", res['name'], "] is closed"
+    else:
+        print delta.seconds, "passed  resource [", res['id'], "] is closed"
     del_ffplay(res, cur_ffplay_id)
 
 def time_remove_timezone(stime, zone_offset='default'):
@@ -320,7 +327,7 @@ def control_embeded_ad__reddot_display(json_data):
     global related
     if json_data['programmer']['sequence']  > 0:
         for res in json_data['programmer']['resources']:
-            if res['info'] == 'embeded_ad':
+            if res.has_key('info') and res['info'] == 'embeded_ad':
                 begin_time=res['begin']
                 end_time=res['end']
                 now_time = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time()))
@@ -347,18 +354,29 @@ def UDP_recv(port, channel_id, name):
     global related
     global channels_info
     global last_res
+    global smtproto
+    global program_json_data
     last_sequence = sequence
     last_id = ""
+    last_begintime = ""
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     print 'binding sigalling port=%d' % port
     s.bind(('', port))
     print bcolors.OKBLUE + "{2} id [{0}] is listened on port {1}".format(channel_id, port, name.encode('utf-8').strip()) + bcolors.ENDC
 
+
     while 1:
 #data, address = s.recvfrom(4096)
         data, address = s.recvfrom(65535)
-        print "data========" +data
-        json_data = json.loads(data)
+        json_data = {}
+        try:
+            json_data = json.loads(data)
+        except:
+            if smtproto.process_smtp_data(data):
+                json_data = signal_format_converter.PA_message_to_program(smtproto.message["PA_message"])
+            else:
+                continue
+        program_json_data = json_data
         control_embeded_ad__reddot_display(json_data)
         if is_gateway == 1 and json_data['programmer']['sequence'] > 0:
             for res in json_data['programmer']['resources']:
@@ -375,9 +393,9 @@ def UDP_recv(port, channel_id, name):
         if(is_continue_play and
            continue_play_channel == channel_id and
            json_data['programmer']['sequence'] > sequence and
-           json_data['programmer']['id'] != last_id ):
+           json_data['programmer']['begin'] != last_begintime ):
             sequence = json_data['programmer']['sequence']
-            last_id = json_data['programmer']['id']
+            last_begintime = json_data['programmer']['begin']
             play_json(json_data)
 
         if json_data['programmer']['sequence'] > last_sequence:
@@ -495,6 +513,7 @@ def initial(info_collector_dest='', device_name=''):
         t = Thread(target=UDP_recv, args=(port,channel['id'],channel['name']))
         t.setDaemon(True)
         t.start()
+        signal_thread = t
         time.sleep(0.1)
 
     # start another thread to handle the command from other terminal like pad

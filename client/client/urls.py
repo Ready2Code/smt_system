@@ -45,5 +45,6 @@ urlpatterns = [
     url(r'^tools/$',                    tools_views.tools,         name='tools'),
     url(r'^tools/render$',                    tools_views.video_render,         name='video_render'),
     url(r'^ts_adapter/',               include('ts_adapter.urls')),
+    url(r'^utils/',               include('utils.urls')),
     url(r'^controller/',               include('controller.urls')),
 ]

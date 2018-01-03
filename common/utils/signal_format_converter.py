@@ -119,7 +119,7 @@ def create_Layer_display_table(program):
 def create_MPI_table(program):
     pass
 
-def program_to_PA_message(program):
+def program_to_PA_message(program, key):
     PA_message = {}
 
     PA_message["message_id"] = 0
@@ -140,8 +140,10 @@ def program_to_PA_message(program):
     Layer_display_table = create_Layer_display_table(program)
     PA_message["extension"].append({"table_id":Layer_display_table["table_id"],"table_version":Layer_display_table["version"]})
     PA_message["message_payload"].append(Layer_display_table)
-
-    return PA_message
+    if key == '':
+        return PA_message
+    else:
+        return {key:PA_message}
     #print json.dumps(PA_message, indent=4)
 
 #-------------------------------------- mmt  message josn to program.json ------------------------------------
@@ -192,7 +194,7 @@ def parse_additional_descriptor(additional_descriptor, resource):
 
 
 
-def PA_message_to_program(PA_message):
+def PA_message_to_program(PA_message, key=''):
     root = {}
     root["programmer"] = {}
     program = root["programmer"]
@@ -207,9 +209,11 @@ def PA_message_to_program(PA_message):
             parse_Layer_display_table(table, program)
 
     program["begin"] = program["resources"][0]["begin"]
-    program["end"] = program["resources"][0]["end"]    
-    return root
-
+    program["end"] = program["resources"][0]["end"] 
+    if key == '':
+        return root
+    else:
+        return {key:root}
 
 
 #------------------------------------------------------------

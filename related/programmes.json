@@ -1,18 +1,14 @@
 {
-    "aheadtime": 2000,
-    "id": "1",
-    "cachetime": 2000,
+    "aheadtime": "2000", 
+    "id": "1", 
+    "cachetime": "2000", 
     "programmers": [
         {
-            "name": "concert",
-            "url": "file:///home/sjtu/Videos/demo_program/concert_multiview/program.json",
-            "begin": "indefinite",
-            "end": "indefinite"
-        },{
-            "name": "concert",
-            "url": "file:///home/sjtu/Videos/demo_program/concert_multiview/program.json",
-            "begin": "indefinite",
-            "end": "indefinite"
+            "name": "\u97f3\u4e50\u4f1a\uff08\u591a\u753b\u9762\uff09 ", 
+            "url": "file:///media/External-3/Videos/programs/demo_release/multi_view/program.json", 
+            "begin": "00:00:00", 
+            "end": "00:00:00"
         }
-    ]
+    ], 
+    "play_order_type": "singleloop"
 }

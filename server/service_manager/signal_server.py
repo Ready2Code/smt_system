@@ -21,6 +21,7 @@ from utils import signal_format_converter
 
 # This is a throwaway variable to deal with a python bug
 throwaway = datetime.strptime('20110101','%Y%m%d')
+signal_thread  = None
 
 FNULL = open(os.devnull, 'w')
 
@@ -100,7 +101,7 @@ class SignalTimerThread(Thread):
 
         for dest in self.dests:
             if dest['format'] == 'smtp_message':
-                dest['current_address'] = ('127.0.0.1', dest['destination_address'][1])
+                dest['current_address'] = ('127.0.0.1', dest['destination_address'][1]+40000)
                 call_ffmpeg_for_send_signalling(dest['current_address'], dest['destination_address'])
             else:
                 dest['current_address'] = dest['destination_address']
@@ -313,18 +314,23 @@ def get_begin_time_string(begin_time, zone_offset='default'):
 
 def call_ffmpeg_for_send_signalling(input_address, output_address ):
     global ffmpeg_list
-    ffmpeg_command = ""
+    command = ""
     if platform.system() == "Windows":
-        ffmpeg_command = SETTING_RELATIVE_PATH + 'ffmpeg.exe'
+        command = SETTING_RELATIVE_PATH + 'smtsig.exe'
     if platform.system() == "Linux":
-        ffmpeg_command = SETTING_RELATIVE_PATH + 'ffmpeg'
-    ffmpeg_command = ffmpeg_command + " -i smt://signalling:message.json@" + input_address[0] + ":" + str(input_address[1])
-    ffmpeg_command = ffmpeg_command + " -f mpu smt://" + output_address[0] + ":" + str(output_address[1])
-    print "ffmpeg_command=",ffmpeg_command
-    ffmpeg_list.append({"cmd":ffmpeg_command, "end":datetime.now() + timedelta(days=999)})
-    os.system(ffmpeg_command)
+        command = SETTING_RELATIVE_PATH + 'smtsig'
+    #command = command + " -i smt://signalling:message.json@" + input_address[0] + ":" + str(input_address[1])
+    #command = command + " -f mpu smt://" + output_address[0] + ":" + str(output_address[1])
+    command = command + " udp://"+ input_address[0] + ":" + str(input_address[1])
+    command = command + " smt://" + output_address[0] + ":" + str(output_address[1])
+    print "command=",command
+    ffmpeg_list.append({"cmd":command, "end":datetime.now() + timedelta(days=999)})
+    t = Thread(target=os.system, args=(command, ))
+    t.daemon = True
+    t.start()
 
-
+  
+    
 def call_ffmpeg(file_dir, res, port, resource_broadcast_ip, ffplay_port, avlogext=''):
     global play_order_type
     time.sleep(aheadtime/1000)
@@ -356,10 +362,10 @@ def call_ffmpeg(file_dir, res, port, resource_broadcast_ip, ffplay_port, avlogex
         str_output = 'smt://%s:%s' % (BROADBAND_SERVER_IP, 1)
     elif(res_type == 'broadcast'):
         str_port ='-port %s' % port
-        if res['added'] == 'true':
-            str_output = 'smt://%s:%s' % (resource_broadcast_ip, ffplay_port)
-        else:
+        if res.has_key('added') and res['added'] == 'false':
             str_output = 'smt://%s:%s' % (BROADBAND_SERVER_IP, 1)
+        else:
+            str_output = 'smt://%s:%s' % (resource_broadcast_ip, ffplay_port)
     mmttool_output = 'smt://%s:%s' % (resource_broadcast_ip, ffplay_port)    
     str_duration = ''
     if play_order_type == PlayOrderType.singleloop:
@@ -425,7 +431,7 @@ def delay_broadcast(s, packet, des):
         if des['format'] == 'program.json':
             sp = json.dumps(packet, cls=DateTimeEncoder)#.encode('utf8')
         elif des['format'] == 'message.json' or des['format'] == 'smtp_message':
-            message_json = signal_format_converter.program_to_PA_message(packet["programmer"])
+            message_json = signal_format_converter.program_to_PA_message(packet["programmer"], 'PA_message')
             sp = json.dumps(message_json, cls=DateTimeEncoder)
         else:
             return
@@ -499,6 +505,7 @@ def start_smt_system(programs_file=CONFIG_FILE_NAME,
     global signal_destination 
     global start_system_flag
     global play_order_type
+    global signal_thread 
 
     signal_timer_thread_flag = 1
     start_system_flag=1
@@ -525,6 +532,7 @@ def start_smt_system(programs_file=CONFIG_FILE_NAME,
     #thread.set_signal_format(signal_format)
     thread.setDaemon(True)
     thread.start()
+    signal_thread = thread
     t = Thread(target=command_timer)
     t.daemon = True
     t.start()
