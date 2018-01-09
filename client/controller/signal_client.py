@@ -582,7 +582,7 @@ def play_programmer(val = DEFAULT, full = DEFAULT):
         print bcolors.FAIL + "unknown channel_id" + bcolors.ENDC
         return
     programmers = channels_info[vals[0]]
-    related = programmers['programmer']['related']
+    related = programmers['programmer']['related'] if programmers['programmer'].has_key('related') else ''
     for res in programmers['programmer']['resources']:
         if res['id'] == vals[1]:
             if('exception' in res.keys()):
