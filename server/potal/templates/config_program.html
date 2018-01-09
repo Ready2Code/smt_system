@@ -96,13 +96,16 @@
                }
 
             }
-			function add_programmes(data,name,path){
+			function add_programmes(data,name,path,external_resources){
 			  var jsonObj=JSON.parse(data)
 			  var add_json={}
               add_json['name']=name
               add_json['url']= path
               add_json['begin']="00:00:00"
               add_json['end']="00:00:00"
+			  if(typeof(external_resources) !='undefined'){
+                 add_json['external_resources']=external_resources
+			  }
 			  jsonObj.programmers.push(add_json)
 			  var json_data=JSON.stringify(jsonObj).replace(/\\n/g,"\\n").replace(/\\r/g,"\\n")
 			  set_config_file(json_data,programmes_path)
@@ -121,13 +124,15 @@
 			}
             function init_programmes(data){
 			  var jsonObj=JSON.parse(data)	
+			 // console.log("data========",data)
               if(typeof(jsonObj.play_order_type)) {
                   $('#play_order_type').val(jsonObj.play_order_type)
               }
 			  for(i=0;i<jsonObj.programmers.length;i++){  
 				    pro_name=jsonObj.programmers[i].name
 				    pro_url=jsonObj.programmers[i].url
-                    get_programme_list(pro_name,pro_url)  
+					external_resources = jsonObj.programmers[i].external_resources
+                    get_programme_list(pro_name,pro_url,external_resources)  
 			  }
 			}
             function up_programmes(data,index,path){
@@ -297,10 +302,11 @@
                 )
 		        $("button.process_resource").unbind('click').bind('click',function(){
 		              var name=$(this).attr('programmename')
-		              var path=$(this).attr('path')
-                      get_programme_list(name,path)
+		              var path=$(this).attr('path') 
+		              var external_resources =$(this).attr('external_resources')
+                      get_programme_list(name,path,external_resources)
 					  var data = set_programmes_file()
-					  add_programmes(data,name,path)
+					  add_programmes(data,name,path,external_resources)
 			          $("#addprogramme_list").hide()
 		    	})
 			}
@@ -318,9 +324,15 @@
 			  resource_num=num
 			  bitrate_info=bitrate
 			}
-            function get_programme_list(name,path){
+            function get_programme_list(name,path,external_resources){
 		      console.log("get_programme_list!!###############" )
 		      console.log(path)
+			  console.log(" external_resources00======",typeof(external_resources))
+			  if(external_resources=='undefined'){
+			  
+		           console.log("#####################3###############" )
+			  
+			  }
 			   var newtr = ""
 			     newtr = newtr + "<tr class='programme_list'> "
 				 newtr = newtr + "<td ></td>"
@@ -329,7 +341,19 @@
 				 newtr = newtr + "<td ><button type='button'  path="+path+""+"  programmename='"+name+" '"+"  class='process_resource_down'>"+"向下"+"</button></td>"
 				 newtr = newtr + "<td ><button type='button'  path="+path+""+"  programmename='"+name+" '"+"  class='process_resource_up'>"+"向上"+"</button></td>"
 				 newtr = newtr + "<td ><button type='button'  path="+path+""+"  programmename='"+name+" '"+"  class='process_resource_delete'>"+"删除"+"</button></td>"
-				 newtr = newtr + "<td ><button type='button'  path="+path+""+"  programmename='"+name+" '"+"  class='process_resource_edit'>"+"查看"+"</button></td>"
+				 if(external_resources=='undefined'){
+				   newtr = newtr + "<td ><button type='button'  path="+path+""+"  programmename='"+name+" '"+"  class='process_resource_edit'>"+"查看"+"</button></td>"
+				 }else{
+				   var filepath = path;
+				   var arr = filepath.split("/")
+				   delete arr[arr.length-1];
+				   var dir = arr.join("/");
+				   console.log(" external_resources2======",external_resources)
+				   var arr2= external_resources.split("/")
+				   var external_filename=arr2[arr2.length-1]
+				   external_resources_path = dir +  external_filename
+				   newtr = newtr + "<td ><button type='button'  path="+path+" "+"  programmename='"+name+" '"+"  class='process_resource_edit'>"+"查看"+"</button><button type='button'  external_resources="+external_resources_path+""+"  programmename='"    +name+" '"+"  class='process_external_resource_edit'>"+"查看ad"+"</button></td>"
+				 }
 			    $("#programme_list").append(newtr)
 
 		       $("button.process_resource_programme").unbind('click').bind('click',function(){
@@ -398,6 +422,10 @@
 			  })
 		       $("button.process_resource_edit").unbind('click').bind('click',function(){
 				   var path= $(this).attr('path')
+                   window.location.href="/edit_file/?path="+path
+			  })
+		       $("button.process_external_resource_edit").unbind('click').bind('click',function(){
+				   var path= $(this).attr('external_resources')
                    window.location.href="/edit_file/?path="+path
 			  })
 
@@ -651,10 +679,11 @@
 			      $("tr.addprogramme_list").remove()
                   clean_addprogramme_list=false
 			  }
-               var addprogramme_obj=jsonObj.programmer			   
+               var addprogramme_obj=jsonObj.programmer
+			   var external_resources= addprogramme_obj.external_resources
 			   var newtr = ""
 			   newtr = newtr + "<tr class='addprogramme_list'> "
-			   newtr = newtr + "<td ><button type='button'  path="+current_path+"  programmename='"+addprogramme_obj.name+" '"+"  class='process_resource'>"+addprogramme_obj.name+"</button></td>"
+			   newtr = newtr + "<td ><button type='button'  path="+current_path+"  external_resources="+external_resources+"  programmename='"+addprogramme_obj.name+" '"+"  class='process_resource'>"+addprogramme_obj.name+"</button></td>"
 			   $("#addprogramme_list").append(newtr)
 			   set_programme_process_response()
 			}
