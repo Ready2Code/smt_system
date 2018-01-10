@@ -132,6 +132,9 @@
 				    pro_name=jsonObj.programmers[i].name
 				    pro_url=jsonObj.programmers[i].url
 					external_resources = jsonObj.programmers[i].external_resources
+					if(typeof(external_resources)=='undefined'){
+					   external_resources=''
+					}
                     get_programme_list(pro_name,pro_url,external_resources)  
 			  }
 			}
@@ -304,6 +307,9 @@
 		              var name=$(this).attr('programmename')
 		              var path=$(this).attr('path') 
 		              var external_resources =$(this).attr('external_resources')
+					  if(typeof(external_resources)=='undefined'){
+					   external_resources=''
+					  }
                       get_programme_list(name,path,external_resources)
 					  var data = set_programmes_file()
 					  add_programmes(data,name,path,external_resources)
@@ -325,14 +331,14 @@
 			  bitrate_info=bitrate
 			}
             function get_programme_list(name,path,external_resources){
-		      console.log("get_programme_list!!###############" )
-		      console.log(path)
-			  console.log(" external_resources00======",typeof(external_resources))
-			  if(external_resources=='undefined'){
+		     // console.log("get_programme_list!!###############" )
+		     // console.log(path)
+			//  console.log(" external_resources00======",typeof(external_resources))
+			/*  if(external_resources=='undefined'){
 			  
 		           console.log("#####################3###############" )
 			  
-			  }
+			  }*/
 			   var newtr = ""
 			     newtr = newtr + "<tr class='programme_list'> "
 				 newtr = newtr + "<td ></td>"
@@ -341,14 +347,14 @@
 				 newtr = newtr + "<td ><button type='button'  path="+path+""+"  programmename='"+name+" '"+"  class='process_resource_down'>"+"向下"+"</button></td>"
 				 newtr = newtr + "<td ><button type='button'  path="+path+""+"  programmename='"+name+" '"+"  class='process_resource_up'>"+"向上"+"</button></td>"
 				 newtr = newtr + "<td ><button type='button'  path="+path+""+"  programmename='"+name+" '"+"  class='process_resource_delete'>"+"删除"+"</button></td>"
-				 if(external_resources=='undefined'){
+				 if(external_resources==''){
 				   newtr = newtr + "<td ><button type='button'  path="+path+""+"  programmename='"+name+" '"+"  class='process_resource_edit'>"+"查看"+"</button></td>"
 				 }else{
 				   var filepath = path;
 				   var arr = filepath.split("/")
 				   delete arr[arr.length-1];
 				   var dir = arr.join("/");
-				   console.log(" external_resources2======",external_resources)
+				//   console.log(" external_resources2======",external_resources)
 				   var arr2= external_resources.split("/")
 				   var external_filename=arr2[arr2.length-1]
 				   external_resources_path = dir +  external_filename
