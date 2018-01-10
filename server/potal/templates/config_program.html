@@ -689,7 +689,11 @@
 			   var external_resources= addprogramme_obj.external_resources
 			   var newtr = ""
 			   newtr = newtr + "<tr class='addprogramme_list'> "
-			   newtr = newtr + "<td ><button type='button'  path="+current_path+"  external_resources="+external_resources+"  programmename='"+addprogramme_obj.name+" '"+"  class='process_resource'>"+addprogramme_obj.name+"</button></td>"
+			   if(typeof(external_resources)=='undefined'){
+			      newtr = newtr + "<td ><button type='button'  path="+current_path+"  programmename='"+addprogramme_obj.name+" '"+"  class='process_resource'>"+addprogramme_obj.name+"</button></td>"
+			   }else{
+			     newtr = newtr + "<td ><button type='button'  path="+current_path+"  external_resources="+external_resources+"  programmename='"+addprogramme_obj.name+" '"+"  class='process_resource'>"+addprogramme_obj.name+"</button></td>"
+			   }
 			   $("#addprogramme_list").append(newtr)
 			   set_programme_process_response()
 			}
