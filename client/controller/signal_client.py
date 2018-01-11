@@ -322,6 +322,23 @@ def get_time_second(time):
     second=float(timearr[2])
     cur_time=minute+second
     return cur_time
+def show_embeded_img(json_data):
+    if json_data.has_key('programmer'):
+      if json_data['programmer'].has_key('external_resources'):
+       for res in json_data['programmer']['resources']:
+         if res.has_key('info') and res['info'] == 'embeded_ad':
+          begin_time=res['begin']
+          end_time=res['end']
+          now_time = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time()))
+          nowtime= get_time_second(now_time)
+          ad_begintime= get_time_second(begin_time)
+          ad_endtime= get_time_second(end_time)
+          diff=nowtime - ad_begintime
+          if diff >= -1.5 and diff <= -0.5:
+             res['display']='1'
+          else:
+             res['display']='0'
+    return json_data
 
 def control_embeded_ad__reddot_display(json_data):
     global related
@@ -558,7 +575,8 @@ def get_current_programme():
     cur_programme = show_channel(continue_play_channel)
     window_stack = window_stack_get()
     if cur_programme.has_key('programmer'):
-        cur_programme['programmer']['window_stack'] = window_stack 
+        cur_programme['programmer']['window_stack'] = window_stack
+    cur_programme=show_embeded_img(cur_programme) 
     return cur_programme
 
 def play_programmer(val = DEFAULT, full = DEFAULT):
@@ -582,7 +600,7 @@ def play_programmer(val = DEFAULT, full = DEFAULT):
         print bcolors.FAIL + "unknown channel_id" + bcolors.ENDC
         return
     programmers = channels_info[vals[0]]
-    related = programmers['programmer']['related']
+    related = programmers['programmer']['related'] if programmers['programmer'].has_key('related') else ''
     for res in programmers['programmer']['resources']:
         if res['id'] == vals[1]:
             if('exception' in res.keys()):

@@ -77,21 +77,27 @@ var getFnName = function(callee){
     }
     return "anonymous"
 }
+var last_name=""
+var fist_img=0
 function get_program_list_data() {
     console.log(getFnName(arguments.callee))
     $.get("/currentprogramme/", function(ret){
-        $("tr.programme_info").remove()
+    //    $("tr.programme_info").remove()
         resources = ret.programmer.resources
+        external_resources=ret.programmer.external_resources
+        if( typeof(external_resources)=='undefined'){
+          $("tr.programme_info").remove()
+        }
         set_resources(resources)
         console.log(ret.programmer)
         var newtr = ""
-		var row=0
+        var row=0
         for(var i=0; i< resources.length; i++) {
             newtr = newtr + "<tr class='programme_info'> "
-        console.log(resources[i].poster)
-        console.log("added======",resources[i].added)
+       // console.log(resources[i].poster)
+       // console.log("added======",resources[i].added)
        if(resources[i].info!='embeded_ad'){
-		if(resources[i].added == 'true'){
+		if( typeof(resources[i].added)=='undefined'  ||resources[i].added == 'true'){
         newtr = newtr + "<td > <a href='#'><img src=" + resources[i].poster + " alt=" + resources[i].name +" </td>"
         newtr = newtr + "<td > <button resource_id='" + resources[i].id + "' " 
         + "channel_id='" + ret.channel_id + "' "
@@ -111,12 +117,12 @@ function get_program_list_data() {
 		}
 	   }else{
 		 if(i>0){
-		  // console.log("begintime=======",resources[i].begin)
+		 //  console.log("begintime=======",resources[i].display)
 		   var begintime=resources[i].begin
 		   arr=begintime.split(":")
 		   var min= parseInt(arr[1])*60
 		   var second= parseFloat(arr[2])
-		   //console.log("minute====",min)
+		  // console.log("minute====",min)
 		  // console.log("second====",second)
 		   var displaytime=min+second
            var myDate = new Date()
@@ -124,17 +130,24 @@ function get_program_list_data() {
 		   var cur_second = myDate.getSeconds()
 		   var cur_time= cur_min+cur_second
 		   var diff=cur_time-displaytime
-		   console.log("diff====",diff)
-		   if(diff<2 && diff >-2){
-		  	row++
+		   //if(diff<-1.5 && diff >-0.5){
+		   if(resources[i].display=='1'){
+                       fist_img++
+		       //console.log("diff====",diff)
+                     if(last_name == resources[i].poster){
+		   //      console.log("last_name====",last_name)
+		     //    console.log("name2====",resources[i].poster)
+                         continue  
+                     }
             newtr = newtr + "<td > <a href='#'><img src=" + resources[i].poster + " alt=" + resources[i].name +" </td>"
             newtr = newtr + "<td > <button ad_url='" + resources[i].adurl + "' " 
                           + "class='process_resource_ad'>购买</button> </td>"
 			tabnewtr=newtr
-			name= resources[i].name
+			last_name= resources[i].poster
 		   }
 		   else if(diff>=2){
-			if(row<3 ){
+		//	if(row<3 ){
+			if(0 ){
 		  	 row++
              newtr = newtr + "<td > <a href='#'><img src=" + resources[i].poster + " alt=" + resources[i].name +" </td>"
              newtr = newtr + "<td > <button ad_url='" + resources[i].adurl + "' " 
@@ -146,7 +159,7 @@ function get_program_list_data() {
 		 }
 	   }
      }
-    $("#programmeinfo").append(newtr);
+    $("#programmeinfo").prepend(newtr);
     $("#programmeinfo").trigger('create');
     set_programme_process_response()
 
