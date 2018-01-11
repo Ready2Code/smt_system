@@ -31,7 +31,7 @@ def create_additional_descriptor(resource):
     additional_content= {}
     additional_content["begin"] = resource["begin"]
     additional_content["end"]   = resource["end"]
-    additional_content["sequence"]   = resource["sequence"]    
+    additional_content["sequence"]   = resource["sequence"]if resource.has_key("sequence") else 1    
     additional_content["poster"]   = resource["poster"] if resource.has_key("poster") else ""    
     additional_content["type"]   = resource["type"]    
     additional_content["added"]   = resource["added"]   if resource.has_key("added") else "true" 
@@ -62,6 +62,8 @@ def create_MP_table(program):
     MP_table["assets"] = []
     for i in range(len(program["resources"])):
         resource = program["resources"][i]
+        if not resource.has_key("layout"):
+            continue
         asset = {}
         asset["Identifier_mapping"] = {}
         asset["Identifier_mapping"]["identifier_type"] = 0x00 #asset_id
