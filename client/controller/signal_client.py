@@ -334,7 +334,7 @@ def show_embeded_img(json_data):
           ad_begintime= get_time_second(begin_time)
           ad_endtime= get_time_second(end_time)
           diff=nowtime - ad_begintime
-          if diff >= -1.5 and diff <= -0.5:
+          if diff >= -0.5 and diff <=0.2:
              res['display']='1'
           else:
              res['display']='0'
