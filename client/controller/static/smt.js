@@ -79,6 +79,20 @@ var getFnName = function(callee){
 }
 var last_name=""
 var fist_img=0
+var arr_url = new Array()
+function get_display(url){
+    var  len=arr_url.length
+    if(len>0){
+      for(var i=0;i<len;i++){
+         if(arr_url[i] == url){
+           return true
+         }
+      }
+    }else{
+     return false
+    }     
+   return false
+}
 function get_program_list_data() {
     console.log(getFnName(arguments.callee))
     $.get("/currentprogramme/", function(ret){
@@ -89,7 +103,7 @@ function get_program_list_data() {
           $("tr.programme_info").remove()
         }
         set_resources(resources)
-        console.log(ret.programmer)
+      //  console.log(ret.programmer)
         var newtr = ""
         var row=0
         for(var i=0; i< resources.length; i++) {
@@ -134,9 +148,12 @@ function get_program_list_data() {
 		   if(resources[i].display=='1'){
                        fist_img++
 		       //console.log("diff====",diff)
-                     if(last_name == resources[i].poster){
+		   //  console.log("len====",arr_url.length)
+                     var ret=get_display(resources[i].poster)
+                    // if(last_name == resources[i].poster){
+                     if(ret){
 		   //      console.log("last_name====",last_name)
-		     //    console.log("name2====",resources[i].poster)
+		         console.log("name2====",resources[i].poster)
                          continue  
                      }
             newtr = newtr + "<td > <a href='#'><img src=" + resources[i].poster + " alt=" + resources[i].name +" </td>"
@@ -144,6 +161,8 @@ function get_program_list_data() {
                           + "class='process_resource_ad'>购买</button> </td>"
 			tabnewtr=newtr
 			last_name= resources[i].poster
+                        arr_url.push(resources[i].poster)
+		       // console.log("arr====",arr_url)
 		   }
 		   else if(diff>=2){
 		//	if(row<3 ){
