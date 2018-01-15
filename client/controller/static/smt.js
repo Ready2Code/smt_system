@@ -108,8 +108,6 @@ function get_program_list_data() {
         var row=0
         for(var i=0; i< resources.length; i++) {
             newtr = newtr + "<tr class='programme_info'> "
-       // console.log(resources[i].poster)
-       // console.log("added======",resources[i].added)
        if(resources[i].info!='embeded_ad'){
 		if( typeof(resources[i].added)=='undefined'  ||resources[i].added == 'true'){
         newtr = newtr + "<td > <a href='#'><img src=" + resources[i].poster + " alt=" + resources[i].name +" </td>"
@@ -132,47 +130,16 @@ function get_program_list_data() {
 	   }else{
 		 if(i>0){
 		 //  console.log("begintime=======",resources[i].display)
-		   var begintime=resources[i].begin
-		   arr=begintime.split(":")
-		   var min= parseInt(arr[1])*60
-		   var second= parseFloat(arr[2])
-		  // console.log("minute====",min)
-		  // console.log("second====",second)
-		   var displaytime=min+second
-           var myDate = new Date()
-		   var cur_min = myDate.getMinutes()*60
-		   var cur_second = myDate.getSeconds()
-		   var cur_time= cur_min+cur_second
-		   var diff=cur_time-displaytime
-		   //if(diff<-1.5 && diff >-0.5){
 		   if(resources[i].display=='1'){
-                       fist_img++
-		       //console.log("diff====",diff)
-		   //  console.log("len====",arr_url.length)
                      var ret=get_display(resources[i].poster)
-                    // if(last_name == resources[i].poster){
                      if(ret){
-		   //      console.log("last_name====",last_name)
-		         console.log("name2====",resources[i].poster)
                          continue  
                      }
             newtr = newtr + "<td > <a href='#'><img src=" + resources[i].poster + " alt=" + resources[i].name +" </td>"
             newtr = newtr + "<td > <button ad_url='" + resources[i].adurl + "' " 
                           + "class='process_resource_ad'>购买</button> </td>"
-			tabnewtr=newtr
 			last_name= resources[i].poster
                         arr_url.push(resources[i].poster)
-		       // console.log("arr====",arr_url)
-		   }
-		   else if(diff>=2){
-		//	if(row<3 ){
-			if(0 ){
-		  	 row++
-             newtr = newtr + "<td > <a href='#'><img src=" + resources[i].poster + " alt=" + resources[i].name +" </td>"
-             newtr = newtr + "<td > <button ad_url='" + resources[i].adurl + "' " 
-                           + "class='process_resource_ad'>购买</button> </td>"
-			}
-		      
 		   }
            newtr = newtr + "</tr>"
 		 }
