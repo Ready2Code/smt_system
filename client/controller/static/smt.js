@@ -101,6 +101,7 @@ function get_program_list_data() {
         external_resources=ret.programmer.external_resources
         if( typeof(external_resources)=='undefined'){
           $("tr.programme_info").remove()
+          arr_url=[]
         }
         set_resources(resources)
       //  console.log(ret.programmer)
