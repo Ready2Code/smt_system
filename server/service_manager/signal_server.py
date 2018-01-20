@@ -183,7 +183,10 @@ def add_embeded_ad_info(program_data,dir_path):
     resources=program_data['programmer']['resources']
     if(external_url != ''):
         (ad_path, name) = os.path.split(external_url)
-        external_url='file://'+dir_path+'/'+name
+        if platform.system() == "Windows":
+           external_url='file:///'+dir_path+'/'+name
+        if platform.system() == "Linux":
+           external_url='file://'+dir_path+'/'+name
         ad_data= url_load(external_url)
         ad_json=json.loads(ad_data)
 
