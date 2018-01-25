@@ -16,7 +16,7 @@ from subprocess import call,Popen,PIPE,STDOUT
 from utils import functions
 from utils import smt_proto 
 from utils import signal_format_converter 
-
+from ntpclient import ntpthread
 
 FNULL = open(os.devnull, 'w')
 DEFAULT = object()
@@ -323,6 +323,10 @@ def get_time_second(time):
     cur_time=minute+second
     return cur_time
 def show_embeded_img(json_data):
+    ntp_status = ntpthread.ntp_status
+    if ntp_status=='stop':
+       ntp_status=0.0
+    ntp_status = float(ntp_status)
     if json_data.has_key('programmer'):
       if json_data['programmer'].has_key('external_resources'):
        for res in json_data['programmer']['resources']:
@@ -330,17 +334,21 @@ def show_embeded_img(json_data):
           begin_time=res['begin']
           end_time=res['end']
           now_time = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time()))
-          nowtime= get_time_second(now_time)
+          nowtime= get_time_second(now_time) + ntp_status
           ad_begintime= get_time_second(begin_time)
           ad_endtime= get_time_second(end_time)
           diff=nowtime - ad_begintime
-          if diff >= -0.5 and diff <=0.2:
+          if diff >= -1 and diff <=0:
              res['display']='1'
           else:
              res['display']='0'
     return json_data
 
 def control_embeded_ad__reddot_display(json_data):
+    ntp_status = ntpthread.ntp_status
+    if ntp_status=='stop':
+       ntp_status=0.0
+    ntp_status = float(ntp_status)
     global related
     if json_data['programmer']['sequence']  > 0:
         for res in json_data['programmer']['resources']:
@@ -348,7 +356,7 @@ def control_embeded_ad__reddot_display(json_data):
                 begin_time=res['begin']
                 end_time=res['end']
                 now_time = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time()))
-                nowtime= get_time_second(now_time)
+                nowtime= get_time_second(now_time) + ntp_status
                 ad_begintime= get_time_second(begin_time)
                 ad_endtime= get_time_second(end_time)
                 diff=nowtime - ad_begintime

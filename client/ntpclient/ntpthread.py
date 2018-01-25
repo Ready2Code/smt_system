@@ -8,7 +8,7 @@ import traceback
 import threading
 ADJUST_THRESHOLD = 0.001
 INTERVAL = 3
-
+ntp_status=0
 class ntpThread (threading.Thread):
     def __init__(self):
         threading.Thread.__init__(self)
@@ -68,6 +68,9 @@ class ntpThread (threading.Thread):
         self.interval = s            
 
     def get_ntp_status(self):
+        global ntp_status
+       // print "get_ntp status=================="+self.status
+        ntp_status=self.status
         return self.status  
 
     def set_ntp_status(self, s):
