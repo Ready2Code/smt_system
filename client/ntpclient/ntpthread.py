@@ -69,7 +69,6 @@ class ntpThread (threading.Thread):
 
     def get_ntp_status(self):
         global ntp_status
-       // print "get_ntp status=================="+self.status
         ntp_status=self.status
         return self.status  
 
