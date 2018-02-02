@@ -29,8 +29,9 @@ CHANNEL_FILE = "channels.json"
 SCREEN_WIDTH = 3840
 SCREEN_HEIGHT = 2160
 
-is_gateway = 1
+is_gateway = 0
 GATEWAY_IP_ADDR = '192.168.100.11'
+GATEWAY_IP_LISTENING_PORT = 5005
 GATEWAY_IP_PORT = 8000
 LOCAL_IP_ADDR = '192.168.100.244'
 
@@ -403,6 +404,11 @@ def UDP_recv(port, channel_id, name):
                 continue
         program_json_data = json_data
         control_embeded_ad__reddot_display(json_data)
+        
+        ## Heart beat
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.sendto('add' , (GATEWAY_IP_ADDR, GATEWAY_IP_LISTENING_PORT))
+        
         if is_gateway == 1 and json_data['programmer']['sequence'] > 0:
             for res in json_data['programmer']['resources']:
                 if(res['type'] == 'broadcast'):
@@ -522,6 +528,9 @@ def initial(info_collector_dest='', device_name=''):
     global channel_info 
     global g_info_collector_dest
     global g_device_name
+
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    s.sendto('add' , (GATEWAY_IP_ADDR, GATEWAY_IP_LISTENING_PORT))
 
     g_info_collector_dest = info_collector_dest
     g_device_name = device_name
