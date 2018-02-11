@@ -91,7 +91,7 @@ def get_screen_resolution():
         SCREEN_WIDTH  = int(resolution[3])
         SCREEN_HEIGHT = int(resolution[2])
     else:
-        print "Invalid platform type",get_platform()
+        print "Can't get_screen_resolution on platform type:",get_platform()
     print 'screen resolution: '+ str(SCREEN_WIDTH)+ ' * '+ str(SCREEN_HEIGHT) 
 
 # window ={'id': xxxxx, 'type': 'fullscreen' or 'normal'
@@ -418,6 +418,7 @@ def UDP_recv(port, channel_id, name):
     last_id = ""
     last_begintime = ""
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     print 'binding sigalling port=%d' % port
     s.bind(('', port))
     print bcolors.OKBLUE + "{2} id [{0}] is listened on port {1}".format(channel_id, port, name.encode('utf-8').strip()) + bcolors.ENDC
