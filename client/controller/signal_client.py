@@ -439,9 +439,9 @@ def UDP_recv(port, channel_id, name):
         control_embeded_ad__reddot_display(json_data)
         
         ## Heart beat
-        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        s.sendto('add' , (GATEWAY_IP_ADDR, GATEWAY_IP_LISTENING_PORT))
-        
+        s_heart = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s_heart.sendto('add' , (GATEWAY_IP_ADDR, GATEWAY_IP_LISTENING_PORT))
+
         if is_gateway == 1 and json_data['programmer']['sequence'] > 0:
             for res in json_data['programmer']['resources']:
                 if(res['type'] == 'broadcast'):
