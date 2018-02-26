@@ -16,21 +16,35 @@ from subprocess import call,Popen,PIPE,STDOUT
 from utils import functions
 from utils import smt_proto 
 from utils import signal_format_converter 
-
+from ntpclient import ntpthread
 
 FNULL = open(os.devnull, 'w')
 DEFAULT = object()
 
 COMMAND_LISTEN_PORT = 9999
 FFPLAY_LISTEN_PORT = 8080
-RELATIVE_PATH = "../related/"
+PORT1 = 9431
+PORT2 = 9430
+
+def get_platform():
+    try:
+        import starglobal
+        return starglobal.platform
+    except:
+        return platform.system()
+		
+if get_platform() == 'Android':
+    RELATIVE_PATH = "/data/data/tv.danmaku.ijk.media.example/files/smt_system/related/"
+else:
+    RELATIVE_PATH = "../related/"
 CHANNEL_FILE = "channels.json"
 
 SCREEN_WIDTH = 3840
 SCREEN_HEIGHT = 2160
 
-is_gateway = 1
+is_gateway = 0
 GATEWAY_IP_ADDR = '192.168.100.11'
+GATEWAY_IP_LISTENING_PORT = 5005
 GATEWAY_IP_PORT = 8000
 LOCAL_IP_ADDR = '192.168.100.244'
 
@@ -65,19 +79,19 @@ class bcolors:
 def get_screen_resolution():
     global SCREEN_WIDTH
     global SCREEN_HEIGHT
-    if platform.system() == "Linux":
+    if get_platform() == "Linux":
         os.environ['DISPLAY'] = ':0.0'
         output = Popen('xrandr | grep "\*" | cut -d" " -f4',shell=True, stdout=PIPE, stderr=PIPE).communicate()[0]
         resolution = output.split()[0].split(b'x')
         SCREEN_WIDTH = int(resolution[0])
         SCREEN_HEIGHT = int(resolution[1])
-    elif platform.system() == "Windows":
+    elif get_platform() == "Windows":
         output = Popen("wmic DESKTOPMONITOR get screenwidth, screenheight", shell=True, stdout=PIPE, stderr=PIPE).communicate()[0]
         resolution = output.split()
         SCREEN_WIDTH  = int(resolution[3])
         SCREEN_HEIGHT = int(resolution[2])
     else:
-        print "can't get platform type"
+        print "Can't get_screen_resolution on platform type:",get_platform()
     print 'screen resolution: '+ str(SCREEN_WIDTH)+ ' * '+ str(SCREEN_HEIGHT) 
 
 # window ={'id': xxxxx, 'type': 'fullscreen' or 'normal'
@@ -161,9 +175,9 @@ def call_ffplay(res):
     str_quick=' -analyzeduration 100 -probesize 50 -framedrop '
     str_type = ' -type ' + res_type
 
-    if platform.system() == "Windows":
+    if get_platform() == "Windows":
         ffplay_command = RELATIVE_PATH + 'ffplay.exe' + ' '
-    if platform.system() == "Linux":
+    if get_platform() == "Linux":
         ffplay_command = RELATIVE_PATH + 'ffplay' + ' '
 
     if g_info_collector_dest != '' and g_device_name != '':
@@ -185,6 +199,11 @@ def call_ffplay(res):
     window_stack_push(res['id'],res['url'],'fullscreen')
     #p = Popen(shlex.split(ffplay_command))
     pffplay = ffplay_command
+
+    if get_platform() == 'Android':
+        send_cmd = "cal-" + res['url']
+        control_player(send_cmd)
+
     ffplay_pid = ffplay_pid + 1
     try:
         thread.start_new_thread( os.system, (ffplay_command, ) )
@@ -260,9 +279,15 @@ def add_ffplay(res, full = DEFAULT):
     add_command['format']['width'] = cal_screen_value(res['layout']['width'], True)
     add_command['format']['height'] = cal_screen_value(res['layout']['height'], False)
     addcommand = json.dumps(add_command)
-    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    print "addcommand=%s" % addcommand
-    s.sendto(addcommand,("localhost", FFPLAY_LISTEN_PORT))
+    if get_platform() == 'Android':
+        send_cmd = "add-" + name
+        control_player(send_cmd)
+    else:
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        print "addcommand=%s" % addcommand
+        s.sendto(addcommand,("localhost", FFPLAY_LISTEN_PORT))
+
+
 
     if(related == 'true'):
         time.sleep(2)
@@ -292,14 +317,22 @@ def del_ffplay(res, pid=0):
     del_command['server'] = server_ip
     del_command['format']['name'] = name
     delcommand = json.dumps(del_command)
-    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    s.sendto(delcommand, ('localhost', FFPLAY_LISTEN_PORT))
+    if get_platform() != 'Android':
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.sendto(delcommand, ('localhost', FFPLAY_LISTEN_PORT))
+    else:
+        send_cmd = "del-" + name
+        control_player(send_cmd)
 
 def prompt_add():    
     add_command = {'type':'reddot','format': {'name': ''}}
     addcommand = json.dumps(add_command)
-    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    s.sendto(addcommand,("localhost", FFPLAY_LISTEN_PORT))
+    if get_platform() != 'Android':
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.sendto(addcommand,("localhost", FFPLAY_LISTEN_PORT))
+    else:
+        send_cmd = "reddot-" + " "
+        image_player(send_cmd)
 
 def prompt_del():
     prompt_add()
@@ -323,6 +356,10 @@ def get_time_second(time):
     cur_time=minute+second
     return cur_time
 def show_embeded_img(json_data):
+    ntp_status = ntpthread.ntp_status
+    if ntp_status=='stop':
+       ntp_status=0.0
+    ntp_status = float(ntp_status)
     if json_data.has_key('programmer'):
       if json_data['programmer'].has_key('external_resources'):
        for res in json_data['programmer']['resources']:
@@ -330,17 +367,21 @@ def show_embeded_img(json_data):
           begin_time=res['begin']
           end_time=res['end']
           now_time = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time()))
-          nowtime= get_time_second(now_time)
+          nowtime= get_time_second(now_time) + ntp_status
           ad_begintime= get_time_second(begin_time)
           ad_endtime= get_time_second(end_time)
           diff=nowtime - ad_begintime
-          if diff >= -0.5 and diff <=0.2:
+          if diff >= -1 and diff <=0:
              res['display']='1'
           else:
              res['display']='0'
     return json_data
 
 def control_embeded_ad__reddot_display(json_data):
+    ntp_status = ntpthread.ntp_status
+    if ntp_status=='stop':
+       ntp_status=0.0
+    ntp_status = float(ntp_status)
     global related
     if json_data['programmer']['sequence']  > 0:
         for res in json_data['programmer']['resources']:
@@ -348,7 +389,7 @@ def control_embeded_ad__reddot_display(json_data):
                 begin_time=res['begin']
                 end_time=res['end']
                 now_time = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time()))
-                nowtime= get_time_second(now_time)
+                nowtime= get_time_second(now_time) + ntp_status
                 ad_begintime= get_time_second(begin_time)
                 ad_endtime= get_time_second(end_time)
                 diff=nowtime - ad_begintime
@@ -377,6 +418,7 @@ def UDP_recv(port, channel_id, name):
     last_id = ""
     last_begintime = ""
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     print 'binding sigalling port=%d' % port
     s.bind(('', port))
     print bcolors.OKBLUE + "{2} id [{0}] is listened on port {1}".format(channel_id, port, name.encode('utf-8').strip()) + bcolors.ENDC
@@ -395,6 +437,11 @@ def UDP_recv(port, channel_id, name):
                 continue
         program_json_data = json_data
         control_embeded_ad__reddot_display(json_data)
+        
+        ## Heart beat
+        s_heart = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s_heart.sendto('add' , (GATEWAY_IP_ADDR, GATEWAY_IP_LISTENING_PORT))
+
         if is_gateway == 1 and json_data['programmer']['sequence'] > 0:
             for res in json_data['programmer']['resources']:
                 if(res['type'] == 'broadcast'):
@@ -462,6 +509,17 @@ def COMMAND_recv(port):
             t = Thread(target=add_ffplay, args=(json_data, ))
             t.start()
 
+def control_player(ccmd):
+    s1 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    s1.sendto(ccmd, ('localhost', PORT1))
+    print "Success send ...", ccmd
+    s1.close()
+def image_player(ccmd):
+    s2 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    s2.sendto(ccmd, ('localhost', PORT2))
+    print "Image Success send ...", ccmd
+    s2.close()
+
 def play_json(json_data):
     #print 'play_json'
     global pffplay
@@ -514,6 +572,9 @@ def initial(info_collector_dest='', device_name=''):
     global channel_info 
     global g_info_collector_dest
     global g_device_name
+
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    s.sendto('add' , (GATEWAY_IP_ADDR, GATEWAY_IP_LISTENING_PORT))
 
     g_info_collector_dest = info_collector_dest
     g_device_name = device_name
@@ -684,9 +745,12 @@ def stop_play(val = DEFAULT):
 def render():
     render_command = {'type':'render','format': {'name': ''}}
     rendercommand = json.dumps(render_command)
-    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    s.sendto(rendercommand,("localhost", FFPLAY_LISTEN_PORT))
-
+    if get_platform() != 'Android':
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.sendto(rendercommand,("localhost", FFPLAY_LISTEN_PORT))
+    else:
+        send_cmd = "render-render"
+        control_player(send_cmd)
 
 def exit():
     print bcolors.OKGREEN + 'goodbye & have a good day...' + bcolors.ENDC

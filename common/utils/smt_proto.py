@@ -3,8 +3,19 @@ import socket
 import struct
 import sys
 import json
-reload(sys)
-sys.setdefaultencoding('utf-8')
+import platform
+def get_platform():
+    try:
+        import starglobal
+        return starglobal.platform
+    except:
+        return platform.system()
+if get_platform() != 'Android':
+    print "reload sys"
+    reload(sys)
+    sys.setdefaultencoding('utf-8')
+else:
+    print "NOTIFY: reload(sys) is disable here, if smt_proto do not work, pls check here"
 SMTP_HEADER_LENGTH = 16
 SMTP_PAYLOAD_HEADER_LENGTH = 4
 SMT_MESSAGE_HEADER_LENGTH = 7

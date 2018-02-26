@@ -80,6 +80,7 @@ var getFnName = function(callee){
 var last_name=""
 var fist_img=0
 var arr_url = new Array()
+var begin_time=""
 function get_display(url){
     var  len=arr_url.length
     if(len>0){
@@ -103,7 +104,12 @@ function get_program_list_data() {
           $("tr.programme_info").remove()
           arr_url=[]
         }
+        if( begin_time == 'undefined'|| begin_time != ret.programmer.begin){
+          $("tr.programme_info").remove()
+          arr_url=[]
+        }
         set_resources(resources)
+        begin_time=ret.programmer.begin
       //  console.log(ret.programmer)
         var newtr = ""
         var row=0
