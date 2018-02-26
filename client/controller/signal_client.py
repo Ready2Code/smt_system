@@ -280,7 +280,7 @@ def add_ffplay(res, full = DEFAULT):
     add_command['format']['height'] = cal_screen_value(res['layout']['height'], False)
     addcommand = json.dumps(add_command)
     if get_platform() == 'Android':
-        send_cmd = "add-" + name
+        send_cmd = "add-" + url
         control_player(send_cmd)
     else:
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
