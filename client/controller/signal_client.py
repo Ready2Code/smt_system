@@ -23,7 +23,8 @@ DEFAULT = object()
 
 COMMAND_LISTEN_PORT = 9999
 FFPLAY_LISTEN_PORT = 8080
-PORT1 = 9431
+ANDROID_FFPLAY_LISTEN_PORT = 8811
+PORT1 = 8080
 PORT2 = 9430
 
 def get_platform():
@@ -66,6 +67,7 @@ last_res = {}
 signal_thread = None
 smtproto = smt_proto.SmtProto()
 program_json_data = {}
+embedded_ad_url=""
 class bcolors:
     HEADER = '\033[95m'
     OKBLUE = '\033[94m'
@@ -281,6 +283,7 @@ def add_ffplay(res, full = DEFAULT):
     addcommand = json.dumps(add_command)
     if get_platform() == 'Android':
         send_cmd = "add-" + url
+        print "send add@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" + send_cmd
         control_player(send_cmd)
     else:
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -321,17 +324,20 @@ def del_ffplay(res, pid=0):
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         s.sendto(delcommand, ('localhost', FFPLAY_LISTEN_PORT))
     else:
-        send_cmd = "del-" + name
+        send_cmd = "del-" + url
         control_player(send_cmd)
 
-def prompt_add():    
+def prompt_add():
+    global embedded_ad_url
     add_command = {'type':'reddot','format': {'name': ''}}
     addcommand = json.dumps(add_command)
     if get_platform() != 'Android':
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         s.sendto(addcommand,("localhost", FFPLAY_LISTEN_PORT))
     else:
-        send_cmd = "reddot-" + " "
+        send_cmd = "reddot-" + embedded_ad_url
+        if embedded_ad_url.find('jpg')== -1:
+                return
         image_player(send_cmd)
 
 def prompt_del():
@@ -343,11 +349,17 @@ def type_update(res, orig):
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     s.sendto(addcommand,("localhost", FFPLAY_LISTEN_PORT))
 
-def fullscreen(res):    
+def fullscreen(res):
+    print "fullscreen@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" + send_cmd
     full_command = {'type':'full','format': {'name': res['url']}}
     fullcommand = json.dumps(full_command)
-    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    s.sendto(fullcommand,("localhost", FFPLAY_LISTEN_PORT))
+    if get_platform() == 'Android':
+       send_cmd = "add-" + res['url']
+       print "fullscreen@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" + send_cmd
+       control_player(send_cmd)
+    else:
+      s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+      s.sendto(fullcommand,("localhost", FFPLAY_LISTEN_PORT))
 
 def get_time_second(time):
     timearr= re.split(":",time)  
@@ -383,6 +395,7 @@ def control_embeded_ad__reddot_display(json_data):
        ntp_status=0.0
     ntp_status = float(ntp_status)
     global related
+    global embedded_ad_url
     if json_data['programmer']['sequence']  > 0:
         for res in json_data['programmer']['resources']:
             if res.has_key('info') and res['info'] == 'embeded_ad':
@@ -398,10 +411,15 @@ def control_embeded_ad__reddot_display(json_data):
 #         print "begintime ===================================\n",begin_time
 #         print "endtime ===================================\n", end_time
 #         print "now_time===================================\n" ,nowtime
-#         print "diff===================================\n" ,diff
+#                print "diff===================================\n" ,diff
 #         print "diff2===================================\n" ,diff2
-                if diff > -2 and diff < 1:
+                if diff >= -2 and diff <= 2:
+                  print "diff===================================\n" ,diff
+                if diff >= -1 and diff <= 1:
                     related='true'
+                    if res.has_key('poster'):
+                       embedded_ad_url=res['poster']
+                       print "name poster===================================\n",res['poster']
                     prompt_add()
                 if diff2 > 0 and related=='true':
                     related='false'
@@ -556,7 +574,6 @@ def exception():
 
 def handle_command(command):
     option = command.split(' ')
-
     if(option[0] not in options.keys()):
         print bcolors.FAIL + 'unknown command, use help' + bcolors.ENDC
         return
@@ -674,7 +691,12 @@ def play_programmer(val = DEFAULT, full = DEFAULT):
                     fullscreen(res)
                     window_stack_fullscreen_type(res['id'])
                 elif window_stack_check_type(res['id']) == 'fullscreen':
-                    print 'invalid operations. full screen cannot be changed to normal.'
+                    if get_platform() == 'Android':
+                       t = Thread(target=add_ffplay, args=(res, full))
+                       t.setDaemon(True)
+                       t.start()
+                    else:
+                        print 'invalid operations. full screen cannot be changed to normal.'
                 else:
                     t = Thread(target=add_ffplay, args=(res, full))
                     t.setDaemon(True)
@@ -750,6 +772,7 @@ def render():
         s.sendto(rendercommand,("localhost", FFPLAY_LISTEN_PORT))
     else:
         send_cmd = "render-render"
+        print "recv cmd render@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
         control_player(send_cmd)
 
 def exit():
