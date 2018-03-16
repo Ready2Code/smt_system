@@ -193,6 +193,8 @@ def call_ffplay(res):
         if ('bk' in res.keys()):
             str_bk = '-bk '+ res['bk'] + ' '
         ffplay_command =(ffplay_command + str_sync + str_avlogext + res['url'] + ' ' + str_port + str_bk + str_quick + str_type)
+    else:
+        ffplay_command =(ffplay_command + str_sync + str_avlogext + res['url'] + ' ' + str_port + str_bk + str_quick + str_type)
 
     print ffplay_command
     window_stack_clean()
@@ -309,8 +311,10 @@ def del_ffplay(res, pid=0):
     (server_ip, name) = get_ip_and_name_from_url(url)
 
     # full screen cannot be closed
-    if cal_screen_value(res['layout']['width'], True) == SCREEN_WIDTH and cal_screen_value(res['layout']['height'], False) == SCREEN_HEIGHT:  return
-    if window_stack_check_type(res['id']) == 'fullscreen' : return 
+#    if cal_screen_value(res['layout']['width'], True) == SCREEN_WIDTH and cal_screen_value(res['layout']['height'], False) == SCREEN_HEIGHT: 
+#        return
+#    if window_stack_check_type(res['id']) == 'fullscreen' : 
+#        return 
     window_stack_pop(res['id'])
     if(related == 'true'):    prompt_del()
     del_command = {'type':'del', 'server': '', 'format': {'name': ''}}
