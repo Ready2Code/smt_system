@@ -292,6 +292,7 @@ function drawbitrateCharts() {
                             document.getElementById('delay_broadband').value="";
                           }
                          }*/
+                         broadband_bitrate=broadband_bitrate-0.5;
                          document.getElementById('bitrate_server1').value=broadband_bitrate.toPrecision(4)+"Mb/s";
                          broadband_bitrate=0;
                        }
