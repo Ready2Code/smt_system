@@ -17,9 +17,10 @@ def ts_adapter(request):
      #return render(request,'login.html',{'url':url})
 def update_list(request):
     all_items = TsAdapterSettings.objects.all()
-    json_str = ''
+    json_str = '[]'
     if all_items:
         json_str = serializers.serialize("json",all_items)
+    print json_str
     return HttpResponse(json_str, content_type='application/json')
 
 def modify_item(request):
