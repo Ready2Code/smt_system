@@ -11,6 +11,7 @@ import os
 import platform
 import thread
 from datetime import datetime, timedelta
+import _strptime
 from threading import Timer, Thread, Event
 from subprocess import call,Popen,PIPE,STDOUT
 from utils import functions
@@ -23,7 +24,8 @@ DEFAULT = object()
 
 COMMAND_LISTEN_PORT = 9999
 FFPLAY_LISTEN_PORT = 8080
-PORT1 = 9431
+ANDROID_FFPLAY_LISTEN_PORT = 8811
+PORT1 = 8080
 PORT2 = 9430
 
 def get_platform():
@@ -43,7 +45,7 @@ SCREEN_WIDTH = 3840
 SCREEN_HEIGHT = 2160
 
 is_gateway = 0
-GATEWAY_IP_ADDR = '192.168.100.11'
+GATEWAY_IP_ADDR = '192.168.100.11'  
 GATEWAY_IP_LISTENING_PORT = 5005
 GATEWAY_IP_PORT = 8000
 LOCAL_IP_ADDR = '192.168.100.244'
@@ -66,6 +68,7 @@ last_res = {}
 signal_thread = None
 smtproto = smt_proto.SmtProto()
 program_json_data = {}
+embedded_ad_url=""
 class bcolors:
     HEADER = '\033[95m'
     OKBLUE = '\033[94m'
@@ -200,11 +203,18 @@ def call_ffplay(res):
     window_stack_clean()
     window_stack_push(res['id'],res['url'],'fullscreen')
     #p = Popen(shlex.split(ffplay_command))
-    pffplay = ffplay_command
 
     if get_platform() == 'Android':
-        send_cmd = "cal-" + res['url']
+        if res['info'] != 'embeded_ad':
+            if res['type'] == 'broadcast':
+                send_cmd = "cal-" + res['url'] + '-broadcast'
+            elif res['type'] == 'broadband':
+                send_cmd = "cal-" + res['url'] + '-broadband'
+        else:
+            send_cmd = "cal-" + res['url'] + '-embeded_ad'
         control_player(send_cmd)
+    else:
+        pffplay = ffplay_command
 
     ffplay_pid = ffplay_pid + 1
     try:
@@ -282,8 +292,12 @@ def add_ffplay(res, full = DEFAULT):
     add_command['format']['height'] = cal_screen_value(res['layout']['height'], False)
     addcommand = json.dumps(add_command)
     if get_platform() == 'Android':
-        send_cmd = "add-" + name
+        send_cmd = "add-" + url
+        print "send add@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" + send_cmd
         control_player(send_cmd)
+        #ser_url = url_parser(res['url'])
+        #connect_server(ser_url['ip'], ser_url['port'], 'add')
+        #print "send add@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
     else:
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         print "addcommand=%s" % addcommand
@@ -325,17 +339,22 @@ def del_ffplay(res, pid=0):
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         s.sendto(delcommand, ('localhost', FFPLAY_LISTEN_PORT))
     else:
-        send_cmd = "del-" + name
+        send_cmd = "del-" + url
         control_player(send_cmd)
+        #ser_url = url_parser(res['url'])
+        #connect_server(ser_url['ip'], ser_url['port'], 'delete')
 
-def prompt_add():    
+def prompt_add():
+    global embedded_ad_url
     add_command = {'type':'reddot','format': {'name': ''}}
     addcommand = json.dumps(add_command)
     if get_platform() != 'Android':
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         s.sendto(addcommand,("localhost", FFPLAY_LISTEN_PORT))
     else:
-        send_cmd = "reddot-" + " "
+        send_cmd = "reddot-" + embedded_ad_url
+        if embedded_ad_url.find('jpg')== -1:
+                return
         image_player(send_cmd)
 
 def prompt_del():
@@ -344,14 +363,32 @@ def prompt_del():
 def type_update(res, orig):    
     add_command = {'type':'type','format': {'orig': orig,'name':res['url'],'type': res['type']}}
     addcommand = json.dumps(add_command)
-    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    s.sendto(addcommand,("localhost", FFPLAY_LISTEN_PORT))
+    if get_platform() != 'Android':
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.sendto(addcommand, ('localhost', FFPLAY_LISTEN_PORT))
+    else:
+        if res['info'] != 'embeded_ad':
+            if res['type'] == 'broadcast':
+                send_cmd = "cal-" + res['url'] + '-broadcast'
+            elif res['type'] == 'broadband':
+                send_cmd = "cal-" + res['url'] + '-broadband'
+        else:
+            send_cmd = "cal-" + res['url'] + '-embeded_ad'
+        control_player(send_cmd)
+        #ser_url = url_parser(res['url'])
+        #connect_server(ser_url['ip'], ser_url['port'], 'add')
 
-def fullscreen(res):    
+def fullscreen(res):
+    print "fullscreen@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" + send_cmd
     full_command = {'type':'full','format': {'name': res['url']}}
     fullcommand = json.dumps(full_command)
-    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    s.sendto(fullcommand,("localhost", FFPLAY_LISTEN_PORT))
+    if get_platform() == 'Android':
+       send_cmd = "add-" + res['url']
+       print "fullscreen@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" + send_cmd
+       control_player(send_cmd)
+    else:
+      s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+      s.sendto(fullcommand,("localhost", FFPLAY_LISTEN_PORT))
 
 def get_time_second(time):
     timearr= re.split(":",time)  
@@ -387,6 +424,7 @@ def control_embeded_ad__reddot_display(json_data):
        ntp_status=0.0
     ntp_status = float(ntp_status)
     global related
+    global embedded_ad_url
     if json_data['programmer']['sequence']  > 0:
         for res in json_data['programmer']['resources']:
             if res.has_key('info') and res['info'] == 'embeded_ad':
@@ -402,10 +440,15 @@ def control_embeded_ad__reddot_display(json_data):
 #         print "begintime ===================================\n",begin_time
 #         print "endtime ===================================\n", end_time
 #         print "now_time===================================\n" ,nowtime
-#         print "diff===================================\n" ,diff
+#                print "diff===================================\n" ,diff
 #         print "diff2===================================\n" ,diff2
-                if diff > -2 and diff < 1:
+                if diff >= -2 and diff <= 2:
+                  print "diff===================================\n" ,diff
+                if diff >= -1 and diff <= 1:
                     related='true'
+                    if res.has_key('poster'):
+                       embedded_ad_url=res['poster']
+                       print "name poster===================================\n",res['poster']
                     prompt_add()
                 if diff2 > 0 and related=='true':
                     related='false'
@@ -523,6 +566,21 @@ def image_player(ccmd):
     s2.sendto(ccmd, ('localhost', PORT2))
     print "Image Success send ...", ccmd
     s2.close()
+def connect_server(serverip, serverport, con_type):
+    s3 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    ccmd = con_type + " SOURCE"
+    s3.sendto(ccmd, (serverip, int(serverport)))
+    print "connect server ...", ccmd
+def url_parser(url):
+    res = {}
+    myurl = url.split(":")
+    if len(myurl) == 3:
+        res['u_type'] = 'broadcast'
+    elif len(myurl) == 4:
+        res['ip'] = myurl[1].lstrip('//')
+        res['port'] = myurl[2].rstrip('@')    
+        res['u_type'] = 'broadband'
+    return res
 
 def play_json(json_data):
     #print 'play_json'
@@ -587,11 +645,12 @@ def initial(info_collector_dest='', device_name=''):
     # each channel is assigned one thread to handle its broadcast signaling
     for channel in channel_info['channels']:
         port = int(channel['url'].split(':')[-1])
+        print "Smt: port ====", port
 
         if is_gateway == 1:
             s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             s.sendto('add '+ LOCAL_IP_ADDR + ':' + str(port) , (GATEWAY_IP_ADDR, GATEWAY_IP_PORT))
-
+            print "send add to gateway@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
         t = Thread(target=UDP_recv, args=(port,channel['id'],channel['name']))
         t.setDaemon(True)
         t.start()
@@ -678,7 +737,12 @@ def play_programmer(val = DEFAULT, full = DEFAULT):
                     fullscreen(res)
                     window_stack_fullscreen_type(res['id'])
                 elif window_stack_check_type(res['id']) == 'fullscreen':
-                    print 'invalid operations. full screen cannot be changed to normal.'
+                    if get_platform() == 'Android':
+                       t = Thread(target=add_ffplay, args=(res, full))
+                       t.setDaemon(True)
+                       t.start()
+                    else:
+                        print 'invalid operations. full screen cannot be changed to normal.'
                 else:
                     t = Thread(target=add_ffplay, args=(res, full))
                     t.setDaemon(True)
@@ -754,6 +818,7 @@ def render():
         s.sendto(rendercommand,("localhost", FFPLAY_LISTEN_PORT))
     else:
         send_cmd = "render-render"
+        print "recv cmd render@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
         control_player(send_cmd)
 
 def exit():
