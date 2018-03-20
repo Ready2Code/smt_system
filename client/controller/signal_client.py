@@ -11,6 +11,7 @@ import os
 import platform
 import thread
 from datetime import datetime, timedelta
+import _strptime
 from threading import Timer, Thread, Event
 from subprocess import call,Popen,PIPE,STDOUT
 from utils import functions
@@ -44,7 +45,7 @@ SCREEN_WIDTH = 3840
 SCREEN_HEIGHT = 2160
 
 is_gateway = 0
-GATEWAY_IP_ADDR = '192.168.100.11'
+GATEWAY_IP_ADDR = '192.168.100.11'  
 GATEWAY_IP_LISTENING_PORT = 5005
 GATEWAY_IP_PORT = 8000
 LOCAL_IP_ADDR = '192.168.100.244'
@@ -200,11 +201,18 @@ def call_ffplay(res):
     window_stack_clean()
     window_stack_push(res['id'],res['url'],'fullscreen')
     #p = Popen(shlex.split(ffplay_command))
-    pffplay = ffplay_command
 
     if get_platform() == 'Android':
-        send_cmd = "cal-" + res['url']
+        if res['info'] != 'embeded_ad':
+            if res['type'] == 'broadcast':
+                send_cmd = "cal-" + res['url'] + '-broadcast'
+            elif res['type'] == 'broadband':
+                send_cmd = "cal-" + res['url'] + '-broadband'
+        else:
+            send_cmd = "cal-" + res['url'] + '-embeded_ad'
         control_player(send_cmd)
+    else:
+        pffplay = ffplay_command
 
     ffplay_pid = ffplay_pid + 1
     try:
@@ -285,6 +293,9 @@ def add_ffplay(res, full = DEFAULT):
         send_cmd = "add-" + url
         print "send add@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" + send_cmd
         control_player(send_cmd)
+        #ser_url = url_parser(res['url'])
+        #connect_server(ser_url['ip'], ser_url['port'], 'add')
+        #print "send add@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
     else:
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         print "addcommand=%s" % addcommand
@@ -326,6 +337,8 @@ def del_ffplay(res, pid=0):
     else:
         send_cmd = "del-" + url
         control_player(send_cmd)
+        #ser_url = url_parser(res['url'])
+        #connect_server(ser_url['ip'], ser_url['port'], 'delete')
 
 def prompt_add():
     global embedded_ad_url
@@ -346,8 +359,20 @@ def prompt_del():
 def type_update(res, orig):    
     add_command = {'type':'type','format': {'orig': orig,'name':res['url'],'type': res['type']}}
     addcommand = json.dumps(add_command)
-    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    s.sendto(addcommand,("localhost", FFPLAY_LISTEN_PORT))
+    if get_platform() != 'Android':
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.sendto(addcommand, ('localhost', FFPLAY_LISTEN_PORT))
+    else:
+        if res['info'] != 'embeded_ad':
+            if res['type'] == 'broadcast':
+                send_cmd = "cal-" + res['url'] + '-broadcast'
+            elif res['type'] == 'broadband':
+                send_cmd = "cal-" + res['url'] + '-broadband'
+        else:
+            send_cmd = "cal-" + res['url'] + '-embeded_ad'
+        control_player(send_cmd)
+        #ser_url = url_parser(res['url'])
+        #connect_server(ser_url['ip'], ser_url['port'], 'add')
 
 def fullscreen(res):
     print "fullscreen@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" + send_cmd
@@ -537,6 +562,21 @@ def image_player(ccmd):
     s2.sendto(ccmd, ('localhost', PORT2))
     print "Image Success send ...", ccmd
     s2.close()
+def connect_server(serverip, serverport, con_type):
+    s3 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    ccmd = con_type + " SOURCE"
+    s3.sendto(ccmd, (serverip, int(serverport)))
+    print "connect server ...", ccmd
+def url_parser(url):
+    res = {}
+    myurl = url.split(":")
+    if len(myurl) == 3:
+        res['u_type'] = 'broadcast'
+    elif len(myurl) == 4:
+        res['ip'] = myurl[1].lstrip('//')
+        res['port'] = myurl[2].rstrip('@')    
+        res['u_type'] = 'broadband'
+    return res
 
 def play_json(json_data):
     #print 'play_json'
@@ -574,6 +614,7 @@ def exception():
 
 def handle_command(command):
     option = command.split(' ')
+
     if(option[0] not in options.keys()):
         print bcolors.FAIL + 'unknown command, use help' + bcolors.ENDC
         return
@@ -600,11 +641,12 @@ def initial(info_collector_dest='', device_name=''):
     # each channel is assigned one thread to handle its broadcast signaling
     for channel in channel_info['channels']:
         port = int(channel['url'].split(':')[-1])
+        print "Smt: port ====", port
 
         if is_gateway == 1:
             s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             s.sendto('add '+ LOCAL_IP_ADDR + ':' + str(port) , (GATEWAY_IP_ADDR, GATEWAY_IP_PORT))
-
+            print "send add to gateway@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
         t = Thread(target=UDP_recv, args=(port,channel['id'],channel['name']))
         t.setDaemon(True)
         t.start()
