@@ -581,13 +581,13 @@ def start_smt_system(programs_file=CONFIG_FILE_NAME,
             endtime = convert['programmer']['end'] - timedelta(milliseconds=(aheadtime+cachetime))
 
 
-            while (endtime - datetime.now()).seconds > 0.05:
+            while (endtime - datetime.now()).total_seconds() > 0.05:
                 if start_system_flag==0:
                     return
                 time.sleep(0.05)
             if start_system_flag==0:
                 return
-            time.sleep((endtime - datetime.now()).seconds)
+            time.sleep((endtime - datetime.now()).total_seconds())
 
             if play_order_type == PlayOrderType.onebyone and i == programmers[len(programmers)-1]:
                 return
