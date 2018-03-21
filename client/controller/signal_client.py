@@ -221,11 +221,11 @@ def call_ffplay(res):
     delta = endtime - curr_time 
 
     cur_ffplay_id = ffplay_pid
-    time.sleep(delta.seconds)
+    time.sleep(delta.total_seconds())
     if res.has_key('name'):
-        print delta.seconds, "passed  resource [", res['name'], "] is closed"
+        print delta.total_seconds(), "passed  resource [", res['name'], "] is closed"
     else:
-        print delta.seconds, "passed  resource [", res['id'], "] is closed"
+        print delta.total_seconds(), "passed  resource [", res['id'], "] is closed"
     del_ffplay(res, cur_ffplay_id)
 
 def time_remove_timezone(stime, zone_offset='default'):
@@ -297,8 +297,8 @@ def add_ffplay(res, full = DEFAULT):
     delta = endtime - curr_time
         # add 1 more second 
     cur_ffplay_id = ffplay_pid
-    time.sleep(delta.seconds)
-    print delta.seconds, "passed  resource [", res['name'], "] is closed"
+    time.sleep(delta.total_seconds())
+    print delta.total_seconds(), "passed  resource [", res['name'], "] is closed"
     del_ffplay(res, cur_ffplay_id)
 
 def del_ffplay(res, pid=0):
